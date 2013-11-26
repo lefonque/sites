@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=com.microsoft.sqlserver.jdbc -DartifactId=sqljdbc4 -Dversion=3.0 -Dpackaging=jar -Dfile=파일이 있는 경로\sqljdbc4.jar 

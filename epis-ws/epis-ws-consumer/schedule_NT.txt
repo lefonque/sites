@@ -1,0 +1,6 @@
+SCHTASKS /Create /TN "epis sample schedule" /TR calc.exe /SC DAILY /SD 2013/11/01 /ST 17:10
+SCHTASKS /Delete /TN "epis sample schedule" /F
+
+# Windows 2000
+AT 11:00 /every M,T,W,Th,F,S,Su calc.exe
+AT 1 /delete/yes

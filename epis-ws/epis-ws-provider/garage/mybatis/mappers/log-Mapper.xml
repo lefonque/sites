@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.epis.ws.provider.dao.core.LogDAO">
+
+
+	<resultMap id="mapLog" type="LogVO">
+		<id property="userId" column="USER_ID" javaType="string" />
+		<result property="pass" column="PASS" javaType="string" />
+		<result property="clientId" column="CLIENT_ID" javaType="string" />
+	</resultMap>
+	
+	<insert id="insertLog" parameterType="LogVO">
+		INSERT INTO tbl_log(
+			username, ip, type, status, create_date
+		)
+		VALUES(
+			#{username, jdbcType=VARCHAR}
+			,#{ip, jdbcType=VARCHAR}
+			,#{type, jdbcType=VARCHAR}
+			,#{status, jdbcType=CHAR}
+			,#{createDate, jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+</mapper>

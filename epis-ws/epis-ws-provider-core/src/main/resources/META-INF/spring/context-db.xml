@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+  <!-- ====================================================== -->
+  <!-- DataSource 정의 										-->
+  <!-- ====================================================== -->
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+  	p:driverClassName="#{jdbc['db.hsqldb.driver.class']}" p:url="#{jdbc['db.hsqldb.url']}"
+  	p:username="#{jdbc['db.hsqldb.username']}" p:password="#{jdbc['db.hsqldb.password']}"/>
+  
+  <!-- 
+  <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
+  	p:URL="#{jdbc['db.oracle.url']}" p:user="#{jdbc['db.oracle.username']}"
+  	p:password="#{jdbc['db.oracle.password']}"/>
+  -->	
+	
+  <!-- ====================================================== -->
+  <!-- Mybatis-Spring Integration 							-->
+  <!-- => not compatible for executing a SQL made on Runtime.	-->
+  <!-- => use JdbcTemplate on Spring JDBC.					-->
+  <!-- ====================================================== -->
+  <!-- 
+  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+  	p:dataSource-ref="dataSource"
+  	p:configLocation="classpath:/META-INF/mybatis/mybatis-config.xml"
+  	p:mapperLocations="classpath:/META-INF/mybatis/mappers/**/*-Mapper.xml"
+  	p:typeAliasesPackage="org.epis.ws.provider.entity"/>
+   -->
+  <!-- New Style
+  <mybatis:scan base-package="org.epis.ws"
+  	annotation="org.springframework.stereotype.Repository" factory-ref="sqlSessionFactory"/>
+   -->
+  <!-- Old Style
+  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+  	p:annotationClass="org.springframework.stereotype.Repository"
+  	p:basePackage="org.epis.ws.provider.dao"
+  	p:sqlSessionFactoryBeanName="sqlSessionFactory"/>
+   -->
+	
+	
+	
+  
+</beans>

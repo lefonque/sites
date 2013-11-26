@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="EPISWSGateway"
+  targetNamespace="http://ws.epis.org/provider/EPISWSGateway"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.epis.org/provider/EPISWSGateway"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema xmlns:tns="http://ws.epis.org/provider/EPISWSGateway"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      attributeFormDefault="unqualified" elementFormDefault="unqualified"
+      targetNamespace="http://ws.epis.org/provider/EPISWSGateway">
+      
+      <xs:element name="findConfigurationData" type="tns:findConfigurationData" />
+      <xs:element name="findConfigurationDataResponse" type="tns:findConfigurationDataResponse" />
+      <xs:element name="processPrimitiveData" type="tns:processPrimitiveData" />
+      <xs:element name="processPrimitiveDataResponse" type="tns:processPrimitiveDataResponse" />
+      
+      <xs:complexType name="findConfigurationData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="findConfigurationDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return"
+            type="tns:configurationVO" />
+        </xs:sequence>
+      </xs:complexType>
+      
+      <xs:complexType name="configurationVO">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="cellNo" type="xs:string" />
+          <xs:element minOccurs="0" name="clientId" type="xs:string" />
+          <xs:element minOccurs="0" name="jdbcDriverClass" type="xs:string" />
+          <xs:element minOccurs="0" name="jdbcPass" type="xs:string" />
+          <xs:element minOccurs="0" name="jdbcUrl" type="xs:string" />
+          <xs:element minOccurs="0" name="jdbcUsername" type="xs:string" />
+          <xs:element minOccurs="0" name="operatingSystem" type="xs:string" />
+          <xs:element minOccurs="0" name="pass" type="xs:string" />
+          <xs:element name="scheduleMap">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0"
+                  name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:string" />
+                      <xs:element minOccurs="0" name="value" type="xs:string" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="sqlText" type="xs:string" />
+          <xs:element minOccurs="0" name="useSmsYn" type="xs:string" />
+          <xs:element minOccurs="0" name="userId" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      
+      <xs:complexType name="processPrimitiveData">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="tns:hashMap" />
+        </xs:sequence>
+      </xs:complexType>
+      
+      <xs:complexType name="hashMap">
+        <xs:complexContent>
+          <xs:extension base="tns:abstractMap">
+            <xs:sequence />
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      
+      <xs:complexType abstract="true" name="abstractMap">
+        <xs:sequence />
+      </xs:complexType>
+      
+      <xs:complexType name="processPrimitiveDataResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="Exception" type="tns:Exception" />
+      <xs:complexType name="Exception">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="message" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  
+  <wsdl:message name="processPrimitiveDataResponse">
+    <wsdl:part name="parameters" element="tns:processPrimitiveDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="findConfigurationDataResponse">
+    <wsdl:part name="parameters" element="tns:findConfigurationDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processPrimitiveData">
+    <wsdl:part name="parameters" element="tns:processPrimitiveData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="Exception">
+    <wsdl:part name="Exception" element="tns:Exception">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="findConfigurationData">
+    <wsdl:part name="parameters" element="tns:findConfigurationData">
+    </wsdl:part>
+  </wsdl:message>
+  
+  <wsdl:portType name="EPISWSGateway">
+    <wsdl:operation name="findConfigurationData">
+      <wsdl:input name="findConfigurationData" message="tns:findConfigurationData">
+      </wsdl:input>
+      <wsdl:output name="findConfigurationDataResponse"
+        message="tns:findConfigurationDataResponse">
+      </wsdl:output>
+      <wsdl:fault name="Exception" message="tns:Exception">
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processPrimitiveData">
+      <wsdl:input name="processPrimitiveData" message="tns:processPrimitiveData">
+      </wsdl:input>
+      <wsdl:output name="processPrimitiveDataResponse"
+        message="tns:processPrimitiveDataResponse">
+      </wsdl:output>
+      <wsdl:fault name="Exception" message="tns:Exception">
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:binding name="EPISWSGatewaySoapBinding" type="tns:EPISWSGateway">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+    
+    <wsdl:operation name="findConfigurationData">
+      <soap:operation
+        soapAction="http://ws.epis.org/provider/EPISWSGateway/findConfigurationData"
+        style="document" />
+      <wsdl:input name="findConfigurationData">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="findConfigurationDataResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+    
+    <wsdl:operation name="processPrimitiveData">
+      <soap:operation
+        soapAction="http://ws.epis.org/provider/EPISWSGateway/processPrimitiveData"
+        style="document" />
+      <wsdl:input name="processPrimitiveData">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="processPrimitiveDataResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  
+  <wsdl:service name="EPISWSGateway">
+    <wsdl:port name="EPISWSGatewayPort" binding="tns:EPISWSGatewaySoapBinding">
+      <soap:address location="http://localhost:9090/EPISWSGatewayPort" />
+    </wsdl:port>
+  </wsdl:service>
+  
+</wsdl:definitions>

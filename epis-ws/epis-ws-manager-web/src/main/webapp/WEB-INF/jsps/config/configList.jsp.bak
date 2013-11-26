@@ -1,0 +1,915 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href='<c:url value="/resources/css/ui-lightness/jquery-ui-1.10.3.custom.css"/>'>
+<link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/ui.jqgrid.css"/>' />
+<link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/sample/screen.css"/>' />
+
+
+<script type="text/javascript" src='<c:url value="/resources/js/jquery-1.10.2.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/jquery-ui-1.10.3.custom.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/i18n/grid.locale-en.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/jquery.jqGrid.src.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/jquery.validate.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/additional-methods.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/date.format.js"/>'></script>
+<!-- 
+<script type="text/javascript" src='<c:url value="/resources/js/i18n/message_ko.js"/>'></script>
+ -->
+<script type="text/javascript">
+
+var configValidator = null, scheduleValidator = null;
+$(document).ready(function() {
+	initFormDialog();
+	initValidation();
+	initGrid();
+	initEvent();
+	//debugging();
+});
+
+function debugging(){
+	$.post('<c:url value="/config/scheduleList"/>?clientId=' + encodeURIComponent('CLIENT#1')
+			,{}
+			,function(data){
+				var list = data.root;
+				$.each(list,function(idx,elem){
+					alert(elem.execDatetime);
+					alert(new Date(elem.execDatetime));
+				});
+			});
+}
+
+/**
+ * 입력 Form Dialog(Configuration, Schedule) 및 Alert Dialog를 설정함
+ */
+function initFormDialog() {
+	//=================================================================
+	//	Configuration 입력 Form Dialog
+	//=================================================================
+	$('#dialogConfig').dialog({
+		autoOpen: false
+		,height: 400
+		,width: 410
+		,modal: true
+		,show:{
+			effect:"blind"
+			,duration:500
+		}
+		,hide:{
+			effect:"explode"
+			,duration:500
+		}
+		,open: handler_DialogConfigOpen
+		,buttons: {
+			//추가 or 수정 버튼
+			"Apply": handler_DialogConfigApplyBtnClick
+			,Cancel: function(){
+				$(this).dialog('close');
+			}
+		}
+		,close: function(){
+			resetForm('Config', configValidator);
+			$('#fieldClientID').show();
+		}
+	});
+	
+	
+	//=================================================================
+	//	Schedule 입력 Form Dialog
+	//=================================================================
+	$('#dialogSchedule').dialog({
+		autoOpen: false
+		,height: 400
+		,width: 400
+		,modal: true
+		,show:{ effect:"blind" ,duration:500 }
+		,hide:{ effect:"explode" ,duration:500 }
+		,open: handler_DialogScheduleOpen
+		,buttons: {
+			//추가or수정 버튼
+			"Apply": handler_DialogScheduleApplyBtnClick
+			,Cancel: function(){
+				$(this).dialog('close');
+			}
+		}
+		,close: function(){
+			resetForm('Schedule', scheduleValidator);
+			$('#useExpression').prop('checked',false).trigger('change');
+		}
+	});
+	
+	
+	//=================================================================
+	//	메세지 Alert용 Dialog : open...Dialog 펑션을 이용할 것
+	//=================================================================
+	$( "#dialogAlert" ).dialog({
+		autoOpen: false
+		,modal: true
+		,buttons: {
+			Ok: function() {
+				$( this ).dialog( "close" );
+				
+			}
+		}
+		,close: function(){
+			var parentDialogID = $(this).find('input:hidden').val();
+			if(parentDialogID!=""){
+				$('#'+parentDialogID).dialog('close');
+			}
+			$(this).find('input:hidden').val('');
+			$(this).dialog("option", 'title', '');
+		}
+	});
+}
+
+/**
+ * 	Configuration측 입력 Form Dialog가 열릴 때 선행처리될 Callback Method
+ *	처리내용 :
+ *		- 수정모드일 경우, 상단 문구표시 (ex. Client ID : CLIENT_A01)
+ *		- 수정모드일 경우, clientId는 표시하지 않도록 함(primary key임)
+ */
+function handler_DialogConfigOpen(event, ui){
+	//=================================================================
+	//	Configuration 입력창 오픈시 선행처리 기술
+	//	-> 상단 문구표시 (ex. Client ID : CLIENT_A01)
+	//	-> 수정모드일 경우, clientId는 표시하지 않도록 함(primary key임)
+	//=================================================================
+	var applyType = $(this).find('input[name$="applyType"]').val();
+	if(applyType=="U"){
+		$('#dialogConfigHead').text("Client ID : " + $('clientId').val());
+		$('#fieldClientID').hide();
+	}
+}
+
+
+/**
+ * 	Configuration측 입력 Form Dialog에서 Apply버튼 클릭시 처리될 Callback Method
+ *	처리내용 :
+ *		- 추가인지, 수정인지에 따라 URL분기
+ *		- ajax로 서버에 반영한다.
+ *		- 처리가 완료되면 안내 Dialog를 띄우고 gridSchedule을 리로드한다.
+ */
+function handler_DialogConfigApplyBtnClick(){
+	if(configValidator.form()){
+		var operation = "추가";
+		var url = '<c:url value="/config/addConfig"/>';
+		if($('#config_applyType').val()=="U"){
+			operation = "수정";
+			url = '<c:url value="/config/modifyConfig"/>';
+		}
+		$.post(url
+			,$('#formConfig').serialize()
+			,function(data){
+				openResultDialog(data, operation,"dialogConfig");
+				jQuery("#gridConfig").jqGrid('setGridParam',{page:1}).trigger("reloadGrid");
+				//$(this).dialog('close'); ALERT에서 닫음
+			}	
+		);
+	}
+}
+
+/**
+ *	Schedule측 입력 Form Dialog가 열릴 때 선행처리될 Callback Method
+ *	처리내용 :
+ *		- dialogScheduler쪽 Hidden Field인 scheduleClientId, systemOS 에, 
+ *		  gridConfig에서 선택된 rowData의 해당 값을 bind한다.
+ *		- Dialog 상단부에 안내문구를 작성한다.
+ *		- 변경일 경우, 실행날짜(execDate), 실행시간(execDate)에 대한 값을 bind한다.
+ *		- intervalUnit 값이 있으면, 그에 따른 required설정(validation관련됨)을 적용시킨다.
+ *		- 스케줄링은 OS쪽 스케줄러(NT일 경우는 Schtasks, Unix계열일 경우 crontab)를 이용하므로,
+ *		  Expression 항목에 Schtasks인지,crontab 인지 표시한다.
+ */
+function handler_DialogScheduleOpen(event, ui){
+	//선택된 Configuration Grid의 Row Data를 가져와서, clientId,operatingSystem 정보를 취득한다.
+	//Schedule Grid에서 취득 : 최초입력일 경우, Schedule Grid에 데이터가 존재하지 않음
+	//jQuery(gridSelector).jqGrid('getGridParam','selrow');
+	var configGridRowId = null;
+	var configGridRowIDs = $('#gridConfig').jqGrid('getGridParam','selarrrow');
+	if(configGridRowIDs!=null && configGridRowIDs.length > 0){
+		configGridRowId = configGridRowIDs[configGridRowIDs.length-1];
+	}
+	else{
+		openAlertDialog('Illegal Access!!!');
+		return false;
+	}
+	var configGridRowData = $('#gridConfig').jqGrid('getRowData',configGridRowId);
+	$("#scheduleClientId").val(configGridRowData.clientId);
+	$('#systemOS').val(configGridRowData.operatingSystem);
+	
+	
+	//안내문구 처리 및 수정모드일 경우 실행날짜시간 처리
+	var applyType = $(this).find('input[name$="applyType"]').val();
+	var headText = "<b>[" + $("#scheduleClientId").val() + "]</b> : ";
+	headText += $(this).find("select option:selected").attr('label');
+	if(applyType=="U"){
+		headText += " 변경";
+		
+		//실행날짜 시간 처리
+		var millisec = eval($('#execDatetime').val());//값이 있었다면 bindForm에서 처리되었음
+		if(millisec!=null){
+			var datetime = new Date(millisec);
+			$('#execDate').val(datetime.format('yyyy-mm-dd'));
+			$('#execTime').val(datetime.format('HH:MM'));
+		}
+	}
+	else{
+		headText += " 신규";
+	}
+	$('#dialogScheduleHead').html(headText);
+	
+	
+	//intervalUnit 값이 있으면, 그 값에 따른 required설정을 적용시킨다.
+	$('#intervalUnit').trigger('change');
+	
+	//Configuration이 선택되었을 때, Schedule 입력폼의
+	//Expression 입력부분 문구를 Configuration의 os설정값에 맞추어 설정한다.
+	var schedulerName = "Cron";
+	if($('#systemOS').val()=="Windows"){
+		schedulerName = "Schtasks";
+	}
+	$('#schedulerExpression').prev().text(schedulerName + " 표현식");
+	
+	//expression 값이 있으면, expression이외의 Form Control은 비활성화 시킨다.
+	if($('#schedulerExpression').val() != ""){
+		$('#useExpression').prop('checked',true).trigger('change');
+	}
+}
+
+/**
+ * 	Schedule측 입력 Form Dialog에서 Apply버튼 클릭시 처리될 Callback Method
+ *	처리내용 :
+ *	- expression을 이용할 경우, 실행날짜나 주기관련 항목은 공백처리되며, 오직 expression만 저장된다.
+ *	- 추가 건인지, 수정 건인지에 따라 URL을 분기한다.
+ *	- ajax로 서버에 반영한다.
+ *	- 처리가 완료되면 안내 Dialog를 띄우고 gridSchedule을 리로드한다.
+ */
+function handler_DialogScheduleApplyBtnClick(){
+	if(scheduleValidator.form()){
+		
+		//expression을 이용할 경우, 실행날짜나 주기관련 항목은 공백처리
+		if($('#useExpression').is(':checked')){
+			$('#execDatetime').val('');
+		}
+		else{
+			$('#execDatetime').val($('#execDate').val() + " " + $('#execTime').val());
+		}
+		
+		//URL 분기 및 서버처리완료 후 안내문구 대응
+		var operation = "추가";
+		var url = '<c:url value="/config/addSchedule"/>';
+		if($('#schedule_applyType').val()=="U"){
+			operation = "수정";
+			url = '<c:url value="/config/modifySchedule"/>';
+		}
+		//서버에 처리요청
+		$.post(url
+			,$('#formSchedule').serialize()
+			,function(data){	//완료시 처리
+				//안내 문구 표시
+				openResultDialog(data, operation, "dialogSchedule");
+				//grid 리로드
+				jQuery("#gridSchedule").trigger("reloadGrid");
+				//$(this).dialog('close');  ALERT에서 닫음
+			}
+		).fail(function(){
+			openAlertDialog("처리에 실패하였습니다.");
+		});
+	}
+}
+
+/**
+ * 	Dialog가 닫혔을 때의 처리를 하는 메서드
+ *	Dialog내의 Form Control을 초기화 및 validator가 화면에
+ *	표시한(표시했을 경우) 경고문구도 초기화한다.
+ */
+function resetForm(subject, validator){
+	var formSelector = '#form' + subject; 
+	$(formSelector + ' input,textarea').val('');
+	$(formSelector + ' option:first-child').prop("selected","selected");
+	if(validator!=null){
+		validator.resetForm();
+	}
+	$('#dialog'+subject+'Head').text('New Entry');
+}
+
+/**
+ * Validation을 설정함.
+ */
+function initValidation(){
+	configValidator = $('#formConfig').validate({
+		rules: {
+			cellNo:{
+				required: function(){
+					return $("#useSmsYn").val()=='Y';
+				}
+			}
+		}
+	});
+	
+	$.validator.addMethod('duplicate'
+		,function(value,element,gridID){
+			var valid = true;
+			var sourceDatas = $('#' + gridID).jqGrid('getRowData');
+			//비교할 데이터가 없으면 신규이므로 valid.
+			if(sourceDatas==null || sourceDatas.length==0){
+				return valid;
+			}
+			//동일한 schedule type이 있는지 확인
+			$.each(sourceDatas,function(idx,row){
+				//modify의 경우, 현재 수정중인 건의 scheduleId와 다른 row의 것과 비교함
+				if(row.scheduleId==$('#scheduleId').val()){
+					return true;
+				}
+				if($(element).val()==row[element.name]){
+					valid = false;
+					return false;
+				}
+			});
+			
+			return valid;
+		}
+		,$.validator.format("The value is already exist.")
+
+	);
+	scheduleValidator = $('#formSchedule').validate({
+		rules: {
+			scheduleType:{
+				duplicate:'gridSchedule'
+			}
+		}
+		,onfocusout: false	//select form에 addMethod로 추가한 method를 적용할 경우,
+							//onfocusout event에도 validate 체킹을 함
+		//,messages:{
+		//	scheduleType:$.format("Schedule type [{0}] is already registered",$('#scheduleType').val())
+		//}
+	});
+	
+}
+
+
+/**
+ * Configuration Grid 및 Schedule Grid를 설정함.
+ */
+function initGrid() {
+	//=================================================================
+	//	Configuration List표시용 Grid
+	//=================================================================
+	jQuery("#gridConfig").jqGrid(
+	{
+		url : '<c:url value="/config/configList"/>'
+		,mtype : 'POST'
+		,datatype : "json"
+		,colNames : [ 'Client ID', 'OS', 'User ID', 'Pass', 'JDBC URL', 'DB User', 'DB Pass', 'DB Driver', 'SMS', '휴대폰번호', 'SQL' ]
+		,colModel : [ 
+			{ name : 'clientId', index : 'client_id', width : 80 }
+			,{ name : 'operatingSystem', index : 'operating_system', width : 70 }
+			,{ name : 'userId', index : 'user_id', width : 80 }
+			,{ name : 'pass', index : 'pass', width : 80 }
+			,{ name : 'jdbcUrl', index : 'jdbc_url', width : 180 }
+			,{ name : 'jdbcUsername', index : 'jdbc_username', width : 80 }
+			,{ name : 'jdbcPass', index : 'jdbc_pass', width : 80 }
+			,{ name : 'jdbcDriverClass', index : 'jdbc_driver_class', width : 180 }
+			,{ name : 'useSmsYn', index : 'use_sms_yn', width : 60 }
+			,{ name : 'cellNo', index : 'cell_no', width : 100 }
+			,{ name : 'sqlText', index : 'sql_text', width : 200 }
+		]
+		,rowNum : 10
+		,rowList : [ 10, 20, 30 ]
+		,pager : '#pagerConfigGrid'
+		,sortname : 'client_id'
+		,viewrecords : true
+		,sortorder : "desc"
+		,multiselect: true
+		,multiboxonly:true
+		,caption : "Configuration List"
+		,jsonReader : {
+			root: "root"
+			,repeatitems: false
+		}
+		,onSelectRow: function(rowId,status){
+			handler_ConfigGridRowSelect(rowId,status);
+		}
+		,onSelectAll: function(rowIds,status){
+			if(rowIds!=null && rowIds.length > 0){
+				handler_ConfigGridRowSelect(rowIds[rowIds.length-1],status);
+			}
+			else{
+				handler_ConfigGridRowSelect(null,status);
+			}
+		}
+		,gridComplete: handler_ConfigGridComplete
+	});
+	jQuery("#gridConfig").jqGrid('navGrid', '#pagerConfigGrid', {
+		edit : false
+		,add : false
+		,del : false
+		,search: false
+		,refresh: false
+		,addfunc:function(){
+			$('#dialogConfig').dialog("open");
+		}
+	});
+	jQuery("#gridConfig").jqGrid('hideCol', ["pass","sqlText","jdbcPass","cellNo"]);
+	
+	
+	//=================================================================
+	//	Schedule List표시용 Grid
+	//=================================================================
+	jQuery("#gridSchedule").jqGrid(
+	{
+		url : '<c:url value="/config/scheduleList"/>?clientId='
+		,mtype : 'POST'
+		,datatype : "json"
+		,colNames : [ 'Schedule ID', 'Client ID', 'Schedule Type', 'Schedule 구분', 'Interval 값', 'Interval 단위', '실행날짜(millisec)', '실행날짜', 'Cron/Schtasks 표현식' ]
+		,colModel : [
+		    { name : 'scheduleId', index : 'schedule_id', width:50}
+			,{ name : 'clientId', index : 'client_id', width : 100 }
+			,{ name : 'scheduleType', index : 'schedule_type', width : 50 }
+			,{ name : 'formatScheduleType', index : 'schedule_type'
+				,formatter : convertScheduleTypeText, width : 100 }
+			,{ name : 'intervalValue', index : 'interval_value', width : 90 }
+			,{ name : 'intervalUnit', index : 'interval_unit', width : 90 }
+			,{ name : 'execDatetime', index : 'exec_datetime', width : 150 }
+			,{ name : 'formatExecDatetime', index : 'exec_datetime', width: 150
+				,formatter : convertExecDatetime, align : "right" }
+			,{ name : 'schedulerExpression', index : 'scheduler_expression', width : 240 }
+		]
+		,rowNum : 10
+		,rowList : [ 10, 20, 30 ]
+		,pager : '#pagerScheduleGrid'
+		,sortname : 'client_id'
+		,viewrecords : true
+		,sortorder : "desc"
+		,caption : "Schedule List"
+		,jsonReader : {
+			root: "root"
+			,repeatitems: false
+		}
+		,onSelectRow: function(id){
+			if(id!=null){
+				$('#btnModifySchedule').button("option","disabled",false);
+			}
+		}
+		,gridComplete: handler_ScheduleGridComplete
+	});
+	jQuery("#gridSchedule").jqGrid('navGrid', '#pagerScheduleGrid', {
+		edit : false
+		,add : false
+		,del : false
+		,search: false
+		,refresh: false
+		,addfunc:function(){
+			$('#dialogSchedule').dialog("open");
+		}
+	});
+	jQuery("#gridSchedule").jqGrid('hideCol', ["scheduleId", "scheduleType", "execDatetime"]);
+}
+
+/**
+ * Schedule Grid 내 날짜표시컬럼에서의 날짜값 표시처리
+ *
+ *	=> 	서버에서 java.util.Date의 값을 millisec으로 보내기 때문에 
+ *		그에 대한 처리가 필요함.
+ *		서버에서 보낸 값을 변경하지 않기 위해, 서버에서 보낸 값이 bind된 컬럼은 hide하고,
+ *		별도의 컬럼을 추가하여 화면표시 용도로 사용한다. 
+ */
+function convertExecDatetime(cellValue,option,rowObject){
+	 var result = '';
+	 if(rowObject.execDatetime!=null){
+		 result = new Date(rowObject.execDatetime).format('yyyy-mm-dd HH:MM');
+	 }
+	return result;
+}
+
+
+function convertScheduleTypeText(cellValue, option, rowObject){
+	var result = '';
+	if(rowObject.scheduleType=='config'){
+		result = 'Configuration동기화';
+	}
+	else if(rowObject.scheduleType='biz'){
+		result = '원시데이터 처리';
+	}
+	return result;
+}
+ 
+/**
+ * Configuration측 Grid에서 row 클릭시 Event Handling
+ */
+function handler_ConfigGridRowSelect(rowId,status){
+	//Schedule Grid 데이터 취득 및 표시
+	var inactivateButton = true;
+	//체크해제시, 선택된 것의 rowID를 찾아서 처리
+	//체크시, 기존처리대로
+	if(!status){
+		var rowIdArray = $('#gridConfig').jqGrid('getGridParam','selarrrow');
+		if(rowIdArray!=null && rowIdArray.length > 0){
+			rowId = rowIdArray[rowIdArray.length-1];
+		}
+		else{
+			rowId = null;
+		}
+	}
+	if(rowId == null) {
+		//schedule grid를 초기화한다.
+		if(jQuery("#gridSchedule").jqGrid('getGridParam','records') > 0 )
+		{
+			var scheduleDataUrl = '<c:url value="/config/scheduleList"/>?clientId=';
+			jQuery("#gridSchedule").jqGrid('setGridParam',{url:scheduleDataUrl, page:1});
+			jQuery("#gridSchedule").trigger('reloadGrid');
+		}
+		jQuery("#gridSchedule").jqGrid('setCaption',"Schedule List");
+	} else {
+		//schedule grid를 로딩한다.
+		var rowData = $("#gridConfig").jqGrid('getRowData', rowId);
+		var scheduleDataUrl = '<c:url value="/config/scheduleList"/>?clientId=' + encodeURIComponent(rowData.clientId);
+		jQuery("#gridSchedule").jqGrid('setGridParam',{url:scheduleDataUrl, page:1});
+		jQuery("#gridSchedule").jqGrid('setCaption',"Schedule List : "+rowData.clientId)
+			.trigger('reloadGrid');
+		inactivateButton = false;
+		
+		//Schedule 측 Form 내 hidden값에 ostype값을 bind한다.
+		$('#systemOS').val(rowData.operatingSystem);
+		$("#scheduleClientId").val(rowData.clientId);
+		$('#btnModifySchedule').button("option","disabled",true);
+	}
+
+	$('#btnModifyConfig').button("option","disabled",inactivateButton);
+	$('#btnRemoveConfig').button("option","disabled",inactivateButton);
+	
+}
+
+function handler_ConfigGridComplete(){
+	$('#btnModifyConfig').button("option","disabled",true);
+	$('#btnRemoveConfig').button("option","disabled",true);
+	$('#btnAddSchedule').button("option","disabled",true);
+	$('#btnModifySchedule').button("option","disabled",true);
+}
+
+/**
+ *	gridSchedule의 데이터가 모두 로딩되고, gridSchedule에 엮인
+ *	여타 처리가 완료되었을 때 처리되는 Callback Method
+ *
+ *	gridConfig에 select된 row가 있을 경우,
+ *	gridSchedule에 로딩된 데이터가 2개 미만이면 schedule추가 버튼을
+ *	활성화시키고, 그렇지 않으면 비활성화시킨다.
+ */
+function handler_ScheduleGridComplete(){
+	
+	//=================================================================
+	//	Schedule 측 Button
+	//=================================================================
+	var inactivateButton = true;
+	//gridConfig에서 select된 row가 있는지 확인
+	var rowIdArray = $('#gridConfig').jqGrid('getGridParam','selarrrow');
+	if(rowIdArray!=null && rowIdArray.length > 0){
+		//gridSchedule에서 loading된 row의 건수가 2 미만일 경우
+		var scheduleRowIDs = $(this).jqGrid('getDataIDs');
+		if(scheduleRowIDs!=null && scheduleRowIDs.length < 2){
+			//버튼 활성화
+			inactivateButton = false;
+		}
+	}
+	//Schedule 버튼 활성/비활성화 처리
+	$('#btnAddSchedule').button("option","disabled",inactivateButton);
+	$('#btnModifySchedule').button("option","disabled",true);
+
+}
+
+/**
+ * Button 및 일부 입력폼내 컨트롤에 대해 Event를 설정한다.
+ */
+function initEvent(){
+	//=================================================================
+	//	Configuration 측 Button
+	//=================================================================
+	$('#btnAddConfig').button().on('click',handler_GridAddBtnClick);
+		//jQuery("#gridConfig").jqGrid('addRowData',1,{'userId':'debug','pass':'debug','clientId':'debug'});
+	//});
+	$('#btnModifyConfig').button({'disabled':true}).on('click',handler_GridModifyBtnClick);
+	$('#btnRemoveConfig').button({'disabled':true}).on('click',handler_ConfigGridRemoveBtnClick);
+	
+	//=================================================================
+	//	Configuration 측 입력폼
+	//=================================================================
+	$('#useSmsYn').on('change',function(){
+		if($(this).val()=='N'){
+			$('#cellNo').val('');
+			$('#cellNo').prop('disabled',true);
+		}
+		else{
+			$('#cellNo').prop('disabled',false);
+		}
+	});
+	$('#cellNo').prop('disabled',true);
+	
+	
+	//=================================================================
+	//	Schedule 측 Button : 삭제는 없으며, 
+	//	하나의 Schedule은 두개의 Schedule을 가져야 함.
+	//		- Configuration 동기 작업 스케쥴링
+	//		- Business 처리 작업 스케쥴링
+	// 	=> Configuration 동기 작업 스케쥴링은 관리되지 않고
+	//		고정적으로 처리되도록 협의 필요
+	//=================================================================
+	$('#btnAddSchedule').button({disabled:true}).on('click',handler_GridAddBtnClick);
+	$('#btnModifySchedule').button({disabled:true}).on('click',handler_GridModifyBtnClick);
+	
+	$('#intervalUnit').on('change',function(){
+		if($(this).val()=="MINUTE"){
+			$('#intervalValue').addClass('required');
+		}
+		else{
+			$('#intervalValue').removeClass('required');
+		}
+	}).trigger('change');
+
+	//=================================================================
+	//	Schedule 측 입력폼
+	//=================================================================
+	$('#execDate').datepicker({"showAnim":"fadeIn", "dateFormat":"yy-mm-dd"});
+	$('#useExpression').on('change',function(){
+		if($(this).is(':checked')){
+			$('#formSchedule input:text,select').not('#scheduleType').removeClass('required').prop('disabled',true);
+			$('#schedulerExpression').addClass('required').prop('disabled',false);
+		}
+		else{
+			$('#formSchedule input:text,select').not('#scheduleType').addClass('required').prop('disabled',false);
+			$('#schedulerExpression').removeClass('required').prop('disabled',true);
+		}
+	});
+	
+	$('#schedulerExpression').prop('disabled',true);
+}
+
+/**
+ * 데이터 추가 버튼 클릭시 이벤트 Handling (Configuration - Schedule 공통)
+ * 세부적인 사항은 해당 Form Dialog내에서 처리됨
+ */
+function handler_GridAddBtnClick(event){
+	var dialogID = $(event.currentTarget).parent().attr('id');
+	dialogID = dialogID.replace("div","dialog");
+	$('#' + dialogID + ' input[name$="applyType"]').val("I");
+	$('#' + dialogID).dialog("open");
+}
+/*
+ * 데이터 변경 버튼 클릭시 이벤트 Handling(Configuration - Schedule 공통)
+ * 세부적인 사항은 해당 Form Dialog내에서 처리됨
+ */
+function handler_GridModifyBtnClick(event){
+	var subject = $(event.currentTarget).parent().attr('id').replace("div","");
+	var gridSelector = "#grid" + subject;
+	var dialogSelector = "#dialog" + subject;
+	var rowId = jQuery(gridSelector).jqGrid('getGridParam','selrow');
+	if(rowId==null){
+		//openAlertDialog("수정할 " + subject + "이 선택되지 않았습니다.");
+		openAlertDialog("수정할 건이 선택되지 않았습니다.");
+		return false;
+	}
+	
+	var rowData = jQuery(gridSelector).jqGrid('getRowData',rowId);
+	bindForm( ('form' + subject),rowData );
+	
+	$(dialogSelector + ' input[name$="applyType"]').val("U");
+	$(dialogSelector).dialog("open");
+}
+
+/**
+ * Configuration쪽 삭제버튼 클릭시 Event Handling
+ * gridConfiguration 내에서 선택된 row들의 clientId값만 모은 배열을 파라메터로 하여,
+ * 서버에 삭제요청을 하고 그 결과를 받는다.
+ */
+function handler_ConfigGridRemoveBtnClick(event){
+	var rowIds = jQuery("#gridConfig").jqGrid('getGridParam','selarrrow');
+	if(rowIds==null){
+		//alert("삭제할 Configuration이 선택되지 않았습니다.");
+		openAlertDialog("삭제할 Configuration이 선택되지 않았습니다.");
+		return false;
+	}
+	
+	var clientIds = new Array();
+	var rowData = null;
+	$.each(rowIds,function(idx,rowId){
+		rowData = jQuery("#gridConfig").jqGrid('getRowData',rowId);
+		clientIds[idx] = rowData.clientId;
+	});
+	$.post('<c:url value="/config/removeConfig"/>'
+		,{"clientIds" : clientIds}
+		,function(data){
+			openResultDialog(data, "삭제", "");
+		}
+	);
+}
+
+/**
+ * Grid에서 선택한 row의 데이터를 Dialog내 Form Control에 바인딩함.
+ * 정상적인 처리를 위해 json데이터의 key와 Form Control의 name이 동일해야 함.
+ * @param formID
+ */
+function bindForm(formID, rowData){
+	$.each(rowData,function(fieldName,fieldValue){
+		$('#'+formID).find('#' + fieldName).val(fieldValue);
+	});
+}
+
+/**
+ *	dialogAlert을 서버처리결과를 알려주는 용도로 사용함
+ *	
+ */
+function openResultDialog(response, operation, parentDialogID){
+	var titleText = operation + " 실패";
+	var msgText = operation + "에 실패하였습니다.";
+	if(response.success){
+		titleText = operation + "완료";
+		msgText = response.message;
+	}
+	$('#dialogAlert').dialog("option", 'title', titleText);
+	$('#alertMessage').text(msgText);
+	$('#dialogAlert input:hidden').val(parentDialogID);
+	$('#dialogAlert').dialog('open');
+}
+
+/**
+ * dialogAlert을 Alert 용도로 사용함
+ */
+function openAlertDialog(msgText){
+	$('#dialogAlert').dialog('option', 'title', "Message");
+	$('#alertMessage').text(msgText);
+	$('#dialogAlert').dialog('open');
+}
+
+</script>
+<title>Configuration List</title>
+</head>
+<body>
+	<!-- ======================================================================================== -->
+	<!-- Configuration List 표시부 : Grid -->
+	<!-- ======================================================================================== -->
+	<div id="divConfig">
+		<h1>Configuration</h1>
+		<table id="gridConfig"></table>
+		<div id="pagerConfigGrid"></div>
+		<button id="btnAddConfig">Add</button>
+		<button id="btnModifyConfig">Modify</button>
+		<button id="btnRemoveConfig">Remove</button>
+	</div>
+	
+	<!-- ======================================================================================== -->
+	<!-- Schedule List 표시부 : Grid -->
+	<!-- ======================================================================================== -->
+	<div id="divSchedule">
+		<h1>Schedule</h1>
+		<table id="gridSchedule"></table>
+		<div id="pagerScheduleGrid"></div>
+		<button id="btnAddSchedule">Add</button>
+		<button id="btnModifySchedule">Modify</button>
+		<!-- <button id="btnRemoveSchedule">Remove</button> -->
+	</div>
+	
+	<!-- ======================================================================================== -->
+	<!-- Configuration 입력 Dialog -->
+	<!-- ======================================================================================== -->
+	<div id="dialogConfig" title="Configuration Setting">
+		<p><b id="dialogConfigHead">New Entry</b></p>
+
+		<form id="formConfig" name="formConfig" class="cmxform"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
+			<fieldset>
+			<p id="fieldClientID">
+				<label for="clientId">클라이언트ID</label>
+				<input type="text" name="clientId" id="clientId"
+					class="required" />
+			</p>
+			<p>
+				<label for="operatingSystem">OS Type</label>
+				<select name="operatingSystem" id="operatingSystem">
+<c:forEach items="${osTypes}" var="os">
+					<option value="${os}" label="${os}">${os}</option>
+</c:forEach>
+				</select>
+			</p>
+			<p>
+				<label for="userId">사용자ID</label>
+				<input type="text" name="userId" id="userId" 
+					class="required" />
+			</p>
+			<p>
+				<label for="pass">Password</label>
+				<input type="password" name="pass" id="pass"
+					class="required password" />
+			</p>
+			<p>
+				<label for="jdbcUrl">JDBC URL</label>
+				<input type="text" name="jdbcUrl" id="jdbcUrl"
+					class="required">
+			</p>
+			<p>
+				<label for="jdbcUrl">DB Username</label>
+				<input type="text" name="jdbcUsername" id="jdbcUsername"
+					class="required">
+			</p>
+			<p>
+				<label for="jdbcUrl">DB Password</label>
+				<input type="password" name="jdbcPass" id="jdbcPass"
+					class="required">
+			</p>
+			<p>
+				<label for="jdbcUrl">DB Type</label>
+				<select name="jdbcDriverClass" id="jdbcDriverClass">
+					<option selected="selected" value="oracle.jdbc.driver.OracleDriver" label="Oracle">Oracle</option>
+					<option value="com.microsoft.sqlserver.jdbc.SQLServerDriver" label="SqlServer">SqlServer</option>
+					<option value="com.mysql.jdbc.Driver" label="MySQL">MySQL</option>
+				</select>
+			</p>
+			<p>
+				<label for="sqlText">SQL</label>
+				<textarea name="sqlText" id="sqlText"
+					class="required">
+				</textarea>
+			</p>
+			<p>
+				<label for="useSmsYn">SMS사용여부</label>
+				<select id="useSmsYn" name="useSmsYn">
+					<option selected="selected" value="N" label="N">N</option>
+					<option value="Y" label="Y">Y</option>
+				</select>
+			</p>
+			<p>
+				<label for="cellNo">휴대폰번호</label>
+				<input type="text" name="cellNo" id="cellNo"
+					class="required" />
+			</p>
+			</fieldset>
+			<input type="hidden" id="config_applyType" name="config_applyType"/>
+		</form>
+	</div>
+	
+	
+	<!-- ======================================================================================== -->
+	<!-- Schedule 입력 Dialog -->
+	<!-- ======================================================================================== -->
+	<div id="dialogSchedule" title="Schedule Setting">
+		<p id="dialogScheduleHead"></p>
+		
+		<form id="formSchedule" name="formSchedule" class="cmxform"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
+			<fieldset>
+			<p>
+				<label for="scheduleType">Schedule 구분</label>
+				<select name="scheduleType" id="scheduleType" class="required">
+					<option value="config" label="Configuration동기화">Configuration동기화</option>
+					<option value="biz" label="원시데이터 처리">원시데이터 처리</option>
+				</select>
+			</p>
+			<p>
+				<label for="intervalUnit">주기 단위</label>
+				<select name="intervalUnit" id="intervalUnit">
+<c:forEach items="${intervalUnitTypes}" var="unit">
+					<option value="${unit}" label="${unit}">${unit}</option>
+</c:forEach>
+				</select>
+			</p>
+			<p>
+				<label for="intervalValue">주기 값</label>
+				<input type="text" name="intervalValue" id="intervalValue"
+					class="digits" />
+			</p>
+			<p>
+				<label for="execDate">시작일자</label>
+				<input type="text" name="execDate" id="execDate"
+					class="required date" />
+			</p>
+			<p>
+				<label for="execTime">시작시간</label>
+				<input type="text" name="execTime" id="execTime"
+					class="required time" />
+			</p>
+			<p>
+				<label for="useExpression">표현식</label>
+				<input type="checkbox" name="useExpression" id="useExpression"/>표현식 사용
+			</p>
+			<p>
+				<label for="schedulerExpression">(Cron/Schtasks) 표현식</label>
+				<textarea name="schedulerExpression" id="schedulerExpression"
+					class="required"></textarea>
+			</p>
+			</fieldset>
+			<input type="hidden" id="schedule_applyType" name="schedule_applyType"/>
+			<input type="hidden" id="systemOS" name="systemOS"/>
+			<input type="hidden" id="scheduleClientId" name="clientId"/>
+			<input type="hidden" id="scheduleId" name="scheduleId"/>
+			<input type="hidden" id="execDatetime" name="execDatetime"/>
+		</form>
+	</div>
+	
+	<!-- ======================================================================================== -->
+	<!-- 안내문구 및 경고 메세지 표시용 Dialog -->
+	<!-- ======================================================================================== -->
+	<div id="dialogAlert" title="">
+		<p id="alertMessage"></p>
+		<form><input type="hidden" id="dialogID" name="dialogID"/></form>
+	</div>
+</body>
+</html>
