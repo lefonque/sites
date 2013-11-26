@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.AgentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,16 +73,18 @@ public class AgentTableModel extends AbstractTableModel {
 		String result = null;
 		
 		if(columnEnum!=null){
-		String exceptionMessage = "EXCEPTION OCCURRED BY BeanUtils";
-		try {
-			result = BeanUtils.getSimpleProperty(row, columnEnum.getFieldName());
-		} catch (IllegalAccessException e) {
-			logger.error(exceptionMessage, e);
-		} catch (InvocationTargetException e) {
-			logger.error(exceptionMessage, e);
-		} catch (NoSuchMethodException e) {
-			logger.error(exceptionMessage, e);
-		}
+			String exceptionMessage = "EXCEPTION OCCURRED BY BeanUtils";
+			if(StringUtils.isNotEmpty(columnEnum.getFieldName())){
+				try {
+					result = BeanUtils.getSimpleProperty(row, columnEnum.getFieldName());
+				} catch (IllegalAccessException e) {
+					logger.error(exceptionMessage, e);
+				} catch (InvocationTargetException e) {
+					logger.error(exceptionMessage, e);
+				} catch (NoSuchMethodException e) {
+					logger.error(exceptionMessage, e);
+				}
+			}
 		}
 		return result;
 	}
@@ -92,14 +95,16 @@ public class AgentTableModel extends AbstractTableModel {
 		AgentTableColumnEnum columnEnum = AgentTableColumnEnum.valueOf(columnIndex);
 		
 		if(columnEnum!=null){
-		String exceptionMessage = "EXCEPTION OCCURRED BY BeanUtils";
-		try {
-			BeanUtils.setProperty(row, columnEnum.getFieldName(), aValue);
-		} catch (IllegalAccessException e) {
-			logger.error(exceptionMessage, e);
-		} catch (InvocationTargetException e) {
-			logger.error(exceptionMessage, e);
-		}
+			if(StringUtils.isNotEmpty(columnEnum.getFieldName())){
+				String exceptionMessage = "EXCEPTION OCCURRED BY BeanUtils";
+				try {
+					BeanUtils.setProperty(row, columnEnum.getFieldName(), aValue);
+				} catch (IllegalAccessException e) {
+					logger.error(exceptionMessage, e);
+				} catch (InvocationTargetException e) {
+					logger.error(exceptionMessage, e);
+				}
+			}
 		}
 		fireTableCellUpdated(rowIndex, columnIndex);
 	}
@@ -108,5 +113,20 @@ public class AgentTableModel extends AbstractTableModel {
 		dataList.clear();
 		dataList.addAll(list);
 		fireTableDataChanged();
+	}
+	
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		Class<?> result = null;
+		switch(columnIndex){
+		case 0:
+			result = Boolean.class;
+			break;
+			
+		default:
+			result = super.getColumnClass(columnIndex);
+			break;
+		}
+		return result;
 	}
 }

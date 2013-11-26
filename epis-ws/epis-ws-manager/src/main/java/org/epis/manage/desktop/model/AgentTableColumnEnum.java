@@ -2,7 +2,8 @@ package org.epis.manage.desktop.model;
 
 
 public enum AgentTableColumnEnum {
-	ORG_NAME(1,"orgCode","기관명")
+	CHECKBOX(0,null,null)
+	,ORG_NAME(1,"orgCode","기관명")
 	,OPERATING_SYSTEM(2,"operatingSystem","OS")
 	,WEBSVC_USER(3,"websvcUser","웹서비스 유저")
 	,SMS_USE_YN(4,"smsUseYn","SMS사용여부")
