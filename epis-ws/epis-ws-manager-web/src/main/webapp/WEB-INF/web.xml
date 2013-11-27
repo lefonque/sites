@@ -11,9 +11,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
- 	        classpath:/META-INF/spring/context-common.xml
-            classpath:/META-INF/spring/context-db.xml
-            classpath:/META-INF/spring/context-tx.xml
+ 	        classpath*:/META-INF/spring/context-*.xml
         </param-value>
     </context-param>
     

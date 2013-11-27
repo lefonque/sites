@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-@Component("loginInterceptor")
 public class LoginInterceptor implements HandlerInterceptor {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());

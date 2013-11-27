@@ -9,20 +9,23 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CheckBoxHeader extends JCheckBox implements TableCellRenderer,MouseListener {
+public class CheckBoxHeader implements TableCellRenderer, MouseListener {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private boolean mousePressed;
+	private final JCheckBox checkbox;
 	private int columnIndex;
 	public CheckBoxHeader(int columnIndex){
 		this.columnIndex = columnIndex;
-		mousePressed = false;
+		checkbox = new JCheckBox();
+		checkbox.addMouseListener(this);
+		logger.debug("Listener Added!!");
 	}
 	/**
 	 * 
@@ -39,14 +42,11 @@ public class CheckBoxHeader extends JCheckBox implements TableCellRenderer,Mouse
 		
 		if((header!=null) && !ArrayUtils.contains(header.getMouseListeners(), this)){
 			
-			this.setForeground(header.getForeground());
-			this.setBackground(header.getBackground());
-			
-			header.addMouseListener(this);
-			logger.debug("Listener Added!!");
+			checkbox.setForeground(header.getForeground());
+			checkbox.setBackground(header.getBackground());
 		}
-		setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-		return this;
+		checkbox.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+		return checkbox;
 	}
 	
 	protected void handlerClickEvent(MouseEvent e){
@@ -56,15 +56,15 @@ public class CheckBoxHeader extends JCheckBox implements TableCellRenderer,Mouse
 		int columnIndex = table.getColumnModel().getColumnIndexAtX(e.getX());
 		int modelIndex = table.convertColumnIndexToModel(columnIndex);
 		logger.debug("columnIndex : {}\tmodelIndex : {}",new Object[]{columnIndex,modelIndex});
-		logger.debug("selection : {}",this.isSelected());
+		logger.debug("selection : {}",checkbox.isSelected());
 		if(columnIndex==this.columnIndex){
-			doClick();
+			checkbox.doClick();
+			logger.debug("after doClick() selection : {}",checkbox.isSelected());
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		handlerClickEvent(e);
 		
 	}
 
@@ -76,7 +76,7 @@ public class CheckBoxHeader extends JCheckBox implements TableCellRenderer,Mouse
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+		handlerClickEvent(e);
 		
 	}
 

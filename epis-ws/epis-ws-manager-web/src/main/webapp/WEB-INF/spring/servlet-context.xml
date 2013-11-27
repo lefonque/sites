@@ -27,6 +27,6 @@
 		p:suffix=".jsp"/>
     
     <mvc:interceptors>
-      <ref bean="loginInterceptor"/>
+      <bean class="org.epis.ws.manager.web.LoginInterceptor"/>
     </mvc:interceptors>
 </beans>

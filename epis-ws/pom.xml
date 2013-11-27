@@ -12,6 +12,7 @@
   	<module>epis-ws-manager</module>
   	<module>epis-ws-provider-core</module>
   	<module>epis-ws-manager-web</module>
+  	<module>epis-ws-manager-core</module>
   </modules>
   
   
