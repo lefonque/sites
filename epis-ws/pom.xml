@@ -13,6 +13,7 @@
   	<module>epis-ws-provider-core</module>
   	<module>epis-ws-manager-web</module>
   	<module>epis-ws-manager-core</module>
+  	<module>epis-ws-manager-desktop</module>
   </modules>
   
   
