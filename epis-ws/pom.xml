@@ -6,14 +6,12 @@
   <packaging>pom</packaging>
   <description>원시자료 실시간 송수신 WebService</description>
   <modules>
+    <module>epis-ws-common</module>
+    <module>epis-ws-consumer</module>
+    <module>epis-ws-manager-core</module>
+    <module>epis-ws-manager-desktop</module>
+    <module>epis-ws-manager-web</module>
   	<module>epis-ws-provider</module>
-  	<module>epis-ws-consumer</module>
-  	<module>epis-ws-common</module>
-  	<module>epis-ws-manager</module>
-  	<module>epis-ws-provider-core</module>
-  	<module>epis-ws-manager-web</module>
-  	<module>epis-ws-manager-core</module>
-  	<module>epis-ws-manager-desktop</module>
   </modules>
   
   
