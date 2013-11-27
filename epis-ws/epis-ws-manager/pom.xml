@@ -12,7 +12,7 @@
     
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>epis-ws-provider-core</artifactId>
+      <artifactId>epis-ws-manager-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
