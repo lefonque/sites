@@ -3,9 +3,12 @@ package org.epis.manage.desktop.ui;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,11 +19,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.JTableHeader;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.epis.manage.desktop.model.AgentTableColumnModel;
+import org.epis.manage.desktop.model.AgentTableColumnEnum;
 import org.epis.manage.desktop.model.AgentTableModel;
 import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.provider.entity.JQGridVO;
@@ -29,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import javax.swing.JCheckBox;
 
 public class SampleWindow {
 
@@ -100,12 +102,33 @@ public class SampleWindow {
 		JScrollPane scrollPaneClients = new JScrollPane();
 		frame.getContentPane().add(scrollPaneClients, "cell 0 1,grow");
 		
-
-		TableColumnModel tblColumnModelAgent = new AgentTableColumnModel();
-		tblModelAgent.setColumnCount(tblColumnModelAgent.getColumnCount());
-		logger.debug("Column Count : {}",tblColumnModelAgent.getColumnCount());
 		
-		tblAgent = new JTable(tblModelAgent,tblColumnModelAgent);
+		tblAgent = new JTable(tblModelAgent);
+		
+		final int checkboxColumnIndex = AgentTableColumnEnum.CHECKBOX.getIndex();
+		final CheckBoxHeader checkboxHeader
+			= new CheckBoxHeader(tblAgent.getTableHeader(),checkboxColumnIndex);
+		JTableHeader header = tblAgent.getTableHeader();
+		header.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTableHeader header = JTableHeader.class.cast(e.getSource());
+				JTable table = header.getTable();
+
+				int columnModelIndex = table.getColumnModel().getColumnIndexAtX(e.getX());
+				int modelIndex = table.convertColumnIndexToModel(columnModelIndex);
+				logger.debug("columnModelIndex : {}\tmodelIndex : {}", new Object[] {
+						columnModelIndex, modelIndex });
+				
+				if (modelIndex == checkboxColumnIndex) {
+					checkboxHeader.selectAllCheckbox(table.getModel());
+				}
+			}
+		});
+		tblAgent.getColumnModel()
+			.getColumn(checkboxColumnIndex).setHeaderRenderer(checkboxHeader);
+		
+		
 		scrollPaneClients.setViewportView(tblAgent);
 		
 		
@@ -205,5 +228,5 @@ public class SampleWindow {
 		mnMenu.add(mntmSub_3);
 		
 	}
-
+	
 }

@@ -18,7 +18,6 @@ public class AgentTableModel extends AbstractTableModel {
 
 //	private final String[] columnName;
 	
-	private int columnCount;
 	private final List<AgentVO> dataList;
 	/**
 	 * 
@@ -26,16 +25,11 @@ public class AgentTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 8466209088692459873L;
 	
 	public AgentTableModel(){
-		this(0,null);
+		this(null);
 	}
 	
-	public AgentTableModel(int columnCount){
-		this(columnCount, null);
-	}
-	
-	public AgentTableModel(int columnCount, final List<AgentVO> dataList){
+	public AgentTableModel(final List<AgentVO> dataList){
 //		this.columnName = columnName;
-		this.columnCount = columnCount;
 		if(dataList==null){
 			this.dataList = new ArrayList<AgentVO>();
 		}
@@ -52,12 +46,7 @@ public class AgentTableModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		
-		return columnCount;
-	}
-	
-	public void setColumnCount(int columnCount) {
-		this.columnCount = columnCount;
+		return AgentTableColumnEnum.values().length;
 	}
 	
 	public void addAgentInfo(AgentVO agentInfo){
@@ -88,7 +77,7 @@ public class AgentTableModel extends AbstractTableModel {
 		}
 		return result;
 	}
-
+	
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		AgentVO row = dataList.get(rowIndex);
@@ -128,5 +117,11 @@ public class AgentTableModel extends AbstractTableModel {
 			break;
 		}
 		return result;
+	}
+	
+	@Override
+	public String getColumnName(int column) {
+		AgentTableColumnEnum columnEnum = AgentTableColumnEnum.valueOf(column);
+		return columnEnum.getHeaderText();
 	}
 }
