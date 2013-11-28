@@ -5,7 +5,7 @@ import java.util.HashMap;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import org.epis.ws.common.entity.AgentVO;
+import org.epis.ws.common.entity.ConfigurationVO;
 
 @WebService(name="EPISWSGateway"
 			,targetNamespace="http://ws.epis.org/provider/EPISWSGateway")
@@ -17,5 +17,5 @@ public interface EPISWSGateway {
 	
 	@WebMethod(operationName="findConfigurationData"
 			,action="http://ws.epis.org/provider/EPISWSGateway/findConfigurationData")
-	public AgentVO findConfigurationData(String clientId) throws Exception;
+	public ConfigurationVO findConfigurationData(String agentId) throws Exception;
 }

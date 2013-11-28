@@ -4,8 +4,11 @@ import java.util.HashMap;
 
 import javax.jws.WebService;
 
-import org.epis.ws.common.entity.AgentVO;
+import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.service.EPISWSGateway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @WebService(
@@ -14,18 +17,22 @@ import org.springframework.stereotype.Service;
 		,endpointInterface="org.epis.ws.common.service.EPISWSGateway")
 @Service("EPISWSGateway")
 public class EPISConcreteWSGateway implements EPISWSGateway {
-
+	
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Autowired
+	private ConfigurationService service;
+	
 	@Override
 	public String processPrimitiveData(HashMap<String, String> paramMap)
 			throws Exception {
-		
-		return null;
+		logger.debug("===== Parameter from Agent : {} =====",paramMap);
+		return "Success";
 	}
-
+	
 	@Override
-	public AgentVO findConfigurationData(String clientId) throws Exception {
-		
-		return null;
+	public ConfigurationVO findConfigurationData(String agentId) throws Exception {
+		ConfigurationVO result = service.getConfigurationInfo(agentId);
+		return result;
 	}
-
 }

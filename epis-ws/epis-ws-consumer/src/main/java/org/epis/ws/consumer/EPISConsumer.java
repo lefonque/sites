@@ -59,7 +59,7 @@ public class EPISConsumer {
 	}
 
 	public static void main(String[] args) {
-		if(args==null || args.length != 1){
+		if(args==null || args.length < 1){
 			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -D=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
 			System.err.println("e.g.) java -Dconsumer.root.dir=/opt/agent -Djob.name=job1 -jar epis-ws-consumer.jar Biz");
 			System.exit(-1);
@@ -159,7 +159,7 @@ public class EPISConsumer {
 				EPISConsumerUTCallbackHandler.class);
 		reqCtx.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
 		reqCtx.put(SecurityConstants.USERNAME,
-				agentProp.getProperty("agent.config.userId"));
+				agentProp.getProperty("consumer.userId"));
 	}
 
 

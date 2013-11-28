@@ -57,11 +57,11 @@ public class ConfigurationDAO {
 		return result;
 	}
 	
-	public String selectUserPassword(String userID) throws Exception {
+	public String selectWebserviceUserPassword(String userID) throws Exception {
 		String sql = sqlRepo.getProperty("select.webservice.password");
 		
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		paramSource.addValue("userId", userID);
+		paramSource.addValue("websvcUser", userID);
 		
 		logger.debug("SQL : [{}]",sql);
 		logger.debug("PARAMETERS : [{}]",userID);
@@ -186,6 +186,19 @@ public class ConfigurationDAO {
 		return result;
 	}
 	
+	public List<JobVO> selectJobList(String agentId){
+		MapSqlParameterSource paramSource = new MapSqlParameterSource("agentId",agentId);
+		
+		String sql = sqlRepo.getProperty("select.config.job.list");
+		
+		logger.debug("SQL : {}",sql);
+		logger.debug("PARAMETERS : {}",paramSource.getValues());
+		
+		List<JobVO> result = jdbcTemplate.query(
+				sql, paramSource, jobRowMapper);
+		return result;
+	}
+	
 	public List<JobVO> selectJobList(JQGridVO searchParam, String agentId){
 		
 		long startIndex = ((searchParam.getPage() * searchParam.getRows()) - searchParam.getRows()) + 1;
@@ -196,7 +209,7 @@ public class ConfigurationDAO {
 		paramSource.addValue("endIndex", endIndex);
 		paramSource.addValue("agentId",agentId);
 		
-		String sql = sqlRepo.getProperty("select.config.job.list");
+		String sql = sqlRepo.getProperty("select.config.job.list.paging");
 		sql = String.format(sql,searchParam.getSidx(),searchParam.getSord());
 		
 		logger.debug("SQL : {}",sql);

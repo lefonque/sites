@@ -1,8 +1,10 @@
 package org.epis.ws.consumer.service.core;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +33,9 @@ public class EPISConsumerService implements ApplicationContextAware {
 	public void executeDebug(EPISWSGateway gateway) throws Exception{
 //		String str = gateway.processPrimitiveData("", "");
 //		logger.debug("RESULT : {}", str);
-//		
-//		ClientVO conf = gateway.findConfigurationData(agentProp.getProperty("agent.config.clientId"));
-//		logger.debug("conf : {}",conf.getClientId());
-//		
-		for(Object key : jobProp.keySet()){
-			logger.debug("{} : {}",new Object[]{key,jobProp.get(key)});
-		}
+		
+		ConfigurationVO configVO = gateway.findConfigurationData(agentProp.getProperty("consumer.clientId"));
+		logger.debug("ConfigurationVO retrieved : {}",configVO);
 	}
 	
 	public void executeConfig(EPISWSGateway gateway) throws Exception {
@@ -119,7 +117,10 @@ public class EPISConsumerService implements ApplicationContextAware {
 */
 	public void executeBiz(EPISWSGateway gateway) throws Exception{
 		
-		String str = gateway.processPrimitiveData(null);
+		HashMap<String,String> param = new HashMap<String,String>();
+		param.put("FIELD1","ABC");
+		param.put("FIELD2","DEF");
+		String str = gateway.processPrimitiveData(param);
 		logger.debug("RESULT : {}", str);
 	}
 

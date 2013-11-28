@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.epis.ws.common.entity.AgentVO;
+import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.provider.dao.core.ConfigurationDAO;
 import org.epis.ws.provider.entity.JQGridVO;
@@ -29,7 +30,20 @@ public class ConfigurationService {
 	}
 	
 	public String getWebServicePass(String userID) throws Exception {
-		String result = dao.selectUserPassword(userID);
+		String result = dao.selectWebserviceUserPassword(userID);
+		return result;
+	}
+	
+	public ConfigurationVO getConfigurationInfo(String agentId) throws Exception{
+		
+		AgentVO agentInfo = dao.selectAgentInfo(agentId);
+		
+		List<JobVO> jobList = dao.selectJobList(agentId);
+		ConfigurationVO result = new ConfigurationVO();
+		
+		result.setAgentInfo(agentInfo);
+		result.setJobList(jobList);
+		
 		return result;
 	}
 	
