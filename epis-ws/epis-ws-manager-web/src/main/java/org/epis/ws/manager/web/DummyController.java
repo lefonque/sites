@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.common.utils.OSEnum;
-import org.epis.ws.manager.web.utils.ColumnName;
+import org.epis.ws.manager.web.utils.LoginPropertyKeyEnum;
 import org.epis.ws.provider.entity.AjaxResponseVO;
 import org.epis.ws.provider.entity.JQGridVO;
 import org.epis.ws.provider.service.core.ConfigurationService;
@@ -46,8 +46,8 @@ public class DummyController {
 			,Model model){
 		String result = null;
 		Map<String,String> userInfo = configService.getLoginUserInfo(loginUsername);
-		if(loginUsername.equals(userInfo.get(ColumnName.LOGIN_USER.getColName()))
-				&& loginPassword.equals(userInfo.get(ColumnName.LOGIN_PASS.getColName()))){
+		if(loginUsername.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName()))
+				&& loginPassword.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName()))){
 			request.getSession().setAttribute("LOGIN", loginUsername);
 			result = "redirect:/config/main";
 		}
