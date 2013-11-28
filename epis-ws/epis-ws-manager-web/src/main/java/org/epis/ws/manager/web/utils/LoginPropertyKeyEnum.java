@@ -1,13 +1,13 @@
 package org.epis.ws.manager.web.utils;
 
-public enum ColumnName {
+public enum LoginPropertyKeyEnum {
 
 	LOGIN_USER("loginUsername")
 	,LOGIN_PASS("loginPassword")
 	;
 	
 	private final String colName;
-	ColumnName(String colName){
+	LoginPropertyKeyEnum(String colName){
 		this.colName = colName;
 	}
 	
