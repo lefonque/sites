@@ -62,10 +62,10 @@ function initFormDialog() {
 			effect:"explode"
 			,duration:500
 		}
-		,open: handler_DialogAgentOpen
+		,open: handleOpen_DialogAgent
 		,buttons: {
 			//추가 or 수정 버튼
-			"Apply": handler_DialogAgentApplyBtnClick
+			"Apply": handleApplyBtnClick_DialogAgent
 			,Cancel: function(){
 				$(this).dialog('close');
 			}
@@ -86,10 +86,10 @@ function initFormDialog() {
 		,modal: true
 		,show:{ effect:"blind" ,duration:500 }
 		,hide:{ effect:"explode" ,duration:500 }
-		,open: handler_DialogAgentJobOpen
+		,open: handleOpen_DialogAgentJob
 		,buttons: {
 			//추가or수정 버튼
-			"Apply": handler_DialogAgentJobApplyBtnClick
+			"Apply": handleApplyBtnClick_DialogAgentJob
 			,Cancel: function(){
 				$(this).dialog('close');
 			}
@@ -129,7 +129,7 @@ function initFormDialog() {
  *	처리내용 :
  *		- 수정모드일 경우, 상단 문구표시 (ex. 유통공사)
  */
-function handler_DialogAgentOpen(event, ui){
+function handleOpen_DialogAgent(event, ui){
 	//=================================================================
 	//	Configuration 입력창 오픈시 선행처리 기술
 	//	-> 상단 문구표시 (ex. Client ID : CLIENT_A01)
@@ -150,7 +150,7 @@ function handler_DialogAgentOpen(event, ui){
  *		- ajax로 서버에 반영한다.
  *		- 처리가 완료되면 안내 Dialog를 띄우고 gridAgent을 리로드한다.
  */
-function handler_DialogAgentApplyBtnClick(){
+function handleApplyBtnClick_DialogAgent(){
 	if(agentValidator.form()){
 		var operation = "추가";
 		var url = '<c:url value="/config/addAgent"/>';
@@ -176,7 +176,7 @@ function handler_DialogAgentApplyBtnClick(){
  *		  gridAgent에서 선택된 rowData의 해당 값을 bind한다.
  *		- Dialog 상단부에 안내문구를 작성한다.
  */
-function handler_DialogAgentJobOpen(event, ui){
+function handleOpen_DialogAgentJob(event, ui){
 	//form.cmxform label { width: 130px; }
 	$('.cmxform label').css({"width": "100px"});
 	var gridAgentRowId = null;
@@ -215,7 +215,7 @@ function handler_DialogAgentJobOpen(event, ui){
  *	- ajax로 서버에 반영한다.
  *	- 처리가 완료되면 안내 Dialog를 띄우고 gridAgentJob을 리로드한다.
  */
-function handler_DialogAgentJobApplyBtnClick(){
+function handleApplyBtnClick_DialogAgentJob(){
 	if(agentJobValidator.form()){
 		
 		//URL 분기 및 서버처리완료 후 안내문구 대응
@@ -358,17 +358,17 @@ function initGrid() {
 			,repeatitems: false
 		}
 		,onSelectRow: function(rowId,status){
-			handler_GridAgentRowSelect(rowId,status);
+			handleRowSelect_GridAgent(rowId,status);
 		}
 		,onSelectAll: function(rowIds,status){
 			if(rowIds!=null && rowIds.length > 0){
-				handler_GridAgentRowSelect(rowIds[rowIds.length-1],status);
+				handleRowSelect_GridAgent(rowIds[rowIds.length-1],status);
 			}
 			else{
-				handler_GridAgentRowSelect(null,status);
+				handleRowSelect_GridAgent(null,status);
 			}
 		}
-		,gridComplete: handler_GridAgentComplete
+		,gridComplete: handleComplete_GridAgent
 	});
 	jQuery("#gridAgent").jqGrid('navGrid', '#pagerAgentGrid', {
 		edit : false
@@ -428,12 +428,8 @@ function initGrid() {
 			root: "root"
 			,repeatitems: false
 		}
-		,onSelectRow: function(id){
-			if(id!=null){
-				$('#btnModifyAgentJob').button("option","disabled",false);
-			}
-		}
-		,gridComplete: handler_AgentJobGridComplete
+		,onSelectRow: handleRowSelect_GridAgentJob
+		,gridComplete: handleComplete_GridAgentJob
 	});
 	jQuery("#gridAgentJob").jqGrid('navGrid', '#pagerAgentJobGrid', 
 		{
@@ -486,8 +482,7 @@ function orgNameFormatter(cellValue, option, rowObject){
  *	rowId : 클릭된 row의 ID
  *	status : checkbox가 check이면 true, uncheck이면 false
  */
-function handler_GridAgentRowSelect(rowId,status){
-	//Schedule Grid 데이터 취득 및 표시
+function handleRowSelect_GridAgent(rowId,status){
 	var inactivateButton = true;
 	//체크해제시, 선택된 것의 rowID를 찾아서 처리
 	//체크시, 기존처리대로
@@ -523,7 +518,7 @@ function handler_GridAgentRowSelect(rowId,status){
 		
 		//Schedule 측 Form 내 hidden값에 ostype값을 bind한다.
 		agentId = rowData.agentId;
-		$('#btnModifyAgentJob').button("option","disabled",true);
+		//$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",true);//handleComplete_GridAgentJob에서 처리됨
 	}
 
 	//Job측 Form내의 jobAgentId 컨트롤에 값을 할당한다.
@@ -536,7 +531,7 @@ function handler_GridAgentRowSelect(rowId,status){
 /**
  * gridAgent가 표시가 완료되었을 때 처리되는 Callback Method
  */
-function handler_GridAgentComplete(){
+function handleComplete_GridAgent(){
 	$('#btnModifyAgent,#btnRemoveAgent,#btnAddAgentJob,#btnModifyAgentJob').button("option","disabled",true);
 
 	$("#gridAgentJob").jqGrid('setCaption',"Agent 작업목록");
@@ -550,12 +545,31 @@ function handler_GridAgentComplete(){
 	//$('#btnRemoveAgentJob').button('option','disabled',true);
 }
 
+
+function handleRowSelect_GridAgentJob(rowId,status){
+	//체킹해제시에만 체킹된 row 존재여부 확인
+	if(!status){
+		var rowIdArray = $('#gridAgentJob').jqGrid('getGridParam','selarrrow');
+		if(rowIdArray!=null && rowIdArray.length > 0){
+			rowId = rowIdArray[rowIdArray.length-1];
+		}
+		else{
+			rowId = null;
+		}
+	}
+	var inactivateButton = true;
+	if(rowId!=null){
+		inactivateButton = false;
+	}
+	$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",inactivateButton);
+}
+
 /**
  *	gridAgentJob의 데이터가 모두 로딩되고, gridAgentJob에 엮인
  *	여타 처리가 완료되었을 때 처리되는 Callback Method
  *	
  */
-function handler_AgentJobGridComplete(){
+function handleComplete_GridAgentJob(){
 	
 	//=================================================================
 	//	Schedule 버튼 활성/비활성화 처리
@@ -565,7 +579,7 @@ function handler_AgentJobGridComplete(){
 		inactivateAddBtn = true;
 	}
 	$('#btnAddAgentJob').button("option","disabled",inactivateAddBtn);
-	$('#btnModifyAgentJob').button("option","disabled",true);
+	$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",true);
 }
 
 /**
@@ -575,11 +589,11 @@ function initEvent(){
 	//=================================================================
 	//	Configuration 측 Button
 	//=================================================================
-	$('#btnAddAgent').button().on('click',handler_GridAddBtnClick);
+	$('#btnAddAgent').button().on('click',handleAddBtnClick_BelowGrid);
 		//jQuery("#gridAgent").jqGrid('addRowData',1,{'userId':'debug','pass':'debug','agentId':'debug'});
 	//});
-	$('#btnModifyAgent').button({'disabled':true}).on('click',handler_GridModifyBtnClick);
-	$('#btnRemoveAgent').button({'disabled':true}).on('click',handler_GridRemoveBtnClick);
+	$('#btnModifyAgent').button({'disabled':true}).on('click',handleModifyBtnClick_BelowGrid);
+	$('#btnRemoveAgent').button({'disabled':true}).on('click',handleRemoveBtnClick_BelowGrid);
 	
 	//=================================================================
 	//	Agent 측 입력폼 : SMS사용여부값에 따라 SMS수신 폰번호 입력란을 활성화시킨다.
@@ -599,12 +613,12 @@ function initEvent(){
 	//=================================================================
 	//	Agent Job 측 Button
 	//=================================================================
-	$('#btnAddAgentJob').button({disabled:true}).on('click',handler_GridAddBtnClick);
-	$('#btnModifyAgentJob').button({disabled:true}).on('click',handler_GridModifyBtnClick);
-	$('#btnRemoveAgentJob').button({'disabled':true}).on('click',handler_GridRemoveBtnClick);
+	$('#btnAddAgentJob').button({disabled:true}).on('click',handleAddBtnClick_BelowGrid);
+	$('#btnModifyAgentJob').button({disabled:true}).on('click',handleModifyBtnClick_BelowGrid);
+	$('#btnRemoveAgentJob').button({'disabled':true}).on('click',handleRemoveBtnClick_BelowGrid);
 	
 	//	JDBC Driver Class 변경시 처리 : jdbcUrl 입력창에 hint표시
-	$('#jdbcDriverClassName').on('change',handler_SelectJdbcDriverChange);
+	$('#jdbcDriverClassName').on('change',handleSelectChange_JdbcDriver);
 	$('#jdbcUrl').tooltip().off("mouseover mouseout");
 
 }
@@ -613,7 +627,7 @@ function initEvent(){
  * 데이터 추가 버튼 클릭시 이벤트 Handling (Configuration - Schedule 공통)
  * 세부적인 사항은 해당 Form Dialog내에서 처리됨
  */
-function handler_GridAddBtnClick(event){
+function handleAddBtnClick_BelowGrid(event){
 	var dialogID = $(event.currentTarget).parent().attr('id');
 	dialogID = dialogID.replace("div","dialog");
 	$('#' + dialogID + ' input[name$="applyType"]').val("I");
@@ -623,7 +637,7 @@ function handler_GridAddBtnClick(event){
  * 데이터 변경 버튼 클릭시 이벤트 Handling(Configuration - Schedule 공통)
  * 세부적인 사항은 해당 Form Dialog내에서 처리됨
  */
-function handler_GridModifyBtnClick(event){
+function handleModifyBtnClick_BelowGrid(event){
 	var subject = $(event.currentTarget).parent().attr('id').replace("div","");
 	var gridSelector = "#grid" + subject;
 	var dialogSelector = "#dialog" + subject;
@@ -646,7 +660,7 @@ function handler_GridModifyBtnClick(event){
  * gridAgent 내에서 선택된 row들의 agentId값만 모은 배열을 파라메터로 하여,
  * 서버에 삭제요청을 하고 그 결과를 받는다.
  */
-function handler_GridRemoveBtnClick(event){
+function handleRemoveBtnClick_BelowGrid(event){
 	var subject = $(event.currentTarget).parent().attr('id').replace("div","");
 	var gridSelector = "#grid" + subject;
 	var rowIds = $(gridSelector).jqGrid('getGridParam','selarrrow');
@@ -714,7 +728,7 @@ function openAlertDialog(msgText){
 }
 
 
-function handler_SelectJdbcDriverChange(event){
+function handleSelectChange_JdbcDriver(event){
 	var selectedDBType = $(event.currentTarget).find('option:selected').text();
 	var title = "";
 	switch(selectedDBType){
