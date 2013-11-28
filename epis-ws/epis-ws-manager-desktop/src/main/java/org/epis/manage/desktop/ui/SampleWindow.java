@@ -20,6 +20,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -125,9 +126,11 @@ public class SampleWindow {
 				}
 			}
 		});
-		tblAgent.getColumnModel()
-			.getColumn(checkboxColumnIndex).setHeaderRenderer(checkboxHeader);
-		
+		TableColumn checkboxHeaderColumn = tblAgent.getColumnModel()
+			.getColumn(checkboxColumnIndex);
+		checkboxHeaderColumn.setHeaderRenderer(checkboxHeader);
+		checkboxHeaderColumn.setPreferredWidth(10);
+		checkboxHeaderColumn.setResizable(false);
 		
 		scrollPaneClients.setViewportView(tblAgent);
 		

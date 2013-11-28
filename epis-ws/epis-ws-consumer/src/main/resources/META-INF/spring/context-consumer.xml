@@ -60,9 +60,9 @@
   </jaxws:client>
  -->
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-    destroy-method="close" p:driverClassName="#{jobProp['${job.name}.jdbcDriverClass']}"
-    p:url="#{jobProp['${job.name}.jdbcUrl']}" p:username="#{jobProp['${job.name}.jdbcUsername']}"
-    p:password="#{jobProp['${job.name}.jdbcPass']}" />
+    destroy-method="close" p:driverClassName="#{jobProp['${job.id}.jdbcDriverClass']}"
+    p:url="#{jobProp['${job.id}.jdbcUrl']}" p:username="#{jobProp['${job.id}.jdbcUsername']}"
+    p:password="#{jobProp['${job.id}.jdbcPass']}" />
 
 
 
@@ -78,10 +78,7 @@
 
   <tx:advice id="txAdvice" transaction-manager="transactionManager">
     <tx:attributes>
-      <tx:method name="add*" rollback-for="java.lang.Throwable" />
-      <tx:method name="modify*" rollback-for="java.lang.Throwable" />
-      <tx:method name="remove*" rollback-for="java.lang.Throwable" />
-      <tx:method name="get*" propagation="NEVER" />
+      <tx:method name="execute*" rollback-for="java.lang.Throwable" />
       <tx:method name="*" propagation="NOT_SUPPORTED" />
     </tx:attributes>
   </tx:advice>

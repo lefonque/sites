@@ -15,7 +15,7 @@
     
     <File>logs/logFile.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>logs/${job.name}/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>logs/${job.id}/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy>
     
     <layout class="ch.qos.logback.classic.PatternLayout">

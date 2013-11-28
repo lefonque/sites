@@ -1,11 +1,17 @@
 package org.epis.ws.consumer.service.core;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.service.EPISWSGateway;
+import org.epis.ws.consumer.dao.AgentBizDAO;
+import org.epis.ws.consumer.util.PropertyEnum;
+import org.epis.ws.consumer.util.SqlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -30,6 +36,12 @@ public class EPISConsumerService implements ApplicationContextAware {
 	@Qualifier("agentProp")
 	private Properties agentProp;
 	
+	@Autowired
+	private SqlUtil sqlUtil;
+	
+	@Autowired
+	private AgentBizDAO agentDao;
+	
 	public void executeDebug(EPISWSGateway gateway) throws Exception{
 //		String str = gateway.processPrimitiveData("", "");
 //		logger.debug("RESULT : {}", str);
@@ -42,7 +54,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 		final AbstractScheduleRegister register = ctx.getBean(
 				agentProp.getProperty("consumer.operatingSystem") + "ScheduleRegister"
 				,AbstractScheduleRegister.class);
-		String[] jobNames = StringUtils.splitPreserveAllTokens(jobProp.getProperty("job.names"), ",");
+		String[] jobNames = StringUtils.splitPreserveAllTokens(jobProp.getProperty("job.ids"), ",");
 		
 		register.registerSchedule(jobNames);
 	}
@@ -115,13 +127,56 @@ public class EPISConsumerService implements ApplicationContextAware {
 		logger.info("===== Configuration Synchronize END =====");
 	}
 */
-	public void executeBiz(EPISWSGateway gateway) throws Exception{
+	public void executeBiz(EPISWSGateway gateway) {
+
+		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
 		
 		HashMap<String,String> param = new HashMap<String,String>();
 		param.put("FIELD1","ABC");
 		param.put("FIELD2","DEF");
-		String str = gateway.processPrimitiveData(param);
-		logger.debug("RESULT : {}", str);
+		
+		
+		boolean result = false;
+		try {
+			//====================================================
+			//Insert Something
+			//====================================================
+			String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
+			//Convert ? to NamedParameter
+			if(sql.substring(StringUtils.indexOfIgnoreCase(sql, "values")).contains("?")){
+				sql = sqlUtil.convertInsertSQL(sql);
+			}
+			int count = agentDao.modify(sql, StringUtils.EMPTY);
+			logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
+			
+			//====================================================
+			//Select Something
+			//====================================================
+			sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
+			// Convert paginational SQL
+			sql = sqlUtil.convertPagableSelectSQL(sql);
+			
+			List<Map<String,Object>> dataList = agentDao.selectList(sql);
+			while(CollectionUtils.isNotEmpty(dataList)){
+				String str = gateway.processPrimitiveData(dataList);
+				logger.info("=== RESPONSED FROM PROVIDER : [{}] ===", str);
+				
+				//Update Something
+				for(Map<String,Object> one : dataList){
+					sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
+					if(sql.contains("?")){
+						
+					}
+					count = agentDao.modify(sql, one);
+				}
+			}
+			
+			
+			result = true;
+		} catch (Exception e) {
+			logger.error("EXCEPTION OCCURED IN WEBSERVICE",e);
+		}
+		
 	}
 
 	@Override

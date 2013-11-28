@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -23,7 +24,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CheckBoxHeader implements TableCellRenderer {
+public class CheckBoxHeader extends DefaultTableCellRenderer {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6590280952207602394L;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -33,7 +39,7 @@ public class CheckBoxHeader implements TableCellRenderer {
 	public CheckBoxHeader(JTableHeader header, int columnIndex) {
 		this.checkboxColumnIndex = columnIndex;
 		checkbox = new JCheckBox();
-		
+		checkbox.setHorizontalAlignment(CENTER);
 		logger.debug("Listener Added to Header!!");
 	}
 
@@ -46,8 +52,8 @@ public class CheckBoxHeader implements TableCellRenderer {
 		if ((header != null)
 				&& !ArrayUtils.contains(header.getMouseListeners(), this)) {
 
-			checkbox.setForeground(header.getForeground());
-			checkbox.setBackground(header.getBackground());
+			//checkbox.setForeground(header.getForeground());
+			//checkbox.setBackground(header.getBackground());
 			
 		}
 		checkbox.setBorder(UIManager.getBorder("TableHeader.cellBorder"));

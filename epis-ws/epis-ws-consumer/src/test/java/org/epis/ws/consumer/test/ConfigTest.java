@@ -9,13 +9,13 @@ import org.epis.ws.consumer.dao.AgentBizDAO;
 import org.epis.ws.consumer.service.core.UnixScheduleRegister;
 import org.epis.ws.consumer.service.core.WindowsScheduleRegister;
 import org.epis.ws.consumer.util.PropertyEnum;
+import org.epis.ws.consumer.util.SqlUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,14 +34,24 @@ public class ConfigTest {
 	@Autowired
 	private AgentBizDAO bizDao;
 	
-	@Value("#{jobProp['${job.name}.jdbcDriverClass']}")
-	private String dummy;
-	
 	@Autowired
 	@Qualifier("jobProp")
 	private Properties jobProp;
 	
+	@Autowired
+	private SqlUtil sqlUtil;
+	
 	@Test
+	public void testSqlUtil(){
+		String sql = "INSERT INTO just_table (field1,field2,field3,field4,field5) VALUES('A? or B?', ?, 'get out', ?, CONCAT('P-',?))";
+		logger.debug(sqlUtil.convertInsertSQL(sql));
+		
+		sql = "UPDATE just_table SET field1=?, field2=CONCAT('P-',?), field3='James', field4=? WHERE field5=TRIM(?)";
+		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
+	}
+	
+	
+//	@Test
 	public void testGarage(){
 		String dumm = "        1   ...                     오후 5:13     E:\temp\test.bat";
 		String[] tokens = StringUtils.split(dumm," ");
@@ -60,7 +70,6 @@ public class ConfigTest {
 	
 	
 	public void testDBConn(){
-		logger.debug("dummy : [{}]",dummy);
 		try {
 			Map<String,Object> result = bizDao.selectInfo(
 					"SELECT url FROM jdbc_info_tbl where job_name=?"
