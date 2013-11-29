@@ -1,5 +1,6 @@
 package org.epis.ws.provider.service.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	private ConfigurationService service;
 	
 	@Override
-	public String processPrimitiveData(List<Map<String,Object>> collectedDataList)
+	public String processPrimitiveData(List<HashMap<String,Object>> collectedDataList)
 			throws Exception {
 		for(Map<String,Object> one : collectedDataList){
 			logger.debug("===== Parameter from Agent : {} =====",one);

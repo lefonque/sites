@@ -1,7 +1,7 @@
 package org.epis.ws.common.service;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -14,7 +14,7 @@ public interface EPISWSGateway {
 	
 	@WebMethod(operationName="processPrimitiveData"
 			,action="http://ws.epis.org/provider/EPISWSGateway/processPrimitiveData")
-	public String processPrimitiveData(List<Map<String,Object>> collectedDataList) throws Exception;
+	public String processPrimitiveData(List<HashMap<String,Object>> collectedDataList) throws Exception;
 	
 	@WebMethod(operationName="findConfigurationData"
 			,action="http://ws.epis.org/provider/EPISWSGateway/findConfigurationData")

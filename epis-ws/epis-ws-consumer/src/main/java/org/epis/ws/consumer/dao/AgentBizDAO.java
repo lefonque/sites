@@ -1,5 +1,9 @@
 package org.epis.ws.consumer.dao;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 /**
  * agent.properties에 설정된 SQL문을 실행하는 DAO
@@ -52,8 +58,12 @@ public class AgentBizDAO {
 	}
 	
 	
-	public List<Map<String,Object>> selectList(String sql){
-		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
+	public List<HashMap<String,Object>> selectList(String sql){
+		//List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
+		List<HashMap<String, Object>> result
+			= jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper(){
+
+		});
 		return result;
 	}
 	
@@ -106,4 +116,30 @@ public class AgentBizDAO {
 	}
 	
 	
+	class ColumnHashMapRowMapper implements RowMapper<HashMap<String,Object>> {
+		public HashMap<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+			HashMap<String, Object> mapOfColValues = createColumnMap(columnCount);
+			for (int i = 1; i <= columnCount; i++) {
+				String key = getColumnKey(JdbcUtils.lookupColumnName(rsmd, i));
+				Object obj = getColumnValue(rs, i);
+				mapOfColValues.put(key, obj);
+			}
+			return mapOfColValues;
+		}
+		
+		protected HashMap<String, Object> createColumnMap(int columnCount) {
+			return new LinkedCaseInsensitiveMap<Object>(columnCount);
+		}
+		
+		protected String getColumnKey(String columnName) {
+			return columnName;
+		}
+		
+		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
+			return JdbcUtils.getResultSetValue(rs, index);
+		}
+	
+	}
 }

@@ -44,7 +44,8 @@ public class SqlUtil {
 		
 		char ch = 0;
 		String fieldName = null;
-		boolean parenthesesOpen = false, readField = true;
+		boolean parenthesesOpen = false, readField = true, startKeyword=false;
+		
 		int fieldStartIndex = 0;
 		
 		StringBuilder result = new StringBuilder();
@@ -66,10 +67,39 @@ public class SqlUtil {
 				result.append(ch);
 				break;
 				
+			case 'w':
+			case 'W':
+				startKeyword = "where".equalsIgnoreCase(sqlPairPart.substring(cursor,cursor+5));
+				result.append(ch);
+				break;
+			case 'a':
+			case 'A':
+				startKeyword = "and".equalsIgnoreCase(sqlPairPart.substring(cursor,cursor+3));
+				result.append(ch);
+				break;
+				
+			case 'o':
+			case 'O':
+				startKeyword = "or".equalsIgnoreCase(sqlPairPart.substring(cursor,cursor+2));
+				result.append(ch);
+				break;
+				
+			case ' ':
+				if(startKeyword){
+					readField = true;
+					fieldStartIndex = cursor+1;
+				}
+				result.append(ch);
+				break;
+				
 			case '=':
 				if(!parenthesesOpen && readField){
 					fieldName = sqlPairPart.substring(fieldStartIndex,cursor).trim();
+					if(StringUtils.contains(fieldName, '(') && StringUtils.contains(fieldName, ')')){
+						fieldName = fieldName.substring(fieldName.indexOf('('), fieldName.indexOf(')'));
+					}
 					readField = false;
+					startKeyword = false;
 				}
 				result.append(ch);
 				break;

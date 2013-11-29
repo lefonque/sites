@@ -28,22 +28,12 @@ $(document).ready(function() {
 	initValidation();
 	initGrid();
 	initEvent();
+	
+	$('#orgCode').parent().hide();
 });
 
-function debugging(){
-	$.post('<c:url value="/config/scheduleList"/>?agentId=' + encodeURIComponent('CLIENT#1')
-			,{}
-			,function(data){
-				var list = data.root;
-				$.each(list,function(idx,elem){
-					alert(elem.execDatetime);
-					alert(new Date(elem.execDatetime));
-				});
-			});
-}
-
 /**
- * 입력 Form Dialog(Configuration, Schedule) 및 Alert Dialog를 설정함
+ * 입력 Form Dialog(Configuration, Job) 및 Alert Dialog를 설정함
  */
 function initFormDialog() {
 	//=================================================================
@@ -77,7 +67,7 @@ function initFormDialog() {
 	
 	
 	//=================================================================
-	//	Schedule 입력 Form Dialog
+	//	Job 입력 Form Dialog
 	//=================================================================
 	$('#dialogAgentJob').dialog({
 		autoOpen: false
@@ -95,8 +85,10 @@ function initFormDialog() {
 			}
 		}
 		,close: function(){
+			var agentId = $('#jobAgentId').val();
 			resetForm('AgentJob', agentJobValidator);
-			$('#useExpression').prop('checked',false).trigger('change');
+			$('#jobAgentId').val(agentId);
+			//$('#useExpression').prop('checked',false).trigger('change');
 		}
 	});
 	
@@ -138,7 +130,8 @@ function handleOpen_DialogAgent(event, ui){
 	$('.cmxform label').css({"width": "130px"});
 	var applyType = $(this).find('input[name$="applyType"]').val();
 	if(applyType=="U"){
-		$('#dialogAgentHead').text($('#orgCode option:selected').text());
+		//$('#dialogAgentHead').text($('#orgCode option:selected').text());
+		$('#dialogAgentHead').text();
 	}
 }
 
@@ -193,8 +186,10 @@ function handleOpen_DialogAgentJob(event, ui){
 	
 	
 	//안내문구 처리
+	var obj = $(this).find('input[name$="applyType"]');
 	var applyType = $(this).find('input[name$="applyType"]').val();
-	var headText = "<b>[" + $('#orgCode option:selected').text() + "]</b> : ";
+	//var headText = "<b>[" + $('#orgCode option:selected').text() + "]</b> : ";
+	var headText = "<b>[" + $('#jobAgentId').val() + "]</b> : ";
 	if(applyType=="U"){
 		headText += $(this).find("#jobName").val();
 		headText += " 변경";
@@ -221,7 +216,7 @@ function handleApplyBtnClick_DialogAgentJob(){
 		//URL 분기 및 서버처리완료 후 안내문구 대응
 		var operation = "추가";
 		var url = '<c:url value="/config/addAgentJob"/>';
-		if($('#schedule_applyType').val()=="U"){
+		if($('#job_applyType').val()=="U"){
 			operation = "수정";
 			url = '<c:url value="/config/modifyAgentJob"/>';
 		}
@@ -258,7 +253,7 @@ function resetForm(subject, validator){
 	if(validator!=null){
 		validator.resetForm();
 	}
-	$('#dialog'+subject+'Head').text('New Entry');
+	$('#dialog'+subject+'Head').text('신규추가');
 }
 
 /**
@@ -283,10 +278,10 @@ function initValidation(){
 			if(sourceDatas==null || sourceDatas.length==0){
 				return valid;
 			}
-			//동일한 schedule type이 있는지 확인
+			//동일한 job name이 있는지 확인
 			$.each(sourceDatas,function(idx,row){
-				//modify의 경우, 현재 수정중인 건의 scheduleId와 다른 row의 것과 비교함
-				if(row.scheduleId==$('#scheduleId').val()){
+				//modify의 경우, 현재 수정중인 건의 jobId와 다른 row의 것과 비교함
+				if(row.jobId==$('#jobId').val()){
 					return true;//continue
 				}
 				if($(element).val()==row[element.name]){
@@ -380,7 +375,7 @@ function initGrid() {
 		//	$('#dialogAgent').dialog("open");
 		//}
 	});
-	jQuery("#gridAgent").jqGrid('hideCol', ["agentId","orgCode","charset","websvcPass","smsCellNo"]);
+	jQuery("#gridAgent").jqGrid('hideCol', ["orgCode","orgName","charset","websvcPass","smsCellNo"]);
 	
 	
 	//=================================================================
@@ -516,7 +511,7 @@ function handleRowSelect_GridAgent(rowId,status){
 			.trigger('reloadGrid');
 		inactivateButton = false;
 		
-		//Schedule 측 Form 내 hidden값에 ostype값을 bind한다.
+		//Job 측 Form 내 hidden값에 bind할 agentId 를 취득한다.
 		agentId = rowData.agentId;
 		//$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",true);//handleComplete_GridAgentJob에서 처리됨
 	}
@@ -572,7 +567,7 @@ function handleRowSelect_GridAgentJob(rowId,status){
 function handleComplete_GridAgentJob(){
 	
 	//=================================================================
-	//	Schedule 버튼 활성/비활성화 처리
+	//	Job쪽 버튼 활성/비활성화 처리
 	//=================================================================
 	var inactivateAddBtn = false;
 	if($('#jobAgentId').val()==""){
@@ -624,7 +619,7 @@ function initEvent(){
 }
 
 /**
- * 데이터 추가 버튼 클릭시 이벤트 Handling (Configuration - Schedule 공통)
+ * 데이터 추가 버튼 클릭시 이벤트 Handling (Configuration - Job 공통)
  * 세부적인 사항은 해당 Form Dialog내에서 처리됨
  */
 function handleAddBtnClick_BelowGrid(event){
@@ -634,7 +629,7 @@ function handleAddBtnClick_BelowGrid(event){
 	$('#' + dialogID).dialog("open");
 }
 /*
- * 데이터 변경 버튼 클릭시 이벤트 Handling(Configuration - Schedule 공통)
+ * 데이터 변경 버튼 클릭시 이벤트 Handling(Configuration - Job 공통)
  * 세부적인 사항은 해당 Form Dialog내에서 처리됨
  */
 function handleModifyBtnClick_BelowGrid(event){
@@ -741,6 +736,9 @@ function handleSelectChange_JdbcDriver(event){
 	case "MySQL":
 		title = "jdbc:mysql://HOSTNAME:PORT/DB명";
 		break;
+		
+	case "HSQLDB":
+		title = "jdbc:hsqldb:hsql://HOSTNAME:PORT/DB명";
 	}
 	$('#jdbcUrl').attr('title',title);
 }
@@ -776,14 +774,15 @@ function handleSelectChange_JdbcDriver(event){
 	<!-- ======================================================================================== -->
 	<!-- Agent 입력 Dialog -->
 	<!-- ======================================================================================== -->
-	<div id="dialogAgent" title="Agent Setting">
-		<p><b id="dialogAgentHead">New Entry</b></p>
+	<div id="dialogAgent" title="Agent 설정">
+		<p><b id="dialogAgentHead">신규추가</b></p>
 
 		<form id="formAgent" name="formAgent" class="cmxform"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
 			<fieldset>
 			<p>
 				<label for="orgCode">기관 코드</label>
 				<select name="orgCode" id="orgCode">
+					<option value="" label="기관선택" selected="selected">기관선택</option>
 <c:forEach items="${orgList}" var="org">
 					<option value="${org.orgCode}" label="${org.orgName}">${org.orgName}</option>
 </c:forEach>
@@ -844,7 +843,7 @@ function handleSelectChange_JdbcDriver(event){
 	<!-- ======================================================================================== -->
 	<!-- Job 입력 Dialog -->
 	<!-- ======================================================================================== -->
-	<div id="dialogAgentJob" title="Job Setting">
+	<div id="dialogAgentJob" title="Job 설정">
 		<p id="dialogAgentJobHead"></p>
 		
 		<form id="formAgentJob" name="formAgentJob" class="cmxform"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
@@ -860,19 +859,6 @@ function handleSelectChange_JdbcDriver(event){
 					class="required time" />
 			</p>
 			<p>
-				<label for="jdbcDriverClassName">DB Type</label>
-				<select name="jdbcDriverClassName" id="jdbcDriverClassName">
-					<option selected="selected" value="oracle.jdbc.driver.OracleDriver" label="Oracle">Oracle</option>
-					<option value="com.microsoft.sqlserver.jdbc.SQLServerDriver" label="SqlServer">SqlServer</option>
-					<option value="com.mysql.jdbc.Driver" label="MySQL">MySQL</option>
-				</select>
-			</p>
-			<p>
-				<label for="jdbcUrl">JDBC URL</label>
-				<input type="text" name="jdbcUrl" id="jdbcUrl"
-					class="required">
-			</p>
-			<p>
 				<label for="jdbcUsername">DB Username</label>
 				<input type="text" name="jdbcUsername" id="jdbcUsername"
 					class="required">
@@ -883,28 +869,43 @@ function handleSelectChange_JdbcDriver(event){
 					class="required">
 			</p>
 			<p>
+				<label for="jdbcDriverClassName">DB Type</label>
+				<select name="jdbcDriverClassName" id="jdbcDriverClassName">
+					<option selected="selected" value="oracle.jdbc.driver.OracleDriver" label="Oracle">Oracle</option>
+					<option value="com.microsoft.sqlserver.jdbc.SQLServerDriver" label="SqlServer">SqlServer</option>
+					<option value="com.mysql.jdbc.Driver" label="MySQL">MySQL</option>
+					<option value="org.hsqldb.jdbcDriver" label="HSQLDB">HSQLDB</option>
+				</select>
+			</p>
+			<p>
+				<label for="jdbcUrl">JDBC URL</label>
+				<input type="text" name="jdbcUrl" id="jdbcUrl" size="38"
+					class="required">
+			</p>
+			<p>
 				<label for="sqlMain">Main SQL</label>
-				<textarea name="sqlMain" id="sqlMain"
+				<textarea name="sqlMain" id="sqlMain" rows="4" cols="37"
 					class="required"></textarea>
 			</p>
 			<p>
 				<label for="sqlPre">전처리 SQL</label>
-				<textarea name="sqlPre" id="sqlPre" rows="3" cols="20"></textarea>
+				<textarea name="sqlPre" id="sqlPre" rows="4" cols="37"></textarea>
 			</p>
 			<p>
 				<label for="sqlPost">후처리 SQL</label>
-				<textarea name="sqlPost" id="sqlPost">
+				<textarea name="sqlPost" id="sqlPost" rows="4" cols="37">
 				</textarea>
 			</p>
 			<p>
 				<label for="serverSql">서버처리 SQL</label>
-				<textarea name="serverSql" id="serverSql" class="required"></textarea>
+				<textarea name="serverSql" id="serverSql" rows="4" cols="37"
+					class="required"></textarea>
 			</p>
 			</fieldset>
 			<input type="hidden" id="jobAgentId" name="agentId"/>
 			<input type="hidden" id="jobId" name="jobId"/>
 			<input type="hidden" id="jobType" name="jobType" value="AGENT"/>
-			<input type="hidden" id="job_ApplyType" name="job_ApplyType"/>
+			<input type="hidden" id="job_applyType" name="job_applyType"/>
 		</form>
 	</div>
 	

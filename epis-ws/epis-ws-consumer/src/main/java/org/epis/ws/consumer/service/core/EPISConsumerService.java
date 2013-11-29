@@ -1,5 +1,6 @@
 package org.epis.ws.consumer.service.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +137,6 @@ public class EPISConsumerService implements ApplicationContextAware {
 		param.put("FIELD2","DEF");
 		
 		
-		boolean result = false;
 		try {
 			//====================================================
 			//Insert Something
@@ -150,29 +150,32 @@ public class EPISConsumerService implements ApplicationContextAware {
 			logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
 			
 			//====================================================
-			//Select Something
+			//Select & Update Something
 			//====================================================
 			sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-			// Convert paginational SQL
+			// 	Convert paginational SQL
 			sql = sqlUtil.convertPagableSelectSQL(sql);
+			//	Select Something
+			List<HashMap<String,Object>> dataList = agentDao.selectList(sql);
 			
-			List<Map<String,Object>> dataList = agentDao.selectList(sql);
-			while(CollectionUtils.isNotEmpty(dataList)){
+			// Avoid Looping Infinitly
+			int maximum = 100000, loopCount = Integer.parseInt(jobProp.getProperty(jobId + ".max.selectcount"));
+			while(CollectionUtils.isNotEmpty(dataList) && (loopCount < maximum)){
+				
 				String str = gateway.processPrimitiveData(dataList);
 				logger.info("=== RESPONSED FROM PROVIDER : [{}] ===", str);
 				
-				//Update Something
+				//	Update Something
 				for(Map<String,Object> one : dataList){
 					sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
 					if(sql.contains("?")){
-						
+						sql = sqlUtil.convertNamedParameterUpdateSQL(sql);
 					}
 					count = agentDao.modify(sql, one);
 				}
+				dataList = agentDao.selectList(sql);
+				loopCount += loopCount;
 			}
-			
-			
-			result = true;
 		} catch (Exception e) {
 			logger.error("EXCEPTION OCCURED IN WEBSERVICE",e);
 		}

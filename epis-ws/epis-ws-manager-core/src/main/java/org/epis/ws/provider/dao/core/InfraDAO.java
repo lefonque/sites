@@ -10,15 +10,12 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class InfraDAO {
 
-	private NamedParameterJdbcTemplate jdbcTemplate;
+//	private NamedParameterJdbcTemplate jdbcTemplate;
 	
 	@Autowired
 	@Qualifier("sql")
@@ -27,7 +24,7 @@ public class InfraDAO {
 	@Autowired
 	@Qualifier("dataSource")
 	private void setDataSource(DataSource dataSource){
-		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+//		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
 	public List<Map<String,Object>> selectOrgList(String keyword){
@@ -38,15 +35,15 @@ public class InfraDAO {
 		
 		//For Testing
 		result = new ArrayList<Map<String,Object>>();
-		Map<String,Object> one = new HashMap<String,Object>();
-		one.put("orgCode","ORG-1");
-		one.put("orgName","유통공사");
-		result.add(one);
-		
-		one = new HashMap<String,Object>();
-		one.put("orgCode","ORG-2");
-		one.put("orgName","농협");
-		result.add(one);
+//		Map<String,Object> one = new HashMap<String,Object>();
+//		one.put("orgCode","ORG-1");
+//		one.put("orgName","유통공사");
+//		result.add(one);
+//		
+//		one = new HashMap<String,Object>();
+//		one.put("orgCode","ORG-2");
+//		one.put("orgName","농협");
+//		result.add(one);
 		
 		return result;
 	}

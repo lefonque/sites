@@ -71,7 +71,7 @@
 
       <xs:complexType name="processPrimitiveData">
         <xs:sequence>
-          <xs:element minOccurs="0" name="arg0" type="tns:hashMap" />
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="tns:hashMap" />
         </xs:sequence>
       </xs:complexType>
 

@@ -85,6 +85,6 @@
 
   <aop:config>
     <aop:advisor advice-ref="txAdvice"
-      pointcut="execution(* org.epis.ws..*Service(..))" />
+      pointcut="execution(* org.epis.ws.consumer..*Service(..))" />
   </aop:config>
 </beans>
