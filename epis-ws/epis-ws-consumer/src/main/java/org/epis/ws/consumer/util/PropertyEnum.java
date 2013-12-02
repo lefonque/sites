@@ -5,6 +5,9 @@ public enum PropertyEnum {
 	JOB_SQL_PRE(".sqlPre")
 	,JOB_SQL_MAIN(".sqlMain")
 	,JOB_SQL_POST(".sqlPost")
+	,JOB_BATCH_SIZE(".batch.selectcount")
+	
+	,AGENT_ID("consumer.agentId")
 	,SYS_ROOT_DIR("consumer.root.dir")
 	,SYS_JOB_NAME("job.id")
 	;

@@ -1,14 +1,15 @@
 package org.epis.ws.consumer.service.core;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.epis.ws.common.entity.ConfigurationVO;
+import org.epis.ws.common.entity.BizVO;
+import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.consumer.dao.AgentBizDAO;
 import org.epis.ws.consumer.util.PropertyEnum;
@@ -47,8 +48,21 @@ public class EPISConsumerService implements ApplicationContextAware {
 //		String str = gateway.processPrimitiveData("", "");
 //		logger.debug("RESULT : {}", str);
 		
-		ConfigurationVO configVO = gateway.findConfigurationData(agentProp.getProperty("consumer.clientId"));
-		logger.debug("ConfigurationVO retrieved : {}",configVO);
+//		ConfigurationVO configVO
+//			= gateway.findConfigurationData(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
+//		logger.debug("ConfigurationVO retrieved : {}",configVO);
+		
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		map.put("Field","Value");
+		List<MapWrapper> list = new ArrayList<MapWrapper>();
+		list.add(new MapWrapper(map));
+		
+		BizVO param = new BizVO();
+		param.setDataList(list);
+		param.setAgentId(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
+		param.setJobId(System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey()));
+		String response = gateway.debugMethod(param);
+		logger.debug("response of Debug : {}",response);
 	}
 	
 	public void executeConfig(EPISWSGateway gateway) throws Exception {
@@ -131,55 +145,68 @@ public class EPISConsumerService implements ApplicationContextAware {
 	public void executeBiz(EPISWSGateway gateway) {
 
 		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
-		
+		logger.info("===== Start JOB Execution : [{}]", jobId);
 		HashMap<String,String> param = new HashMap<String,String>();
 		param.put("FIELD1","ABC");
 		param.put("FIELD2","DEF");
 		
 		
-		try {
-			//====================================================
-			//Insert Something
-			//====================================================
-			String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
-			//Convert ? to NamedParameter
-			if(sql.substring(StringUtils.indexOfIgnoreCase(sql, "values")).contains("?")){
-				sql = sqlUtil.convertInsertSQL(sql);
-			}
-			int count = agentDao.modify(sql, StringUtils.EMPTY);
-			logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
-			
-			//====================================================
-			//Select & Update Something
-			//====================================================
-			sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-			// 	Convert paginational SQL
-			sql = sqlUtil.convertPagableSelectSQL(sql);
-			//	Select Something
-			List<HashMap<String,Object>> dataList = agentDao.selectList(sql);
-			
-			// Avoid Looping Infinitly
-			int maximum = 100000, loopCount = Integer.parseInt(jobProp.getProperty(jobId + ".max.selectcount"));
-			while(CollectionUtils.isNotEmpty(dataList) && (loopCount < maximum)){
-				
-				String str = gateway.processPrimitiveData(dataList);
-				logger.info("=== RESPONSED FROM PROVIDER : [{}] ===", str);
-				
-				//	Update Something
-				for(Map<String,Object> one : dataList){
-					sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
-					if(sql.contains("?")){
-						sql = sqlUtil.convertNamedParameterUpdateSQL(sql);
-					}
-					count = agentDao.modify(sql, one);
-				}
-				dataList = agentDao.selectList(sql);
-				loopCount += loopCount;
-			}
-		} catch (Exception e) {
-			logger.error("EXCEPTION OCCURED IN WEBSERVICE",e);
-		}
 		
+		String preSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
+		//====================================================
+		//PRE SQL
+		//====================================================
+		int count = agentDao.modify(preSQL);
+		logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
+		
+		
+		//	MAIN SQL : Select Something
+		String mainSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
+		mainSQL = sqlUtil.convertPagableSelectSQL(mainSQL);	// Convert paginational SQL
+		
+		//	POST SQL : Update Flag & Timestamp
+		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
+		if(postSQL.contains("?")){
+			postSQL = sqlUtil.convertNamedParameterUpdateSQL(postSQL);
+		}
+
+		String eflag = "S";Timestamp edate = null;
+		// Avoid Looping Infinitly (For Debug)
+		int maximum = 100000, loopCount = Integer.parseInt(jobProp.getProperty(jobId + PropertyEnum.JOB_BATCH_SIZE.getKey()));
+		
+		//====================================================
+		//Select & Update Something
+		//====================================================
+		//	Select
+		List<MapWrapper> dataList = agentDao.selectList(mainSQL);
+		BizVO bizParam = new BizVO();
+		bizParam.setAgentId(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
+		bizParam.setJobId(jobId);
+		while(CollectionUtils.isNotEmpty(dataList)){
+			bizParam.setDataList(dataList);
+			eflag = "F";
+			try {
+				String str = gateway.processPrimitiveData(bizParam);
+				eflag = "S";
+				logger.info("=== RESPONSED FROM PROVIDER : [{}] ===", str);
+			} catch (Exception e) {
+				logger.error("##### ERROR occurred during executing WebService : processPrimitiveData #####");
+			}
+			
+			//	Update Something
+			edate = new Timestamp(System.currentTimeMillis());
+			for(MapWrapper one : dataList){
+				one.core.put("EFLAG",eflag);
+				one.core.put("EDATE",edate);
+				count = agentDao.modify(postSQL, one.core);
+			}
+			dataList = agentDao.selectList(mainSQL);
+			loopCount += loopCount;
+			if (loopCount > maximum){
+				logger.warn("##### It must be in the infinite looping!!! #####");
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -187,5 +214,4 @@ public class EPISConsumerService implements ApplicationContextAware {
 			throws BeansException {
 		this.ctx = applicationContext;
 	}
-
 }

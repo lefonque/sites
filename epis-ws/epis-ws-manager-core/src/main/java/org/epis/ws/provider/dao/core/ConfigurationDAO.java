@@ -163,14 +163,17 @@ public class ConfigurationDAO {
 	}
 
 	
-	public JobVO selectJobInfo(String jobId){
+	public JobVO selectJobInfo(String agentId, String jobId){
 		String sql = sqlRepo.getProperty("select.config.job.one");
-		MapSqlParameterSource paramSource = new MapSqlParameterSource("jobId", jobId);
-		JobVO result = jdbcTemplate.queryForObject(sql, paramSource, jobRowMapper);
+		MapSqlParameterSource paramSource = new MapSqlParameterSource();
+		paramSource.addValue("agentId", agentId);
+		paramSource.addValue("jobId", jobId);
 
 		logger.debug("SQL : {}",sql);
-		logger.debug("PARAMETERS : {}",new Object[]{jobId});
+		logger.debug("PARAMETERS : {}",paramSource);
 		
+		JobVO result = jdbcTemplate.queryForObject(sql, paramSource, jobRowMapper);
+
 		return result;
 	}
 	

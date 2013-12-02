@@ -17,15 +17,16 @@
 
       <xs:complexType name="findConfigurationData">
         <xs:sequence>
-          <xs:element minOccurs="0" name="arg0" type="xs:string" />
+          <xs:element minOccurs="0" name="agentId" type="xs:string" />
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="findConfigurationDataResponse">
         <xs:sequence>
-          <xs:element minOccurs="0" name="return" type="tns:configurationVO" />
+          <xs:element minOccurs="0" name="return"
+            type="tns:configurationVO" />
         </xs:sequence>
       </xs:complexType>
-
+      
       <xs:complexType name="configurationVO">
         <xs:sequence>
           <xs:element minOccurs="0" name="agentInfo" type="tns:agentVO" />
@@ -68,23 +69,31 @@
           <xs:element minOccurs="0" name="sqlPre" type="xs:string" />
         </xs:sequence>
       </xs:complexType>
-
+      
       <xs:complexType name="processPrimitiveData">
         <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="tns:hashMap" />
+          <xs:element maxOccurs="unbounded" minOccurs="0"
+            name="collectedDataList" type="tns:mapWrapper" />
         </xs:sequence>
       </xs:complexType>
 
-      <xs:complexType name="hashMap">
-        <xs:complexContent>
-          <xs:extension base="tns:abstractMap">
-            <xs:sequence />
-          </xs:extension>
-        </xs:complexContent>
-      </xs:complexType>
-
-      <xs:complexType abstract="true" name="abstractMap">
-        <xs:sequence />
+      <xs:complexType name="mapWrapper">
+        <xs:sequence>
+          <xs:element name="core">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:string" />
+                      <xs:element minOccurs="0" name="value" type="xs:anyType" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
       </xs:complexType>
 
       <xs:complexType name="processPrimitiveDataResponse">

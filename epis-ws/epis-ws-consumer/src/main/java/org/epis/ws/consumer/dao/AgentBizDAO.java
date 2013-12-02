@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.consumer.vo.ColumnInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +59,9 @@ public class AgentBizDAO {
 	}
 	
 	
-	public List<HashMap<String,Object>> selectList(String sql){
+	public List<MapWrapper> selectList(String sql){
 		//List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
-		List<HashMap<String, Object>> result
+		List<MapWrapper> result
 			= jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper(){
 
 		});
@@ -84,6 +85,10 @@ public class AgentBizDAO {
 	}
 	
 	
+	public int modify(String sql){
+		int result = jdbcTemplate.getJdbcOperations().update(sql);
+		return result;
+	}
 	
 	/**
 	 * For Insert, Update, Delete
@@ -116,8 +121,8 @@ public class AgentBizDAO {
 	}
 	
 	
-	class ColumnHashMapRowMapper implements RowMapper<HashMap<String,Object>> {
-		public HashMap<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+	class ColumnHashMapRowMapper implements RowMapper<MapWrapper> {
+		public MapWrapper mapRow(ResultSet rs, int rowNum) throws SQLException {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 			HashMap<String, Object> mapOfColValues = createColumnMap(columnCount);
@@ -126,7 +131,8 @@ public class AgentBizDAO {
 				Object obj = getColumnValue(rs, i);
 				mapOfColValues.put(key, obj);
 			}
-			return mapOfColValues;
+			MapWrapper result = new MapWrapper(mapOfColValues);
+			return result;
 		}
 		
 		protected HashMap<String, Object> createColumnMap(int columnCount) {

@@ -23,8 +23,8 @@
   </cxf:bus>
 
 
-  <jaxws:endpoint implementor="#EPISWSGateway" address="/EPISWSGateway"
-    wsdlLocation="/WEB-INF/wsdls/EPISWSGateway.wsdl">
+  <jaxws:endpoint implementor="#EPISWSGateway" address="/EPISWSGateway"><!-- 
+    wsdlLocation="/WEB-INF/wsdls/EPISWSGateway.wsdl"> -->
     <jaxws:properties>
       <entry
         key="#{T(org.apache.cxf.ws.security.SecurityConstants).CALLBACK_HANDLER}"

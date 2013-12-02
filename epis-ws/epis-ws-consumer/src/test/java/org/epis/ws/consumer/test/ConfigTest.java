@@ -1,10 +1,12 @@
 package org.epis.ws.consumer.test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.consumer.dao.AgentBizDAO;
 import org.epis.ws.consumer.service.core.UnixScheduleRegister;
 import org.epis.ws.consumer.service.core.WindowsScheduleRegister;
@@ -42,6 +44,22 @@ public class ConfigTest {
 	private SqlUtil sqlUtil;
 	
 	@Test
+	public void testSelect(){
+		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
+		
+		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
+		
+		String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
+		List<MapWrapper> mapList = bizDao.selectList(sql);
+		for(MapWrapper wrapper : mapList){
+			logger.debug("map : {}", wrapper.core);
+			Object obj = wrapper.core.get("EDATE");
+			logger.debug("edate : {}",obj);
+			bizDao.modify(postSQL, wrapper.core);
+		}
+	}
+	
+//	@Test
 	public void testSqlUtil(){
 		String sql = "INSERT INTO just_table (field1,field2,field3,field4,field5) VALUES('A? or B?', ?, 'get out', ?, CONCAT('P-',?))";
 		logger.debug(sqlUtil.convertInsertSQL(sql));

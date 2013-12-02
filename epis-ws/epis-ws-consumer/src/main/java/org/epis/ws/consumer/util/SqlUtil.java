@@ -24,7 +24,7 @@ public class SqlUtil {
 		builder.append("SELECT * FROM (SELECT ROWNUM rnum, temp.* FROM (")
 			.append(sql)
 			.append(") temp) WHERE rnum BETWEEN 1 AND ")
-			.append(jobProp.getProperty(jobId + ".max.selectcount"));
+			.append(jobProp.getProperty(jobId + PropertyEnum.JOB_BATCH_SIZE.getKey()));
 		return builder.toString();
 	}
 	
@@ -142,6 +142,9 @@ public class SqlUtil {
 		
 		int startIdx = sql.indexOf("(") + 1;
 		int endIdx = StringUtils.indexOfIgnoreCase(sql, "values");
+		if(endIdx == -1){
+			throw new RuntimeException("Invalid INSERT SQL");
+		}
 		String columnPart = sql.substring(startIdx,endIdx);
 		columnPart = columnPart.substring(0, columnPart.lastIndexOf(")"));
 		String[] columns = StringUtils.split(columnPart, ",");

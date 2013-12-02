@@ -1,8 +1,12 @@
 package org.epis.ws.provider.test;
 
-import org.epis.ws.common.entity.AgentVO;
+import java.util.List;
+
+import org.epis.ws.common.entity.BizVO;
+import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.provider.dao.core.ConfigurationDAO;
-import org.epis.ws.provider.service.core.EPISConcreteWSGateway_OLD;
+import org.epis.ws.provider.service.BizService;
+import org.epis.ws.provider.service.core.EPISConcreteWSGateway;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,18 +22,27 @@ public class DAOTest {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
-	private ConfigurationDAO clientDao;
+	private ConfigurationDAO configDao;
 	
 	@Autowired
-	private EPISConcreteWSGateway_OLD gtway;
+	private BizService service;
+	
+	@Autowired
+	private EPISConcreteWSGateway gtway;
 	
 	
 	
 	@Test
 	public void clientDaoTest(){
 		try {
-			AgentVO client = clientDao.selectAgentInfo("CLIENT#3");
-			logger.debug("CLIENT : {}",client.getAgentId());
+			BizVO bizVO = new BizVO();
+			bizVO.setAgentId("AGENT-5");
+			bizVO.setJobId("JOB-1");
+			
+			String sql = "SELECT * FROM if_src_job1";
+			List<MapWrapper> paramList = service.getData(sql);
+			bizVO.setDataList(paramList);
+			service.addData(bizVO);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

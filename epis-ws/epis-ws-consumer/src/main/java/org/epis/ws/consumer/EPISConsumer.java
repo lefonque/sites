@@ -60,18 +60,18 @@ public class EPISConsumer {
 
 	public static void main(String[] args) {
 		if(args==null || args.length < 1){
-			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -D=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
+			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -Djob.id=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
 			System.err.println("e.g.) java -Dconsumer.root.dir=/opt/agent -Djob.id=job1 -jar epis-ws-consumer.jar Biz");
 			System.exit(-1);
 		}
 		if( !("Config".equals(args[0]) || "Biz".equals(args[0]) || "Debug".equals(args[0])) ){
-			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -D=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
+			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -Djob.id=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
 			System.err.println("e.g.) java -Dconsumer.root.dir=/opt/agent -Djob.id=job1 -jar epis-ws-consumer.jar Biz");
 			System.exit(-1);
 		}
 		if(!System.getProperties().containsKey(PropertyEnum.SYS_JOB_NAME.getKey())
 				|| !System.getProperties().containsKey(PropertyEnum.SYS_ROOT_DIR.getKey())){
-			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -D=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
+			System.err.println("Usage : java -Dconsumer.root.dir=[pwd of jar file] -Djob.id=[Job Name] -jar epis-ws-consumer.jar [Config or Biz]");
 			System.err.println("e.g.) java -Dconsumer.root.dir=/opt/agent -Djob.id=job1 -jar epis-ws-consumer.jar Biz");
 			System.exit(-1);
 		}
@@ -108,9 +108,9 @@ public class EPISConsumer {
 			Object result = method.invoke(service, gateway);
 			logger.debug("result : {}",result);
 		} catch (MalformedURLException e) {
-			logger.error("MalformedURLException Occurred on start()", e);
+			logger.error("##### MalformedURLException Occurred on start() #####", e);
 		} catch (Exception e){
-			logger.error("Exception Occurred on start()", e);
+			logger.error("##### Exception Occurred on start() #####", e);
 		}
 		
 	}

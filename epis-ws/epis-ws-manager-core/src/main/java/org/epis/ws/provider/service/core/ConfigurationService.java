@@ -140,12 +140,13 @@ public class ConfigurationService {
 	
 	/**
 	 * Schedule ID에 해당하는 Schedule 정보를 가져온다.
-	 * 현재 사용안함
+	 * Agent에서 webservice로 보내온 데이터를 처리할 SQL을 취득할 때 사용함
+	 * @param agentId
 	 * @param jobId
 	 * @return
 	 */
-	public JobVO getJobInfo(String jobId){
-		JobVO result = dao.selectJobInfo(jobId);
+	public JobVO getJobInfo(String agentId, String jobId){
+		JobVO result = dao.selectJobInfo(agentId, jobId);
 		return result;
 	}
 	
