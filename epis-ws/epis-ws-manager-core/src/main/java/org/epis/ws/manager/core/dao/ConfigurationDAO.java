@@ -1,4 +1,4 @@
-package org.epis.ws.provider.dao.core;
+package org.epis.ws.manager.core.dao;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.common.entity.JobVO;
-import org.epis.ws.provider.entity.JQGridVO;
+import org.epis.ws.manager.entity.JQGridVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

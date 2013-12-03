@@ -375,7 +375,7 @@ function initGrid() {
 		//	$('#dialogAgent').dialog("open");
 		//}
 	});
-	jQuery("#gridAgent").jqGrid('hideCol', ["orgCode","orgName","charset","websvcPass","smsCellNo"]);
+	jQuery("#gridAgent").jqGrid('hideCol', ["orgCode","orgName","charset","websvcPass","smsCellNo","officerContact"]);
 	
 	
 	//=================================================================
@@ -389,11 +389,11 @@ function initGrid() {
 		,colNames : [
 			'작업 ID', '작업명', 'Agent ID', '작업구분', '실행시각'
 			,'메인SQL', '전처리SQL', '후처리SQL', 'JDBC DRIVER', 'JDBC URL'
-			,'JDBC USERNAME', 'JDBC PASSWORD', 'Server SQL', '등록일자', '수정일자'
+			,'JDBC USERNAME', 'JDBC PASSWORD', 'Server SQL', '레코드제한', '등록일자', '수정일자'
 		]
 		,colModel : [
 		    { name : 'jobId', index : 'job_id', width:50}
-			,{ name : 'jobName', index : 'job_name', width : 150 }
+			,{ name : 'jobName', index : 'job_name', width : 100 }
 			,{ name : 'agentId', index : 'agent_id', width : 50 }
 			,{ name : 'jobType', index : 'job_type', width : 50 }
 			,{ name : 'agentExecTime', index : 'agent_exec_time', width : 80 }
@@ -401,10 +401,11 @@ function initGrid() {
 			,{ name : 'sqlPre', index : 'sql_pre', width : 150 }
 			,{ name : 'sqlPost', index : 'sql_post', width : 150 }
 			,{ name : 'jdbcDriverClassName', index : 'jdbc_driver_class_name', width : 100 }
-			,{ name : 'jdbcUrl', index : 'jdbc_url', width : 270 }
+			,{ name : 'jdbcUrl', index : 'jdbc_url', width : 215 }
 			,{ name : 'jdbcUsername', index : 'jdbc_username', width : 80 }
 			,{ name : 'jdbcPassword', index : 'jdbc_password', width : 80 }
 			,{ name : 'serverSql', index : 'server_sql', width : 150 }
+			,{ name : 'batchSelectCount', index : 'batch_select_count', width : 80 }
 			,{ name : 'createdDate', index : 'created_date'
 				,formatter : datetimeFormatter, width : 100 }
 			,{ name : 'modifiedDate', index : 'modified_date'
@@ -442,7 +443,7 @@ function initGrid() {
 	jQuery("#gridAgentJob").jqGrid('hideCol', [
 	   	"jobId", "agentId", "jobType", "sqlMain", "sqlPre"
 		,"sqlPost", "jdbcDriverClassName", "jdbcUsername"
-		,"jdbcPassword", "serverSql"
+		,"jdbcPassword", "serverSql", "batchSelectCount"
 	]);
 }
 
@@ -615,6 +616,7 @@ function initEvent(){
 	//	JDBC Driver Class 변경시 처리 : jdbcUrl 입력창에 hint표시
 	$('#jdbcDriverClassName').on('change',handleSelectChange_JdbcDriver);
 	$('#jdbcUrl').tooltip().off("mouseover mouseout");
+	//$('#batchSelectCount').tooltip().off("mouseover mouseout click focus");
 
 }
 
@@ -900,6 +902,10 @@ function handleSelectChange_JdbcDriver(event){
 				<label for="serverSql">서버처리 SQL</label>
 				<textarea name="serverSql" id="serverSql" rows="4" cols="37"
 					class="required"></textarea>
+			</p>
+			<p>
+				<label for="batchSelectCount">레코드 제한</label>
+				<input type="text" name="batchSelectCount" id="batchSelectCount" title="agent가 1회 select시 취득할 레코드 수">
 			</p>
 			</fieldset>
 			<input type="hidden" id="jobAgentId" name="agentId"/>

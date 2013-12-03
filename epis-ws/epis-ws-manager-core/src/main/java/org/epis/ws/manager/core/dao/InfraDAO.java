@@ -1,4 +1,4 @@
-package org.epis.ws.provider.dao.core;
+package org.epis.ws.manager.core.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;

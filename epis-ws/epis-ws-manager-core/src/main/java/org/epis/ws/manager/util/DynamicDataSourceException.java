@@ -1,4 +1,4 @@
-package org.epis.ws.provider.utils;
+package org.epis.ws.manager.util;
 
 public class DynamicDataSourceException extends RuntimeException {
 

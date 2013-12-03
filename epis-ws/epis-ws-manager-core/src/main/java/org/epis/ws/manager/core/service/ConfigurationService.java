@@ -1,4 +1,4 @@
-package org.epis.ws.provider.service.core;
+package org.epis.ws.manager.core.service;
 
 import java.util.List;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.entity.JobVO;
-import org.epis.ws.provider.dao.core.ConfigurationDAO;
-import org.epis.ws.provider.entity.JQGridVO;
+import org.epis.ws.manager.core.dao.ConfigurationDAO;
+import org.epis.ws.manager.entity.JQGridVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

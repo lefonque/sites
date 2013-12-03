@@ -152,13 +152,15 @@ public class EPISConsumerService implements ApplicationContextAware {
 		
 		
 		
+		int count = 0;
 		String preSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
 		//====================================================
 		//PRE SQL
 		//====================================================
-		int count = agentDao.modify(preSQL);
-		logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
-		
+		if(StringUtils.isNotEmpty(preSQL)){
+			count = agentDao.modify(preSQL);
+			logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
+		}
 		
 		//	MAIN SQL : Select Something
 		String mainSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
@@ -166,9 +168,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 		
 		//	POST SQL : Update Flag & Timestamp
 		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
-		if(postSQL.contains("?")){
-			postSQL = sqlUtil.convertNamedParameterUpdateSQL(postSQL);
-		}
+		
 
 		String eflag = "S";Timestamp edate = null;
 		// Avoid Looping Infinitly (For Debug)
@@ -194,6 +194,10 @@ public class EPISConsumerService implements ApplicationContextAware {
 			}
 			
 			//	Update Something
+			if(StringUtils.isEmpty(postSQL)){
+				break;
+			}
+			
 			edate = new Timestamp(System.currentTimeMillis());
 			for(MapWrapper one : dataList){
 				one.core.put("EFLAG",eflag);
@@ -207,6 +211,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 				break;
 			}
 		}
+		logger.info("===== End JOB Execution : [{}]", jobId);
 	}
 
 	@Override

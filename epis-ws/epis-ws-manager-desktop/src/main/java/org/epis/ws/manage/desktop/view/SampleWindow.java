@@ -1,4 +1,4 @@
-package org.epis.manage.desktop.ui;
+package org.epis.ws.manage.desktop.view;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -24,11 +24,11 @@ import javax.swing.table.TableColumn;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.epis.manage.desktop.model.AgentTableColumnEnum;
-import org.epis.manage.desktop.model.AgentTableModel;
 import org.epis.ws.common.entity.AgentVO;
-import org.epis.ws.provider.entity.JQGridVO;
-import org.epis.ws.provider.service.core.ConfigurationService;
+import org.epis.ws.manage.desktop.model.AgentTableColumnEnum;
+import org.epis.ws.manage.desktop.model.AgentTableModel;
+import org.epis.ws.manager.core.service.ConfigurationService;
+import org.epis.ws.manager.entity.JQGridVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -100,8 +100,8 @@ public class SampleWindow {
 		lblClientList.setFont(new Font("Dialog", Font.BOLD, 16));
 		frame.getContentPane().add(lblClientList, "cell 0 0,alignx left,aligny center");
 		
-		JScrollPane scrollPaneClients = new JScrollPane();
-		frame.getContentPane().add(scrollPaneClients, "cell 0 1,grow");
+		JScrollPane scrollPaneAgents = new JScrollPane();
+		frame.getContentPane().add(scrollPaneAgents, "cell 0 1,grow");
 		
 		
 		tblAgent = new JTable(tblModelAgent);
@@ -132,7 +132,7 @@ public class SampleWindow {
 		checkboxHeaderColumn.setPreferredWidth(10);
 		checkboxHeaderColumn.setResizable(false);
 		
-		scrollPaneClients.setViewportView(tblAgent);
+		scrollPaneAgents.setViewportView(tblAgent);
 		
 		
 		//Pagination for Agent List
@@ -187,12 +187,9 @@ public class SampleWindow {
 		));
 		scrollPaneJobs.setViewportView(tblJobs);
 		
-		JCheckBox chckbxTestcheck = new JCheckBox("testCheck");
-		frame.getContentPane().add(chckbxTestcheck, "flowx,cell 0 7,alignx center");
-		
 		//pagination for Job List
 		JButton btnPrevJobList = new JButton("prev");
-		frame.getContentPane().add(btnPrevJobList, "cell 0 7,alignx center,aligny center");
+		frame.getContentPane().add(btnPrevJobList, "flowx,cell 0 7,alignx center,aligny center");
 
 		JComboBox cmbPageJobList = new JComboBox();
 		frame.getContentPane().add(cmbPageJobList, "cell 0 7");

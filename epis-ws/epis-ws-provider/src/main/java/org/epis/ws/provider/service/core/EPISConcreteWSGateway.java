@@ -7,6 +7,8 @@ import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.common.utils.ConstEnum;
+import org.epis.ws.manager.core.service.ConfigurationService;
+import org.epis.ws.manager.core.service.LogService;
 import org.epis.ws.provider.service.BizService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,24 +30,37 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	@Autowired
 	private BizService bizService;
 	
+	@Autowired
+	private LogService logService;
+	
+	
+	
 	@Override
 	public String processPrimitiveData(BizVO bizParam)
 			throws Exception {
 		String result = ConstEnum.SUCCESS.name();
-		
+		String resultFlag = "F";
 		String agentId = bizParam.getAgentId(), jobId = bizParam.getJobId();
-		if(bizParam==null || agentId==null || jobId==null){
-			throw new IllegalArgumentException("PARAMETER IS NULL!!");
+		try{
+			if(bizParam==null || agentId==null || jobId==null){
+				throw new IllegalArgumentException("PARAMETER IS NULL!!");
+			}
+			
+			if(CollectionUtils.isEmpty(bizParam.getDataList())){
+				logger.warn("===== No Data Found to execute in SERVER =====");
+				return result;
+			}
+			else{
+				bizService.addData(bizParam);
+			}
+			resultFlag = "S";
+			//TODO Customize Logging
+			logger.debug("===== Executed on Server side Successfully =====");
+		} finally {
+			logService.addLog(bizParam, resultFlag);
 		}
 		
-		if(CollectionUtils.isEmpty(bizParam.getDataList())){
-			logger.warn("===== No Data Found to execute in SERVER =====");
-			return result;
-		}
-		bizService.addData(bizParam);
 		
-		//TODO Customize Logging
-		logger.debug("===== Executed on Server side Successfully =====");
 		return result;
 	}
 	

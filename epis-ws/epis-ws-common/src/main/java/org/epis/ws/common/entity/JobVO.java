@@ -28,6 +28,8 @@ public class JobVO {
 	private String jdbcUrl;
 	private String jdbcUsername;
 	private String jdbcPassword;
+	
+	private String batchSelectCount;
 
 	private String serverSql;
 	
@@ -113,6 +115,12 @@ public class JobVO {
 	}
 	public void setServerSql(String serverSql) {
 		this.serverSql = serverSql;
+	}
+	public String getBatchSelectCount() {
+		return batchSelectCount;
+	}
+	public void setBatchSelectCount(String batchSelectCount) {
+		this.batchSelectCount = batchSelectCount;
 	}
 	public Date getCreatedDate() {
 		return createdDate;

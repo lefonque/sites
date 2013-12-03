@@ -8,7 +8,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ws.security.WSPasswordCallback;
-import org.epis.ws.provider.service.core.ConfigurationService;
+import org.epis.ws.manager.core.service.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

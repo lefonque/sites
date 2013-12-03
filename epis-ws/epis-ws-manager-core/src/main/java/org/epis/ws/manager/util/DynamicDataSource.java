@@ -1,4 +1,4 @@
-package org.epis.ws.provider.utils;
+package org.epis.ws.manager.util;
 
 import java.util.Map;
 import java.util.Properties;

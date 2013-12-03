@@ -17,7 +17,7 @@ CREATE TABLE if_src_job2_com_seed (
 
 /*
 SELECT * FROM if_src_job2_com_seed
-WHERE EFLAG IN ('I', 'F')
+WHERE EFLAG = 'I'
 
 INSERT INTO if_src_job2_com_seed (
 	IDX, COM_NAME, ITEM_CD, ITEM_NM, ITEM_IMG, DTL_IMG, SUBJECT, ITEM_SPEC, CAUTION

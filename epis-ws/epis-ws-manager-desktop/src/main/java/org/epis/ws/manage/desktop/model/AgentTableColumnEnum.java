@@ -1,4 +1,4 @@
-package org.epis.manage.desktop.model;
+package org.epis.ws.manage.desktop.model;
 
 
 public enum AgentTableColumnEnum {

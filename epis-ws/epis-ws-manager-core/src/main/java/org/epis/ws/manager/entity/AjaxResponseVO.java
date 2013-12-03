@@ -1,4 +1,4 @@
-package org.epis.ws.provider.entity;
+package org.epis.ws.manager.entity;
 
 
 

@@ -1,9 +1,9 @@
-package org.epis.ws.provider.service.core;
+package org.epis.ws.manager.core.service;
 
 import java.util.List;
 import java.util.Map;
 
-import org.epis.ws.provider.dao.core.InfraDAO;
+import org.epis.ws.manager.core.dao.InfraDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

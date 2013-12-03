@@ -1,43 +1,54 @@
 drop sequence seq_agent;
 drop sequence seq_job;
+drop sequence seq_log;
 drop table TBL_CONFIG_AGENT;
 drop table TBL_CONFIG_JOB;
+drop table TBL_IF_LOG;
 create table TBL_CONFIG_AGENT (
-	agent_id VARCHAR(4000) not null primary key
-	,org_code VARCHAR(4000)
-	,operating_system VARCHAR(4000)
-	,charset VARCHAR(4000)
-	,websvc_user VARCHAR(4000)
-	,websvc_pass VARCHAR(4000)
-	,officer_name VARCHAR(4000)
-	,officer_contact VARCHAR(4000)
+	agent_id VARCHAR2(4000) not null primary key
+	,org_code VARCHAR2(4000)
+	,operating_system VARCHAR2(4000)
+	,charset VARCHAR2(4000)
+	,websvc_user VARCHAR2(4000)
+	,websvc_pass VARCHAR2(4000)
+	,officer_name VARCHAR2(4000)
+	,officer_contact VARCHAR2(4000)
 	,sms_use_yn CHAR
-	,sms_cell_no VARCHAR(4000)
+	,sms_cell_no VARCHAR2(4000)
 	,created_date TIMESTAMP
 	,modified_date TIMESTAMP
 );
 
 create table TBL_CONFIG_JOB (
-	job_id VARCHAR(4000) not null primary key
-	,agent_id VARCHAR(4000)
-	,job_name VARCHAR(4000)
-	,job_type VARCHAR(4000)
-	,agent_exec_time VARCHAR(4000)
-	,sql_main VARCHAR(4000)
-	,sql_pre VARCHAR(4000)
-	,sql_post VARCHAR(4000)
-	,jdbc_driver_class_name VARCHAR(4000)
-	,jdbc_url VARCHAR(4000)
-	,jdbc_username VARCHAR(4000)
-	,jdbc_password VARCHAR(4000)
-	,server_sql VARCHAR(4000)
+	job_id VARCHAR2(4000) not null primary key
+	,agent_id VARCHAR2(4000)
+	,job_name VARCHAR2(4000)
+	,job_type VARCHAR2(4000)
+	,agent_exec_time VARCHAR2(4000)
+	,sql_main VARCHAR2(4000)
+	,sql_pre VARCHAR2(4000)
+	,sql_post VARCHAR2(4000)
+	,jdbc_driver_class_name VARCHAR2(4000)
+	,jdbc_url VARCHAR2(4000)
+	,jdbc_username VARCHAR2(4000)
+	,jdbc_password VARCHAR2(4000)
+	,server_sql VARCHAR2(4000)
+	,batch_select_count INTEGER
 	,created_date TIMESTAMP
 	,modified_date TIMESTAMP
 );
 
+CREATE TABLE TBL_IF_LOG(
+	log_id VARCHAR2(4000) primary key
+	,agent_id VARCHAR2(4000)
+	,job_id VARCHAR2(4000)
+	,result_flag CHAR(1)
+	,create_date TIMESTAMP
+);
+
 create sequence seq_agent start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_job start with 1 increment by 1 maxvalue 1000000;
-
+create sequence seq_log start with 1 increment by 1 maxvalue 1000000;
 
 
 

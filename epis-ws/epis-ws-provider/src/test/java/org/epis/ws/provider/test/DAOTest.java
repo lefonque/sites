@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.MapWrapper;
-import org.epis.ws.provider.dao.core.ConfigurationDAO;
+import org.epis.ws.manager.core.dao.ConfigurationDAO;
 import org.epis.ws.provider.service.BizService;
 import org.epis.ws.provider.service.core.EPISConcreteWSGateway;
 import org.junit.Test;
