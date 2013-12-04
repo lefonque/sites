@@ -1,17 +1,19 @@
 package org.epis.ws.consumer.service.core;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.BizVO;
-import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.entity.RecordMap;
+import org.epis.ws.common.entity.RecordMapEntry;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.consumer.dao.AgentBizDAO;
+import org.epis.ws.consumer.service.AgentBizService;
 import org.epis.ws.consumer.util.PropertyEnum;
 import org.epis.ws.consumer.util.SqlUtil;
 import org.slf4j.Logger;
@@ -44,6 +46,9 @@ public class EPISConsumerService implements ApplicationContextAware {
 	@Autowired
 	private AgentBizDAO agentDao;
 	
+	@Autowired
+	private AgentBizService agentService;
+	
 	public void executeDebug(EPISWSGateway gateway) throws Exception{
 //		String str = gateway.processPrimitiveData("", "");
 //		logger.debug("RESULT : {}", str);
@@ -52,16 +57,11 @@ public class EPISConsumerService implements ApplicationContextAware {
 //			= gateway.findConfigurationData(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
 //		logger.debug("ConfigurationVO retrieved : {}",configVO);
 		
-		HashMap<String,Object> map = new HashMap<String,Object>();
+		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("Field","Value");
-		List<MapWrapper> list = new ArrayList<MapWrapper>();
-		list.add(new MapWrapper(map));
+		List<RecordMap> recordList = agentService.executeMainSQLAsRecordMap();
 		
-		BizVO param = new BizVO();
-		param.setDataList(list);
-		param.setAgentId(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
-		param.setJobId(System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey()));
-		String response = gateway.debugMethod(param);
+		String response = gateway.debugMethod(recordList);
 		logger.debug("response of Debug : {}",response);
 	}
 	
@@ -74,6 +74,98 @@ public class EPISConsumerService implements ApplicationContextAware {
 		register.registerSchedule(jobNames);
 	}
 	
+	public boolean executeBiz(EPISWSGateway gateway) {
+
+		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
+		logger.info("===== Start JOB Execution : [{}] =====", jobId);
+		
+		int count = 0;
+		String preSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
+		//====================================================
+		//PRE SQL
+		//====================================================
+		if(StringUtils.isNotEmpty(preSQL)){
+			count = agentDao.modify(preSQL);
+			logger.info("=== {}'s Pre SQL Process END : [{}] ===",new Object[]{jobId, count});
+		}
+
+		//	POST SQL : Update Flag & Timestamp
+		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
+		
+		//	MAIN SQL : Select Something
+		String mainSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
+		if(StringUtils.isNotEmpty(postSQL)){
+			mainSQL = sqlUtil.convertPagableSelectSQL(mainSQL);	// Convert paginational SQL
+		}
+		
+
+		String eflag = "S";Timestamp edate = null;
+		// Avoid Looping Infinitly (For Debug)
+		int maximum = 100000, loopCount = 0;
+		int batchLimit = Integer.parseInt(
+				jobProp.getProperty(jobId + PropertyEnum.JOB_BATCH_SIZE.getKey()));
+		
+		BizVO bizParam = new BizVO();
+		bizParam.setAgentId(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
+		bizParam.setJobId(jobId);
+		boolean occurError = false, existIntfRecord = false;
+		//====================================================
+		//Select & Update Something
+		//====================================================
+		
+		//	Select
+		List<RecordMap> dataList = agentDao.selectListAsRecordMap(mainSQL);
+		do{
+			existIntfRecord = CollectionUtils.isNotEmpty(dataList);
+			count = existIntfRecord ? dataList.size() : 0;
+			logger.info("=== {}'s Main SQL Process END : [{}] ===",new Object[]{jobId, count});
+			bizParam.setDataList(dataList);
+			
+			//	Execute WebService
+			eflag = "F";
+			try {
+				String str = gateway.processPrimitiveData(bizParam);
+				eflag = "S";
+				logger.info("=== {}'s WebService Process END : [{}] ===",new Object[]{jobId, str});
+			} catch (Exception e) {
+				occurError = true;
+				logger.error("##### ERROR occurred during executing WebService : processPrimitiveData #####");
+			}
+			
+			//	Update Something
+			if(StringUtils.isEmpty(postSQL)){
+				logger.info("===== No SQL For the Post Processing =====");
+				break;
+			}
+			edate = new Timestamp(System.currentTimeMillis());
+			count = 0;
+			for(RecordMap one : dataList){
+				one.entry.add(new RecordMapEntry("EFLAG",eflag));
+				one.entry.add(new RecordMapEntry("EDATE",edate));
+				count += agentDao.modify(postSQL, one);
+			}
+			logger.info("=== {}'s Post SQL Process END : [{}] ===",new Object[]{jobId, count});
+			
+			//	Avoid Infinite Loop
+			loopCount += batchLimit;
+			if (loopCount > maximum){
+				logger.warn("##### It must be in the infinite looping!!! #####");
+				break;
+			}
+			
+			//	Select
+			dataList = agentDao.selectListAsRecordMap(mainSQL);
+		} while(CollectionUtils.isNotEmpty(dataList));
+		
+		logger.info("===== End JOB Execution : [{}] =====", jobId);
+		return occurError;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext)
+			throws BeansException {
+		this.ctx = applicationContext;
+	}
 /*
 	public void executeConfig(EPISWSGateway gateway) throws Exception{
 		
@@ -142,81 +234,4 @@ public class EPISConsumerService implements ApplicationContextAware {
 		logger.info("===== Configuration Synchronize END =====");
 	}
 */
-	public void executeBiz(EPISWSGateway gateway) {
-
-		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
-		logger.info("===== Start JOB Execution : [{}]", jobId);
-		HashMap<String,String> param = new HashMap<String,String>();
-		param.put("FIELD1","ABC");
-		param.put("FIELD2","DEF");
-		
-		
-		
-		int count = 0;
-		String preSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
-		//====================================================
-		//PRE SQL
-		//====================================================
-		if(StringUtils.isNotEmpty(preSQL)){
-			count = agentDao.modify(preSQL);
-			logger.info("=== {}'s Pre Process END : [{}] ===",new Object[]{jobId, count});
-		}
-		
-		//	MAIN SQL : Select Something
-		String mainSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-		mainSQL = sqlUtil.convertPagableSelectSQL(mainSQL);	// Convert paginational SQL
-		
-		//	POST SQL : Update Flag & Timestamp
-		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
-		
-
-		String eflag = "S";Timestamp edate = null;
-		// Avoid Looping Infinitly (For Debug)
-		int maximum = 100000, loopCount = Integer.parseInt(jobProp.getProperty(jobId + PropertyEnum.JOB_BATCH_SIZE.getKey()));
-		
-		//====================================================
-		//Select & Update Something
-		//====================================================
-		//	Select
-		List<MapWrapper> dataList = agentDao.selectList(mainSQL);
-		BizVO bizParam = new BizVO();
-		bizParam.setAgentId(agentProp.getProperty(PropertyEnum.AGENT_ID.getKey()));
-		bizParam.setJobId(jobId);
-		while(CollectionUtils.isNotEmpty(dataList)){
-			bizParam.setDataList(dataList);
-			eflag = "F";
-			try {
-				String str = gateway.processPrimitiveData(bizParam);
-				eflag = "S";
-				logger.info("=== RESPONSED FROM PROVIDER : [{}] ===", str);
-			} catch (Exception e) {
-				logger.error("##### ERROR occurred during executing WebService : processPrimitiveData #####");
-			}
-			
-			//	Update Something
-			if(StringUtils.isEmpty(postSQL)){
-				break;
-			}
-			
-			edate = new Timestamp(System.currentTimeMillis());
-			for(MapWrapper one : dataList){
-				one.core.put("EFLAG",eflag);
-				one.core.put("EDATE",edate);
-				count = agentDao.modify(postSQL, one.core);
-			}
-			dataList = agentDao.selectList(mainSQL);
-			loopCount += loopCount;
-			if (loopCount > maximum){
-				logger.warn("##### It must be in the infinite looping!!! #####");
-				break;
-			}
-		}
-		logger.info("===== End JOB Execution : [{}]", jobId);
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		this.ctx = applicationContext;
-	}
 }

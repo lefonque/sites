@@ -2,15 +2,21 @@ package org.epis.ws.common.entity;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BizVO {
 
-	private List<MapWrapper> dataList;
-	
+	private List<RecordMap> dataList;
+
 	private String agentId;
-	
+	@XmlCDATA
 	private String jobId;
 
-	public List<MapWrapper> getDataList() {
+	public List<RecordMap> getDataList() {
 		return dataList;
 	}
 
@@ -22,7 +28,7 @@ public class BizVO {
 		return jobId;
 	}
 
-	public void setDataList(List<MapWrapper> dataList) {
+	public void setDataList(List<RecordMap> dataList) {
 		this.dataList = dataList;
 	}
 

@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.entity.RecordMap;
+import org.epis.ws.common.entity.RecordMapEntry;
 import org.epis.ws.consumer.vo.ColumnInfoVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,48 +44,18 @@ public class AgentBizDAO {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
-	public Map<String,Object> selectInfo(String sql, Object... params){
-		Map<String,Object> result = jdbcTemplate.getJdbcOperations().queryForMap(sql, params);
-		return result;
-	}
-	
-	public Map<String,Object> selectInfo(String sql, List<ColumnInfoVO> params){
-		
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		
-		for(ColumnInfoVO colInfo : params){
-			paramSource.addValue(colInfo.getFieldName(),colInfo.getValue(), colInfo.getType());
-		}
-		Map<String,Object> result = jdbcTemplate.queryForMap(sql, paramSource);
-		return result;
-	}
-	
-	
 	public List<MapWrapper> selectList(String sql){
-		//List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
+//		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
 		List<MapWrapper> result
-			= jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper(){
-
-		});
+			= jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper());
 		return result;
 	}
 	
-	public List<Map<String,Object>> selectList(String sql, Object... params){
-		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql, params);
+	public List<RecordMap> selectListAsRecordMap(String sql){
+		List<RecordMap> result
+			= jdbcTemplate.getJdbcOperations().query(sql, new RecordMapRowMapper());
 		return result;
 	}
-	
-	public List<Map<String,Object>> selectList(String sql, List<ColumnInfoVO> params){
-		
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		for(ColumnInfoVO colInfo : params){
-			paramSource.addValue(colInfo.getFieldName(), colInfo.getValue(), colInfo.getType());
-		}
-		
-		List<Map<String,Object>> result = jdbcTemplate.queryForList(sql, paramSource);
-		return result;
-	}
-	
 	
 	public int modify(String sql){
 		int result = jdbcTemplate.getJdbcOperations().update(sql);
@@ -101,10 +73,25 @@ public class AgentBizDAO {
 		return result;
 	}
 	
+	/**
+	 * For Insert, Update, Delete with record Map
+	 * @param sql
+	 * @param record
+	 * @return
+	 */
 	public int modify(String sql, Map<String,Object> record){
 		SqlParameterSource paramSource = new MapSqlParameterSource(record);
-		logger.debug("SQL : [{}]",sql);
-		logger.debug("Parameters : [{}]",paramSource);
+		logger.trace("SQL : [{}]",sql);
+		logger.trace("Parameters : [{}]",paramSource);
+		int result = jdbcTemplate.update(sql, paramSource);
+		return result;
+	}
+	
+	public int modify(String sql, RecordMap recordMap){
+		MapSqlParameterSource paramSource = new MapSqlParameterSource();
+		for(RecordMapEntry entry : recordMap.entry){
+			paramSource.addValue(entry.getKey(), entry.getValue());
+		}
 		int result = jdbcTemplate.update(sql, paramSource);
 		return result;
 	}
@@ -120,6 +107,30 @@ public class AgentBizDAO {
 		return result;
 	}
 	
+	class RecordMapRowMapper implements RowMapper<RecordMap>{
+
+		public RecordMap mapRow(ResultSet rs, int rowNum) throws SQLException {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+			RecordMap result = new RecordMap();
+			for (int i = 1; i <= columnCount; i++) {
+				String key = getColumnKey(JdbcUtils.lookupColumnName(rsmd, i));
+				Object obj = getColumnValue(rs, i);
+				RecordMapEntry entry = new RecordMapEntry(key,obj);
+				result.entry.add(entry);
+			}
+			
+			return result;
+		}
+		
+		protected String getColumnKey(String columnName) {
+			return columnName;
+		}
+		
+		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
+			return JdbcUtils.getResultSetValue(rs, index);
+		}
+	}
 	
 	class ColumnHashMapRowMapper implements RowMapper<MapWrapper> {
 		public MapWrapper mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -144,7 +155,13 @@ public class AgentBizDAO {
 		}
 		
 		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
-			return JdbcUtils.getResultSetValue(rs, index);
+			Object result = JdbcUtils.getResultSetValue(rs, index);
+			//CXF에서 XML Escape를 하기 때문에 처리상에 문제 발생함.
+			//CDATA를 이용하려면 MOXy를 이용하는 방법밖에 없음.
+//			if(result instanceof String){
+//				result = "<![CDATA[" + result + "]]>";
+//			}
+			return result;
 		}
 	
 	}

@@ -7,11 +7,18 @@ public class LogVO {
 	private String logId;
 	private String agentId;
 	private String jobId;
+	private int rowCount;
 	private String resultFlag;
 	private Timestamp createDate;
 	
 	public String getLogId() {
 		return logId;
+	}
+	public int getRowCount() {
+		return rowCount;
+	}
+	public void setRowCount(int rowCount) {
+		this.rowCount = rowCount;
 	}
 	public String getAgentId() {
 		return agentId;

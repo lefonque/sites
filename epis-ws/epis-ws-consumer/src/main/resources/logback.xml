@@ -27,6 +27,10 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>
   </logger>
+  
+  <logger name="org.apache.cxf" level="INFO" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
    
  
   <root level="WARN">

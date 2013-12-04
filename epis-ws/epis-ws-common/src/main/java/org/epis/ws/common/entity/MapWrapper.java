@@ -2,8 +2,9 @@ package org.epis.ws.common.entity;
 
 import java.util.HashMap;
 
-public class MapWrapper {
 
+public class MapWrapper {
+	
 	public final HashMap<String,Object> core;
 	
 	public MapWrapper(){

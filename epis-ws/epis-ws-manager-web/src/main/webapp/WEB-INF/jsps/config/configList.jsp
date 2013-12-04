@@ -186,7 +186,6 @@ function handleOpen_DialogAgentJob(event, ui){
 	
 	
 	//안내문구 처리
-	var obj = $(this).find('input[name$="applyType"]');
 	var applyType = $(this).find('input[name$="applyType"]').val();
 	//var headText = "<b>[" + $('#orgCode option:selected').text() + "]</b> : ";
 	var headText = "<b>[" + $('#jobAgentId').val() + "]</b> : ";
@@ -615,8 +614,7 @@ function initEvent(){
 	
 	//	JDBC Driver Class 변경시 처리 : jdbcUrl 입력창에 hint표시
 	$('#jdbcDriverClassName').on('change',handleSelectChange_JdbcDriver);
-	$('#jdbcUrl').tooltip().off("mouseover mouseout");
-	//$('#batchSelectCount').tooltip().off("mouseover mouseout click focus");
+	$('#jdbcUrl,#batchSelectCount').tooltip().off("mouseover mouseout");
 
 }
 

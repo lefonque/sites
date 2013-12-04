@@ -8,7 +8,7 @@ import javax.jws.WebService;
 
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
-import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.entity.RecordMap;
 
 @WebService(name="EPISWSGateway"
 			,targetNamespace="http://ws.epis.org/provider/EPISWSGateway")
@@ -24,6 +24,6 @@ public interface EPISWSGateway {
 	
 	@WebMethod(operationName="debugMethod"
 			,action="http://ws.epis.org/provider/EPISWSGateway/debugMethod")
-	public String debugMethod(@WebParam(name="param") BizVO param) throws Exception;
+	public String debugMethod(@WebParam(name="param") List<RecordMap> param) throws Exception;
 	
 }

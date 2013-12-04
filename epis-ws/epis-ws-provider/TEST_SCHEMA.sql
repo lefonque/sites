@@ -42,6 +42,7 @@ CREATE TABLE TBL_IF_LOG(
 	log_id VARCHAR2(4000) primary key
 	,agent_id VARCHAR2(4000)
 	,job_id VARCHAR2(4000)
+	,row_count INTEGER
 	,result_flag CHAR(1)
 	,create_date TIMESTAMP
 );
@@ -49,7 +50,6 @@ CREATE TABLE TBL_IF_LOG(
 create sequence seq_agent start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_job start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_log start with 1 increment by 1 maxvalue 1000000;
-
 
 
 /*

@@ -1,10 +1,14 @@
 package org.epis.ws.provider.service.core;
 
+import java.util.List;
+
 import javax.jws.WebService;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
+import org.epis.ws.common.entity.RecordMap;
+import org.epis.ws.common.entity.RecordMapEntry;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.common.utils.ConstEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
@@ -48,6 +52,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 			
 			if(CollectionUtils.isEmpty(bizParam.getDataList())){
 				logger.warn("===== No Data Found to execute in SERVER =====");
+				resultFlag = "S";
 				return result;
 			}
 			else{
@@ -71,8 +76,15 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	}
 
 	@Override
-	public String debugMethod(BizVO param) throws Exception {
-		logger.debug("param's dataList : {}",param.getDataList());
+	public String debugMethod(List<RecordMap> recordList) throws Exception {
+		logger.debug("param's dataList : {}",recordList.size());
+		for(RecordMap map : recordList){
+			for(RecordMapEntry entry : map.entry){
+				logger.debug("=== {} : [({}){}] ==="
+						,new Object[]{entry.getKey(),entry.getValue().getClass(),entry.getValue()});
+			}
+			logger.debug("##########################################");
+		}
 		return "Success";
 	}
 

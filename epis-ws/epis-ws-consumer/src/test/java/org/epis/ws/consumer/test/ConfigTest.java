@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.entity.RecordMap;
+import org.epis.ws.common.entity.RecordMapEntry;
 import org.epis.ws.consumer.dao.AgentBizDAO;
 import org.epis.ws.consumer.service.core.UnixScheduleRegister;
 import org.epis.ws.consumer.service.core.WindowsScheduleRegister;
@@ -47,15 +49,14 @@ public class ConfigTest {
 	public void testSelect(){
 		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
 		
-		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
-		
 		String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-		List<MapWrapper> mapList = bizDao.selectList(sql);
-		for(MapWrapper wrapper : mapList){
-			logger.debug("map : {}", wrapper.core);
-			Object obj = wrapper.core.get("EDATE");
-			logger.debug("edate : {}",obj);
-			bizDao.modify(postSQL, wrapper.core);
+//		List<MapWrapper> list = bizDao.selectList(sql);
+		List<RecordMap> mapList = bizDao.selectListAsRecordMap(sql);
+		for(RecordMap wrapper : mapList){
+			logger.debug("entry count : {}", wrapper.entry.size());
+			for(RecordMapEntry entry : wrapper.entry){
+				logger.debug("{} : {}",entry.getKey(),entry.getValue());
+			}
 		}
 	}
 	
@@ -67,7 +68,6 @@ public class ConfigTest {
 		sql = "UPDATE just_table SET field1=?, field2=CONCAT('P-',?), field3='James', field4=? WHERE field5=TRIM(?)";
 		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
 	}
-	
 	
 //	@Test
 	public void testGarage(){
@@ -84,20 +84,6 @@ public class ConfigTest {
 				,System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey())
 				,jobName);
 		logger.debug("formatted : [{}]", result);
-	}
-	
-	
-	public void testDBConn(){
-		try {
-			Map<String,Object> result = bizDao.selectInfo(
-					"SELECT url FROM jdbc_info_tbl where job_name=?"
-					,"job2");
-			for(String key : result.keySet()){
-				logger.debug("[{}] : [{}]",new Object[]{key, result.get(key)});
-			}
-		} catch (Exception e) {
-			logger.error("EXCEPTION : ",e);
-		}
 	}
 	
 	

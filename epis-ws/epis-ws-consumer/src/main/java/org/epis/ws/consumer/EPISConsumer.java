@@ -93,6 +93,7 @@ public class EPISConsumer {
 		String wsdlURLString = agentProp.getProperty("agent.provider.endpoint");
 		String svcNmString = "EPISWSGateway";
 		String portNmString = "EPISWSGatewayPort";
+		logger.info("===== Begin Schedule Job =====");
 		try {
 			EPISWSGateway gateway
 				= createPortType(targetNamespace,wsdlURLString
@@ -106,13 +107,17 @@ public class EPISConsumer {
 			EPISConsumerService service = ctx.getBean(EPISConsumerService.class);
 			Method method = service.getClass().getDeclaredMethod(methodName, EPISWSGateway.class);
 			Object result = method.invoke(service, gateway);
-			logger.debug("result : {}",result);
+			String msg = "Successfully";
+			if(Boolean.class.cast(result)){
+				msg = " with Error";
+			}
+			logger.info("===== Executed Schedule Job {} =====",msg);
 		} catch (MalformedURLException e) {
 			logger.error("##### MalformedURLException Occurred on start() #####", e);
 		} catch (Exception e){
 			logger.error("##### Exception Occurred on start() #####", e);
 		}
-		
+		logger.info("===== Finish Schedule Job =====");
 	}
 
 	

@@ -20,6 +20,9 @@ public class LogService {
 		param.setAgentId(bizVO.getAgentId());
 		param.setJobId(bizVO.getJobId());
 		param.setResultFlag(resultFlag);
+		if(bizVO.getDataList()!=null){
+			param.setRowCount(bizVO.getDataList().size());
+		}
 		int result = dao.insertLog(param);
 		return result;
 	}

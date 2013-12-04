@@ -38,7 +38,7 @@ CREATE TABLE if_tgt_job2_com_seed (
 	,EFLAG		CHAR(1) DEFAULT 'I' NOT NULL
 );
 
---set password 'sa'
+set password 'sa'
 
 /*
 JOB1.
@@ -51,7 +51,7 @@ INSERT INTO if_tgt_job1 (
 )
 
 JOB2.
-INSERT INTO if_tgt_job2 (
+INSERT INTO if_tgt_job2_com_seed (
 	IDX, COM_NAME, ITEM_CD, ITEM_NM, ITEM_IMG, DTL_IMG, SUBJECT, ITEM_SPEC, CAUTION, EDATE, EFLAG
 ) VALUES (
 	:IDX, :COM_NAME, :ITEM_CD, :ITEM_NM, :ITEM_IMG, :DTL_IMG, :SUBJECT, :ITEM_SPEC, :CAUTION, :EDATE, :EFLAG

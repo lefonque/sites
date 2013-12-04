@@ -5,6 +5,7 @@ import java.util.List;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.entity.RecordMap;
 import org.epis.ws.manager.core.dao.ConfigurationDAO;
 import org.epis.ws.provider.dao.BizDAO;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class BizService {
 		JobVO jobInfo = configDao.selectJobInfo(agentId,jobId);
 		String sql = jobInfo.getServerSql();
 
-		List<MapWrapper> wrapperList = bizVO.getDataList();
+		List<RecordMap> wrapperList = bizVO.getDataList();
 		int[] resultCount = dao.insert(sql, wrapperList);
 		int result = 0;
 		for(int i : resultCount){

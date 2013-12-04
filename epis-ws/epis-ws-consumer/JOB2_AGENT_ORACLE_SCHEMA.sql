@@ -13,7 +13,7 @@ CREATE TABLE if_src_job2_com_seed (
 	,EFLAG		CHAR(1) DEFAULT 'I' NOT NULL
 )
 
-
+DELETE FROM if_src_job2_com_seed;
 
 /*
 SELECT * FROM if_src_job2_com_seed
