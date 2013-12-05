@@ -12,6 +12,7 @@
     <module>epis-ws-manager-desktop</module>
     <module>epis-ws-manager-web</module>
   	<module>epis-ws-provider</module>
+  	<module>epis-ws-agent-scheduler</module>
   </modules>
   
   

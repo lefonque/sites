@@ -1,14 +1,15 @@
 package org.epis.ws.provider.service.core;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.jws.WebService;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
-import org.epis.ws.common.entity.RecordMap;
-import org.epis.ws.common.entity.RecordMapEntry;
+import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.common.utils.ConstEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
@@ -76,12 +77,22 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	}
 
 	@Override
-	public String debugMethod(List<RecordMap> recordList) throws Exception {
+	public String debugMethod(List<MapWrapper> recordList) throws Exception {
 		logger.debug("param's dataList : {}",recordList.size());
-		for(RecordMap map : recordList){
-			for(RecordMapEntry entry : map.entry){
+		
+		for(MapWrapper wrapper : recordList){
+			Map<String,Object> map = wrapper.core;
+			Object value = null;Class<?> type = null;
+			for(String key : map.keySet()){
+				value = map.get(key);
+				if(value!=null){
+					type = value.getClass();
+				}
+				else{
+					type = Null.class;
+				}
 				logger.debug("=== {} : [({}){}] ==="
-						,new Object[]{entry.getKey(),entry.getValue().getClass(),entry.getValue()});
+						,new Object[]{key,type,value});
 			}
 			logger.debug("##########################################");
 		}

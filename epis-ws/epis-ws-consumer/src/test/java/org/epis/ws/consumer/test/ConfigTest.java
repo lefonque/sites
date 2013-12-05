@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.agent.dao.AgentBizDAO;
+import org.epis.ws.agent.service.UnixScheduleRegister;
+import org.epis.ws.agent.service.WindowsScheduleRegister;
+import org.epis.ws.agent.util.PropertyEnum;
+import org.epis.ws.agent.util.SqlUtil;
 import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.entity.RecordMap;
 import org.epis.ws.common.entity.RecordMapEntry;
-import org.epis.ws.consumer.dao.AgentBizDAO;
-import org.epis.ws.consumer.service.core.UnixScheduleRegister;
-import org.epis.ws.consumer.service.core.WindowsScheduleRegister;
-import org.epis.ws.consumer.util.PropertyEnum;
-import org.epis.ws.consumer.util.SqlUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -58,6 +58,7 @@ public class ConfigTest {
 				logger.debug("{} : {}",entry.getKey(),entry.getValue());
 			}
 		}
+		
 	}
 	
 //	@Test

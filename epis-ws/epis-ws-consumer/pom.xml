@@ -110,7 +110,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>org.epis.ws.consumer.EPISConsumer</mainClass>
+              <mainClass>org.epis.ws.agent.EPISConsumer</mainClass>
             </manifest>
           </archive>
         </configuration>

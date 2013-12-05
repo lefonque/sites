@@ -1,10 +1,10 @@
 drop sequence seq_agent;
 drop sequence seq_job;
 drop sequence seq_log;
-drop table TBL_CONFIG_AGENT;
-drop table TBL_CONFIG_JOB;
-drop table TBL_IF_LOG;
-create table TBL_CONFIG_AGENT (
+drop table COM_EPIS_EAI_AGENT;
+drop table COM_EPIS_EAI_JOB;
+drop table COM_EPIS_EAI_LOG;
+create table COM_EPIS_EAI_AGENT (
 	agent_id VARCHAR2(4000) not null primary key
 	,org_code VARCHAR2(4000)
 	,operating_system VARCHAR2(4000)
@@ -19,7 +19,7 @@ create table TBL_CONFIG_AGENT (
 	,modified_date TIMESTAMP
 );
 
-create table TBL_CONFIG_JOB (
+create table COM_EPIS_EAI_JOB (
 	job_id VARCHAR2(4000) not null primary key
 	,agent_id VARCHAR2(4000)
 	,job_name VARCHAR2(4000)
@@ -38,7 +38,7 @@ create table TBL_CONFIG_JOB (
 	,modified_date TIMESTAMP
 );
 
-CREATE TABLE TBL_IF_LOG(
+CREATE TABLE COM_EPIS_EAI_LOG(
 	log_id VARCHAR2(4000) primary key
 	,agent_id VARCHAR2(4000)
 	,job_id VARCHAR2(4000)
@@ -51,7 +51,7 @@ create sequence seq_agent start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_job start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_log start with 1 increment by 1 maxvalue 1000000;
 
-
+ALTER USER SA SET PASSWORD 'sa'
 /*
 SELECT SYSDATE FROM DUAL
 SELECT SYSTIMESTAMP FROM DUAL

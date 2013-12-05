@@ -30,6 +30,11 @@ $(document).ready(function() {
 	initEvent();
 	
 	$('#orgCode').parent().hide();
+	
+	// rows="4" cols="37"  size="38"
+	$('textarea').attr('rows','6').attr('cols','117');
+	$('div[id^="dialog"]').find('input:text, input:password').attr('size','38');
+	
 });
 
 /**
@@ -71,8 +76,8 @@ function initFormDialog() {
 	//=================================================================
 	$('#dialogAgentJob').dialog({
 		autoOpen: false
-		,height: 400
-		,width: 400
+		,height: 600
+		,width: 900
 		,modal: true
 		,show:{ effect:"blind" ,duration:500 }
 		,hide:{ effect:"explode" ,duration:500 }
@@ -219,6 +224,9 @@ function handleApplyBtnClick_DialogAgentJob(){
 			operation = "수정";
 			url = '<c:url value="/config/modifyAgentJob"/>';
 		}
+		if($('#batchSelectCount').val()==""){
+			$('#batchSelectCount').val(0);
+		}
 		//서버에 처리요청
 		$.post(url
 			,$('#formAgentJob').serialize()
@@ -321,11 +329,11 @@ function initGrid() {
 		,datatype : "json"
 		,colNames : [ 'Agent ID', 'Org Code','기관명', 'OS', 'Charset', '웹서비스 유저명', '웹서비스 패스워드', 'SMS 여부', 'SMS TEL', '담당자명', '담당자연락처', '등록일자', '수정일자' ]
 		,colModel : [ 
-			{ name : 'agentId', index : 'agent_id', width : 80 }
+			{ name : 'agentId', index : 'agent_id', width : 120 }
 			,{ name : 'orgCode', index : 'org_code', width : 80 }
 			,{ name : 'orgName', index : 'org_code'
 				,formatter : orgNameFormatter, width : 100 }
-			,{ name : 'operatingSystem', index : 'operating_system', width : 70 }
+			,{ name : 'operatingSystem', index : 'operating_system', width : 100 }
 			,{ name : 'charset', index : 'charset', width : 70 }
 			,{ name : 'websvcUser', index : 'websvc_user', width : 100 }
 			,{ name : 'websvcPass', index : 'websvc_pass', width : 80 }
@@ -391,7 +399,7 @@ function initGrid() {
 			,'JDBC USERNAME', 'JDBC PASSWORD', 'Server SQL', '레코드제한', '등록일자', '수정일자'
 		]
 		,colModel : [
-		    { name : 'jobId', index : 'job_id', width:50}
+		    { name : 'jobId', index : 'job_id', width:66}
 			,{ name : 'jobName', index : 'job_name', width : 100 }
 			,{ name : 'agentId', index : 'agent_id', width : 50 }
 			,{ name : 'jobType', index : 'job_type', width : 50 }
@@ -440,7 +448,7 @@ function initGrid() {
 		,{'agentId':$('#jobAgentId').val()}
 	);
 	jQuery("#gridAgentJob").jqGrid('hideCol', [
-	   	"jobId", "agentId", "jobType", "sqlMain", "sqlPre"
+	   	"agentId", "jobType", "sqlMain", "sqlPre"
 		,"sqlPost", "jdbcDriverClassName", "jdbcUsername"
 		,"jdbcPassword", "serverSql", "batchSelectCount"
 	]);
@@ -879,26 +887,26 @@ function handleSelectChange_JdbcDriver(event){
 			</p>
 			<p>
 				<label for="jdbcUrl">JDBC URL</label>
-				<input type="text" name="jdbcUrl" id="jdbcUrl" size="38"
+				<input type="text" name="jdbcUrl" id="jdbcUrl"
 					class="required">
 			</p>
 			<p>
 				<label for="sqlMain">Main SQL</label>
-				<textarea name="sqlMain" id="sqlMain" rows="4" cols="37"
+				<textarea name="sqlMain" id="sqlMain" 
 					class="required"></textarea>
 			</p>
 			<p>
 				<label for="sqlPre">전처리 SQL</label>
-				<textarea name="sqlPre" id="sqlPre" rows="4" cols="37"></textarea>
+				<textarea name="sqlPre" id="sqlPre" ></textarea>
 			</p>
 			<p>
 				<label for="sqlPost">후처리 SQL</label>
-				<textarea name="sqlPost" id="sqlPost" rows="4" cols="37">
+				<textarea name="sqlPost" id="sqlPost">
 				</textarea>
 			</p>
 			<p>
 				<label for="serverSql">서버처리 SQL</label>
-				<textarea name="serverSql" id="serverSql" rows="4" cols="37"
+				<textarea name="serverSql" id="serverSql" 
 					class="required"></textarea>
 			</p>
 			<p>

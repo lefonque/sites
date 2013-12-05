@@ -10,14 +10,6 @@
   <artifactId>epis-ws-common</artifactId>
   <packaging>jar</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>eclipselink</artifactId>
-      <version>2.5.1</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <resources>
       <resource>

@@ -23,15 +23,15 @@
     </layout>
   </appender>
    
-  <logger name="org.epis.ws.consumer" level="DEBUG" additivity="false">
+  <logger name="org.epis.ws.agent" level="DEBUG" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>
   </logger>
-  
+  <!-- 
   <logger name="org.apache.cxf" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
-   
+    -->
  
   <root level="WARN">
     <appender-ref ref="STDOUT" />

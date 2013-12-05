@@ -13,6 +13,8 @@ import org.epis.ws.manager.core.service.InfraService;
 import org.epis.ws.manager.entity.AjaxResponseVO;
 import org.epis.ws.manager.entity.JQGridVO;
 import org.epis.ws.manager.web.utils.LoginPropertyKeyEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,13 +27,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class DummyController {
 	
-	//private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
-	public ConfigurationService configService;
+	private ConfigurationService configService;
 	
 	@Autowired
-	public InfraService infraService;
+	private InfraService infraService;
 	
 	@RequestMapping(value="/test")
 	public String sample(){
@@ -45,7 +47,13 @@ public class DummyController {
 			,HttpServletRequest request
 			,Model model){
 		String result = null;
-		Map<String,String> userInfo = configService.getLoginUserInfo(loginUsername);
+		Map<String,Object> userInfo = infraService.getLoginUser(loginUsername);
+		logger.debug("User Info from DB : [{}] / [{}]"
+				,new Object[]{
+					userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName())
+					,userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName())
+				});
+		
 		if(loginUsername.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName()))
 				&& loginPassword.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName()))){
 			request.getSession().setAttribute("LOGIN", loginUsername);

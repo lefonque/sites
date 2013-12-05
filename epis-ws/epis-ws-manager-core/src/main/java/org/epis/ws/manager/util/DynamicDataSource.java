@@ -48,7 +48,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 		return result;
 	}
 	
-	protected DataSource createDataSource(Map<String,Object> jdbcInfo) throws Exception{
+	protected DataSource createDataSource(Map<String,Object> jdbcInfo) throws Exception {
 		Properties jdbcProperties = new Properties();
 		jdbcProperties.putAll(jdbcInfo);
 		DataSource result = BasicDataSourceFactory.createDataSource(jdbcProperties);

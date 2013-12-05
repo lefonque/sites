@@ -15,6 +15,10 @@ CREATE TABLE if_src_job2_com_seed (
 
 DELETE FROM if_src_job2_com_seed;
 
+select item_spec from com_seed where idx=431
+select * from nls_database_parameters
+where parameter = 'NLS_CHARACTERSET';
+
 /*
 SELECT * FROM if_src_job2_com_seed
 WHERE EFLAG = 'I'
@@ -29,4 +33,16 @@ FROM COM_SEED
 UPDATE if_src_job2_com_seed
 SET EFLAG=:EFLAG, EDATE=:EDATE
 WHERE IDX=:IDX
+
+
+
+
+SELECT *
+FROM
+(
+SELECT IDX, COUNT(*) CNT
+FROM COM_SEED
+GROUP BY IDX
+)
+WHERE CNT > 1
 */

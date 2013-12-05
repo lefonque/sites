@@ -1,0 +1,8 @@
+/*C6*/SET SCHEMA PUBLIC
+create table COM_EPIS_EAI_AGENT (\u000a\u0009agent_id VARCHAR2(4000) not null primary key\u000a\u0009,org_code VARCHAR2(4000)\u000a\u0009,operating_system VARCHAR2(4000)\u000a\u0009,charset VARCHAR2(4000)\u000a\u0009,websvc_user VARCHAR2(4000)\u000a\u0009,websvc_pass VARCHAR2(4000)\u000a\u0009,officer_name VARCHAR2(4000)\u000a\u0009,officer_contact VARCHAR2(4000)\u000a\u0009,sms_use_yn CHAR\u000a\u0009,sms_cell_no VARCHAR2(4000)\u000a\u0009,created_date TIMESTAMP\u000a\u0009,modified_date TIMESTAMP\u000a)\u000d\u000a
+create table COM_EPIS_EAI_JOB (\u000a\u0009job_id VARCHAR2(4000) not null primary key\u000a\u0009,agent_id VARCHAR2(4000)\u000a\u0009,job_name VARCHAR2(4000)\u000a\u0009,job_type VARCHAR2(4000)\u000a\u0009,agent_exec_time VARCHAR2(4000)\u000a\u0009,sql_main VARCHAR2(4000)\u000a\u0009,sql_pre VARCHAR2(4000)\u000a\u0009,sql_post VARCHAR2(4000)\u000a\u0009,jdbc_driver_class_name VARCHAR2(4000)\u000a\u0009,jdbc_url VARCHAR2(4000)\u000a\u0009,jdbc_username VARCHAR2(4000)\u000a\u0009,jdbc_password VARCHAR2(4000)\u000a\u0009,server_sql VARCHAR2(4000)\u000a\u0009,batch_select_count INTEGER\u000a\u0009,created_date TIMESTAMP\u000a\u0009,modified_date TIMESTAMP\u000a)\u000d\u000a
+CREATE TABLE COM_EPIS_EAI_LOG(\u000a\u0009log_id VARCHAR2(4000) primary key\u000a\u0009,agent_id VARCHAR2(4000)\u000a\u0009,job_id VARCHAR2(4000)\u000a\u0009,row_count INTEGER\u000a\u0009,result_flag CHAR(1)\u000a\u0009,create_date TIMESTAMP\u000a)\u000d\u000a
+create sequence seq_agent start with 1 increment by 1 maxvalue 1000000\u000d\u000a
+create sequence seq_job start with 1 increment by 1 maxvalue 1000000\u000d\u000a
+create sequence seq_log start with 1 increment by 1 maxvalue 1000000\u000d\u000a
+DISCONNECT

@@ -18,7 +18,7 @@ public class InfraService {
 		return result;
 	}
 	
-	public Map<String,Object> getUser(String userId){
+	public Map<String,Object> getLoginUser(String userId){
 		Map<String,Object> result = dao.selectUser(userId);
 		return result;
 	}

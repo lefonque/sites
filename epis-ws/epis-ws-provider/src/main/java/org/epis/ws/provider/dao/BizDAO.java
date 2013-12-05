@@ -33,12 +33,12 @@ public class BizDAO {
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	
 	@Autowired
-	@Qualifier("dataSource")
+	@Qualifier("bizDataSource")
 	public void setDataSource(DataSource dataSource){
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
-	public int[] insert(String sql, List<RecordMap> paramList){
+	public int[] insert2(String sql, List<RecordMap> paramList){
 		
 		int idx = 0;
 		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
@@ -66,21 +66,26 @@ public class BizDAO {
 		return jdbcTemplate.batchUpdate(sql, paramSources);
 	}
 	
-	public int[] insert2(String sql, List<MapWrapper> paramList){
+	public int[] insert(String sql, List<MapWrapper> paramList){
 		
 		int idx = 0;
 		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
 		MapSqlParameterSource[] paramSources = new MapSqlParameterSource[paramList.size()];
+		Object value = null;
 		for(MapWrapper wrapper : paramList){
 			paramSources[idx] = new MapSqlParameterSource(wrapper.core);
 			for(String key : wrapper.core.keySet()){
-				logger.debug("[{}]'s type : [{}]",new Object[]{key,wrapper.core.get(key).getClass()});
-				if(wrapper.core.get(key) instanceof XMLGregorianCalendar){
-					GregorianCalendar cal = XMLGregorianCalendar.class.cast(wrapper.core.get(key)).toGregorianCalendar();
-					paramSources[idx].addValue(
-							key
-							,cal.getTime());
+				value = wrapper.core.get(key);
+				if(value!=null){
+					logger.debug("[{}]'s type : [{}]",new Object[]{key,value.getClass()});
 				}
+				if(value instanceof XMLGregorianCalendar){
+					GregorianCalendar cal
+						= XMLGregorianCalendar.class.cast(value)
+							.toGregorianCalendar();
+					value = cal.getTime();
+				}
+				paramSources[idx].addValue(key,value);
 			}
 			paramSources[idx].addValue("EDATE", nowTime);
 			paramSources[idx].addValue("EFLAG", "S");

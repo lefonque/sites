@@ -3,14 +3,11 @@ package org.epis.ws.common.entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RecordMapEntry {
 	
 	private String key;
 	
-	@XmlCDATA
 	private Object value;
 	
 	public RecordMapEntry(){}

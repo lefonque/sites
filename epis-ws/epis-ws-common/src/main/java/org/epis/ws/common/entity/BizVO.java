@@ -5,18 +5,16 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BizVO {
 
-	private List<RecordMap> dataList;
+	private List<MapWrapper> dataList;
 
 	private String agentId;
-	@XmlCDATA
+	
 	private String jobId;
 
-	public List<RecordMap> getDataList() {
+	public List<MapWrapper> getDataList() {
 		return dataList;
 	}
 
@@ -28,7 +26,7 @@ public class BizVO {
 		return jobId;
 	}
 
-	public void setDataList(List<RecordMap> dataList) {
+	public void setDataList(List<MapWrapper> dataList) {
 		this.dataList = dataList;
 	}
 

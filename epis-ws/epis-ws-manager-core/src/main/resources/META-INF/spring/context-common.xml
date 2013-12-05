@@ -17,7 +17,7 @@
 
   <!-- Loading properties -->
   <!-- util:properties id="info" location="file:#{systemProperties['root.dir']}/info.properties"/-->
-  <util:properties id="jdbc" location="classpath:/META-INF/properties/jdbc.properties"/>
+  <!-- util:properties id="jdbc" location="classpath:/META-INF/properties/jdbc.properties"/ -->
   <util:properties id="sql" location="classpath:/META-INF/properties/sql.properties"/>
-  
+  <context:property-placeholder location="classpath:/META-INF/properties/jdbc.properties"/>
 </beans>

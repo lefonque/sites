@@ -1,30 +1,37 @@
 package org.epis.ws.manager.core.dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class InfraDAO {
+	
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-//	private NamedParameterJdbcTemplate jdbcTemplate;
+	private NamedParameterJdbcTemplate jdbcTemplate;
 	
 	@Autowired
 	@Qualifier("sql")
 	private Properties sqlRepo;
 
 	@Autowired
-	@Qualifier("dataSource")
+	@Qualifier("infraDataSource")
 	private void setDataSource(DataSource dataSource){
-//		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
 	public List<Map<String,Object>> selectOrgList(String keyword){
@@ -48,17 +55,15 @@ public class InfraDAO {
 		return result;
 	}
 	
-	public Map<String,Object> selectUser(String userId){
+	public Map<String,Object> selectUser(String userId) {
 		Map<String,Object> result = null;
-//		String sql = sqlRepo.getProperty("");
-//		SqlParameterSource paramSource = new MapSqlParameterSource("", userId);
-//		result = jdbcTemplate.queryForMap(sql, paramSource);
-		
-		//For Testing
-		result = new HashMap<String,Object>();
-		result.put("user_id","jack");
-		result.put("password","jackass");
-		
+		try{
+			String sql = sqlRepo.getProperty("select.infra.user");
+			SqlParameterSource paramSource = new MapSqlParameterSource("user_id", userId);
+			result = jdbcTemplate.queryForMap(sql, paramSource);
+		} catch(EmptyResultDataAccessException e) {
+			logger.warn("### Result is Empty ###");
+		}
 		return result;
 	}
 }

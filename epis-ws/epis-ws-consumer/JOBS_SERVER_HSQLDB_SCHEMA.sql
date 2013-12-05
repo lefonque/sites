@@ -38,8 +38,7 @@ CREATE TABLE if_tgt_job2_com_seed (
 	,EFLAG		CHAR(1) DEFAULT 'I' NOT NULL
 );
 
-set password 'sa'
-
+delete from if_tgt_job2_com_seed;
 /*
 JOB1.
 INSERT INTO if_tgt_job1 (

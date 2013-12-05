@@ -9,7 +9,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
         <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
         <init-param>
         	<param-name>config-location</param-name>
-        	<param-value>classpath:/META-INF/cxf/*.xml</param-value>
+        	<param-value>classpath:/META-INF/spring/*-epis.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
