@@ -52,6 +52,18 @@ create sequence seq_job start with 1 increment by 1 maxvalue 1000000;
 create sequence seq_log start with 1 increment by 1 maxvalue 1000000;
 
 ALTER USER SA SET PASSWORD 'sa'
+
+
+
+SELECT * FROM (SELECT ROWNUM rnum, temp.* FROM (SELECT log.log_id,log.agent_id,log.job_id,job.job_name,log.row_count,log.result_flag,DECODE(log.result_flag,'S','성공','F','실패',log.result_flag) result_flag_text,log.create_date FROM COM_EPIS_EAI_LOG log, COM_EPIS_EAI_JOB job WHERE log.job_id=job.job_id ORDER BY create_date desc) temp WHERE result_flag_text='실패') WHERE rnum BETWEEN 1 AND 10
+
+
+SELECT COUNT(log_id) FROM (
+		SELECT log.log_id,log.agent_id,log.job_id,job.job_name,log.row_count,log.result_flag,DECODE(log.result_flag,'S','성공','F','실패',log.result_flag) result_flag_text,log.create_date
+		FROM COM_EPIS_EAI_LOG log, COM_EPIS_EAI_JOB job
+		WHERE log.job_id=job.job_id
+)
+WHERE result_flag_text='성공'
 /*
 SELECT SYSDATE FROM DUAL
 SELECT SYSTIMESTAMP FROM DUAL

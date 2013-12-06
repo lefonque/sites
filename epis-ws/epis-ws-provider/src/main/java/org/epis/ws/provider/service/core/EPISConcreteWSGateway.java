@@ -63,7 +63,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 			//TODO Customize Logging
 			logger.debug("===== Executed on Server side Successfully =====");
 		} finally {
-			logService.addLog(bizParam, resultFlag);
+			logService.writeLog(bizParam, resultFlag);
 		}
 		
 		

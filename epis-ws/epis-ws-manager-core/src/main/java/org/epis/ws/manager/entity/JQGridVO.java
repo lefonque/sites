@@ -1,14 +1,29 @@
 package org.epis.ws.manager.entity;
 
 import java.util.List;
-
+/*_search=true
+nd=1386307226951
+rows=10
+page=1
+sidx=create_date
+sord=desc
+searchField=job_id
+searchString=JOB-2
+searchOper=eq
+filters=
+ * 
+ */
 public class JQGridVO {
 	private int page;//페이지
 	private int rows;//한페이지에 표시될 레코드수
 	private String sidx;//sort할 컬럼
 	private String sord;//asc, desc
 	private long nd;//서버에 요청한 time
-	private boolean _search;//
+	private boolean _search;//조건검색을 하였는가
+	
+	private String searchField;
+	private String searchString;
+	private String searchOper;
 	
 	private List<?> root;
 	private int total;
@@ -50,6 +65,24 @@ public class JQGridVO {
 	}
 	public void set_search(boolean _search) {
 		this._search = _search;
+	}
+	public String getSearchField() {
+		return searchField;
+	}
+	public String getSearchString() {
+		return searchString;
+	}
+	public void setSearchField(String searchField) {
+		this.searchField = searchField;
+	}
+	public void setSearchString(String searchString) {
+		this.searchString = searchString;
+	}
+	public String getSearchOper() {
+		return searchOper;
+	}
+	public void setSearchOper(String searchOper) {
+		this.searchOper = searchOper;
 	}
 	public List<?> getRoot() {
 		return root;

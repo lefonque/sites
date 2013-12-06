@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import org.epis.ws.manager.entity.JQGridVO;
 import org.epis.ws.manager.entity.LogVO;
+import org.epis.ws.manager.util.JQGridSearchOpEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -46,18 +47,53 @@ public class LogDAO {
 		return result;
 	}
 
-	public List<LogVO> selectLogList(JQGridVO searchParam){
+	public List<LogVO> selectLogList(JQGridVO paging){
 		String sql = sqlRepo.getProperty("select.log.list");
-		sql = String.format(sql,searchParam.getSidx(),searchParam.getSord());
 		
-		long startRowIndex = ((searchParam.getPage() * searchParam.getRows()) - searchParam.getRows()) + 1;
-		long endRowIndex = (searchParam.getPage() * searchParam.getRows());
+		long startRowIndex = ((paging.getPage() * paging.getRows()) - paging.getRows()) + 1;
+		long endRowIndex = (paging.getPage() * paging.getRows());
 		
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("startIndex", startRowIndex);
 		paramSource.addValue("endIndex", endRowIndex);
 		
+		StringBuilder where = new StringBuilder();
+		if(paging.is_search()){
+			where.append(getWhereClause(paging," WHERE "));
+			paramSource.addValue(paging.getSearchField(),paging.getSearchString());
+		}
+		sql = String.format(sql, paging.getSidx(), paging.getSord(), where.toString());
+		
 		List<LogVO> result = jdbcTemplate.query(sql, paramSource, logRowMapper);
 		return result;
 	}
+	
+	public int selectLogCount(JQGridVO paging){
+		int result = 0;
+		StringBuilder sql = new StringBuilder(sqlRepo.getProperty("select.log.count"));
+		
+		if(paging.is_search()){
+			sql.append(getWhereClause(paging," WHERE "));
+			MapSqlParameterSource paramSource
+				= new MapSqlParameterSource(paging.getSearchField(), paging.getSearchString());
+			
+			result = jdbcTemplate.queryForInt(sql.toString(), paramSource);
+		}
+		else{
+			result = jdbcTemplate.getJdbcOperations().queryForInt(sql.toString());
+		}
+		
+		return result;
+	}
+	
+	private StringBuilder getWhereClause(JQGridVO paging, String prefix){
+		String param = ":" + paging.getSearchField();
+		JQGridSearchOpEnum opEnum = JQGridSearchOpEnum.get(paging.getSearchOper());
+		
+		StringBuilder where = new StringBuilder();
+		where.append(prefix).append(paging.getSearchField())
+			.append(String.format(opEnum.getValue(), param));
+		return where;
+	}
+	
 }

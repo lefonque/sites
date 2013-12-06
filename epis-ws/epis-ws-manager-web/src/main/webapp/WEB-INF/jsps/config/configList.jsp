@@ -33,8 +33,8 @@ $(document).ready(function() {
 	
 	// rows="4" cols="37"  size="38"
 	$('textarea').attr('rows','6').attr('cols','117');
-	$('div[id^="dialog"]').find('input:text, input:password').attr('size','38');
-	
+	$('#dialogAgentJob').find('input:text, input:password').attr('size','38');
+	$('#dialogAgent').find('input:text, input:password').attr('size','30');
 });
 
 /**
@@ -46,7 +46,7 @@ function initFormDialog() {
 	//=================================================================
 	$('#dialogAgent').dialog({
 		autoOpen: false
-		,height: 400
+		,height: 465
 		,width: 410
 		,modal: true
 		,show:{
@@ -228,6 +228,25 @@ function handleApplyBtnClick_DialogAgentJob(){
 			$('#batchSelectCount').val(0);
 		}
 		//서버에 처리요청
+		$.ajax({
+			type: "POST"
+			,url: url
+			,data: $('#formAgentJob').serialize()
+			,success: function(data,textStatus,jqXHR){
+				//안내 문구 표시
+				openResultDialog(data, operation, "dialogAgentJob");
+				//grid 리로드 (검색시 agentId값도 조건에 반영되도록 조치함)
+				var agentJobDataUrl = '<c:url value="/config/agentJobList"/>?agentId=';
+				agentJobDataUrl += encodeURIComponent($('#jobAgentId').val());
+				jQuery("#gridAgentJob").jqGrid('setGridParam',{url:agentJobDataUrl, page:1}).trigger("reloadGrid");
+				//$(this).dialog('close');  ALERT에서 닫음
+			}
+			,error: function(jqXHR, textStatus, errorThrown){
+				alert('textStatus : ' + textStatus);
+				alert('errorThrown : ' + errorThrown);
+				alert('responseText : ' + jqXHR.responseText);
+			}
+		});
 		$.post(url
 			,$('#formAgentJob').serialize()
 			,function(data){	//완료시 처리
@@ -784,8 +803,7 @@ function handleSelectChange_JdbcDriver(event){
 	<!-- ======================================================================================== -->
 	<div id="dialogAgent" title="Agent 설정">
 		<p><b id="dialogAgentHead">신규추가</b></p>
-
-		<form id="formAgent" name="formAgent" class="cmxform"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
+		<form id="formAgent" name="formAgent" class="cmxform" style="width:370px;"><!-- User ID', 'Pass', 'Client ID','Use SMS', 'Cell No. -->
 			<fieldset>
 			<p>
 				<label for="orgCode">기관 코드</label>
@@ -814,12 +832,12 @@ function handleSelectChange_JdbcDriver(event){
 			<p>
 				<label for="websvcUser">웹서비스 사용자ID</label>
 				<input type="text" name="websvcUser" id="websvcUser" 
-					class="required" />
+					class="required alphanumeric" />
 			</p>
 			<p>
 				<label for="websvcPass">웹서비스 Password</label>
 				<input type="password" name="websvcPass" id="websvcPass"
-					class="required password" />
+					class="required password alphanumeric" />
 			</p>
 			<p>
 				<label for="officerName">담당자명</label>
@@ -911,7 +929,8 @@ function handleSelectChange_JdbcDriver(event){
 			</p>
 			<p>
 				<label for="batchSelectCount">레코드 제한</label>
-				<input type="text" name="batchSelectCount" id="batchSelectCount" title="agent가 1회 select시 취득할 레코드 수">
+				<input type="text" name="batchSelectCount" id="batchSelectCount"
+					class="number" title="agent가 1회 select시 취득할 레코드 수">
 			</p>
 			</fieldset>
 			<input type="hidden" id="jobAgentId" name="agentId"/>

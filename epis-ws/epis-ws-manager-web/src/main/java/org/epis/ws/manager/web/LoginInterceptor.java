@@ -40,6 +40,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		//예외처리
 		if(!StringUtils.endsWith(request.getRequestURI(), "/config/login")){
 			if(session.getAttribute("LOGIN")==null){
+				request.setAttribute("msg","Session Expired");
 				response.sendRedirect(request.getContextPath() + "/index.jsp");
 				result = false;
 			}

@@ -14,6 +14,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.entity.RecordMap;
 import org.epis.ws.common.entity.RecordMapEntry;
+import org.epis.ws.common.utils.EAIColumnEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,34 +39,6 @@ public class BizDAO {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
-	public int[] insert2(String sql, List<RecordMap> paramList){
-		
-		int idx = 0;
-		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
-		MapSqlParameterSource[] paramSources = new MapSqlParameterSource[paramList.size()];
-		Object value = null;
-		for(RecordMap map : paramList){
-			paramSources[idx] = new MapSqlParameterSource();
-			for(RecordMapEntry entry : map.entry){
-				value = entry.getValue();
-				if(value instanceof XMLGregorianCalendar){
-					GregorianCalendar cal = XMLGregorianCalendar.class.cast(value).toGregorianCalendar();
-					value = cal.getTime();
-				}
-				paramSources[idx].addValue(entry.getKey() ,value);
-			}
-			paramSources[idx].addValue("EDATE", nowTime);
-			paramSources[idx].addValue("EFLAG", "S");
-			idx++;
-		}
-		
-		logger.debug("SQL : [{}]",sql);
-		for(MapSqlParameterSource paramSource : paramSources){
-			logger.debug("PARAMETER : [{}]",paramSource.getValues());
-		}
-		return jdbcTemplate.batchUpdate(sql, paramSources);
-	}
-	
 	public int[] insert(String sql, List<MapWrapper> paramList){
 		
 		int idx = 0;
@@ -77,7 +50,7 @@ public class BizDAO {
 			for(String key : wrapper.core.keySet()){
 				value = wrapper.core.get(key);
 				if(value!=null){
-					logger.debug("[{}]'s type : [{}]",new Object[]{key,value.getClass()});
+					logger.trace("[{}]'s type : [{}]",new Object[]{key,value.getClass()});
 				}
 				if(value instanceof XMLGregorianCalendar){
 					GregorianCalendar cal
@@ -87,14 +60,13 @@ public class BizDAO {
 				}
 				paramSources[idx].addValue(key,value);
 			}
-			paramSources[idx].addValue("EDATE", nowTime);
-			paramSources[idx].addValue("EFLAG", "S");
+			paramSources[idx].addValue(EAIColumnEnum.RECV_EDATE.getColumnName(), nowTime);
 			idx++;
 		}
 		
-		logger.debug("SQL : [{}]",sql);
+		logger.trace("SQL : [{}]",sql);
 		for(MapSqlParameterSource paramSource : paramSources){
-			logger.debug("PARAMETER : [{}]",paramSource.getValues());
+			logger.trace("PARAMETER : [{}]",paramSource.getValues());
 		}
 		return jdbcTemplate.batchUpdate(sql, paramSources);
 	}
@@ -131,4 +103,33 @@ public class BizDAO {
 		}
 	
 	}
+	
+
+	public int[] insert2(String sql, List<RecordMap> paramList){
+		
+		int idx = 0;
+		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
+		MapSqlParameterSource[] paramSources = new MapSqlParameterSource[paramList.size()];
+		Object value = null;
+		for(RecordMap map : paramList){
+			paramSources[idx] = new MapSqlParameterSource();
+			for(RecordMapEntry entry : map.entry){
+				value = entry.getValue();
+				if(value instanceof XMLGregorianCalendar){
+					GregorianCalendar cal = XMLGregorianCalendar.class.cast(value).toGregorianCalendar();
+					value = cal.getTime();
+				}
+				paramSources[idx].addValue(entry.getKey() ,value);
+			}
+			paramSources[idx].addValue(EAIColumnEnum.RECV_EDATE.getColumnName(), nowTime);
+			idx++;
+		}
+		
+		logger.debug("SQL : [{}]",sql);
+		for(MapSqlParameterSource paramSource : paramSources){
+			logger.debug("PARAMETER : [{}]",paramSource.getValues());
+		}
+		return jdbcTemplate.batchUpdate(sql, paramSources);
+	}
+	
 }

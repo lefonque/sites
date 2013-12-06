@@ -1,6 +1,5 @@
 package org.epis.ws.agent.service;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Properties;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.epis.ws.agent.dao.AgentBizDAO;
 import org.epis.ws.agent.util.PropertyEnum;
 import org.epis.ws.agent.util.SqlUtil;
 import org.epis.ws.common.entity.BizVO;
@@ -40,9 +38,6 @@ public class EPISConsumerService implements ApplicationContextAware {
 	
 	@Autowired
 	private SqlUtil sqlUtil;
-	
-	@Autowired
-	private AgentBizDAO agentDao;
 	
 	@Autowired
 	private AgentBizService agentService;
@@ -78,26 +73,17 @@ public class EPISConsumerService implements ApplicationContextAware {
 		logger.info("===== Start JOB Execution : [{}] =====", jobId);
 		
 		int count = 0;
-		String preSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_PRE.getKey());
+		
 		//====================================================
 		//PRE SQL
 		//====================================================
-		if(StringUtils.isNotEmpty(preSQL)){
-			count = agentDao.modify(preSQL);
+		count = agentService.executePreSQL();
+		if(count!=-1){;
 			logger.info("=== {}'s Pre SQL Process END : [{}] ===",new Object[]{jobId, count});
 		}
 
-		//	POST SQL : Update Flag & Timestamp
-		String postSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_POST.getKey());
 		
-		//	MAIN SQL : Select Something
-		String mainSQL = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-		if(StringUtils.isNotEmpty(postSQL)){
-			mainSQL = sqlUtil.convertPagableSelectSQL(mainSQL);	// Convert paginational SQL
-		}
-		
-
-		String eflag = "S";Timestamp edate = null;
+		String eflag = "Y";
 		// Avoid Looping Infinitly (For Debug)
 		int maximum = 100000, loopCount = 0;
 		
@@ -110,7 +96,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 		//====================================================
 		
 		//	Select
-		List<MapWrapper> dataList = agentDao.selectList(mainSQL);
+		List<MapWrapper> dataList = agentService.executeMainSQL();
 		do{
 			existIntfRecord = CollectionUtils.isNotEmpty(dataList);
 			count = existIntfRecord ? dataList.size() : 0;
@@ -118,10 +104,10 @@ public class EPISConsumerService implements ApplicationContextAware {
 			bizParam.setDataList(dataList);
 			
 			//	Execute WebService
-			eflag = "F";
+			eflag = "N";
 			try {
 				String str = gateway.processPrimitiveData(bizParam);
-				eflag = "S";
+				eflag = "Y";
 				logger.info("=== {}'s WebService Process END : [{}] ===",new Object[]{jobId, str});
 			} catch (Exception e) {
 				occurError = true;
@@ -129,16 +115,10 @@ public class EPISConsumerService implements ApplicationContextAware {
 			}
 			
 			//	Update Something
-			if(StringUtils.isEmpty(postSQL)){
-				logger.info("===== No SQL For the Post Processing =====");
+			count = agentService.executePostSQL(dataList, eflag);
+			if(count==-1){
+				logger.info("=== No SQL For the Post Processing ===");
 				break;
-			}
-			edate = new Timestamp(System.currentTimeMillis());
-			count = 0;
-			for(MapWrapper one : dataList){
-				one.core.put("EFLAG",eflag);
-				one.core.put("EDATE",edate);
-				count += agentDao.modify(postSQL, one.core);
 			}
 			logger.info("=== {}'s Post SQL Process END : [{}] ===",new Object[]{jobId, count});
 			
@@ -149,8 +129,9 @@ public class EPISConsumerService implements ApplicationContextAware {
 				break;
 			}
 			logger.debug("=== Loop : [{}] =======================================",loopCount);
+			
 			//	Select
-			dataList = agentDao.selectList(mainSQL);
+			dataList = agentService.executeMainSQL();
 		} while(CollectionUtils.isNotEmpty(dataList));
 		
 		logger.info("===== End JOB Execution : [{}] =====", jobId);

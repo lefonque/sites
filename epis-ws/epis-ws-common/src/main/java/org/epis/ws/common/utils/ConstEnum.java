@@ -9,6 +9,7 @@ public enum ConstEnum {
 	Unix,
 	
 	AGENT,
-	SERVER
+	SERVER,
+	
 	;
 }

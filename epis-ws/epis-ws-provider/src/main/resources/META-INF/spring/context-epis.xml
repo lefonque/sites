@@ -20,6 +20,7 @@
   
   <context:component-scan base-package="org.epis.ws.provider">
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
   </context:component-scan>
   
   
@@ -28,4 +29,12 @@
    p:user="#{jdbcBiz['db.biz.oracle.username']}" p:password="#{jdbcBiz['db.biz.oracle.password']}"
    />
    
+  <!-- ====================================================== -->
+  <!-- Transaction -->
+  <!-- ====================================================== -->
+  <tx:annotation-driven transaction-manager="bizTransactionManager"/>
+  
+  <bean id="bizTransactionManager"
+    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+    p:dataSource-ref="dataSource" />
 </beans>

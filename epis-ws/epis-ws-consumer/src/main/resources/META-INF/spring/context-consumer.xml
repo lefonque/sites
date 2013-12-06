@@ -16,13 +16,10 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-  <context:component-scan base-package="org.epis.ws">
-    <context:include-filter type="annotation"
-      expression="org.springframework.stereotype.Component" />
-    <context:include-filter type="annotation"
-      expression="org.springframework.stereotype.Repository" />
-    <context:include-filter type="annotation"
-      expression="org.springframework.stereotype.Service" />
+  <context:component-scan base-package="org.epis.ws.agent">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
   </context:component-scan>
 
   <util:properties id="jobProp"
@@ -43,39 +40,23 @@
       <cxf:logging/>
     </cxf:features>
   </cxf:bus>
-  <!-- 
-  <jaxws:client id="consumer"
-      serviceName="gate:EPISWSGateway"
-      address="${agent.provider.endpoint}"
-      endpointName="gate:EPISWSGatewayPort"
-      xmlns:gate="http://ws.epis.org/provider/EPISWSGateway">
-    <jaxws:properties>
-      <entry key="#{T(org.apache.cxf.ws.security.SecurityConstants).USERNAME}" value="#{agent['agent.username']}"/>
-      <entry key="#{T(org.apache.cxf.ws.security.SecurityConstants).CALLBACK_HANDLER}" value-ref="EPISUTCallbackHandler" />
-      <entry key="#{T(org.apache.cxf.common.util.SOAPConstants).MTOM_ENABLED}" value="true"/>
-      
-      <entry key="faultStackTraceEnabled" value="true" />
-      <entry key="exceptionMessageCauseEnabled" value="true" />
-    </jaxws:properties>
-  </jaxws:client>
- -->
+  
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
     destroy-method="close" p:driverClassName="#{jobProp['${job.id}.jdbcDriverClass']}"
     p:url="#{jobProp['${job.id}.jdbcUrl']}" p:username="#{jobProp['${job.id}.jdbcUsername']}"
     p:password="#{jobProp['${job.id}.jdbcPass']}" />
 
 
-
-
   <!-- ====================================================== -->
   <!-- Transaction -->
   <!-- ====================================================== -->
-  <tx:annotation-driven />
+  
+  <tx:annotation-driven transaction-manager="transactionManager"/>
 
   <bean id="transactionManager"
     class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
     p:dataSource-ref="dataSource" />
-
+<!-- 
   <tx:advice id="txAdvice" transaction-manager="transactionManager">
     <tx:attributes>
       <tx:method name="execute*" rollback-for="java.lang.Throwable" />
@@ -87,4 +68,5 @@
     <aop:advisor advice-ref="txAdvice"
       pointcut="execution(* org.epis.ws.agent..*Service(..))" />
   </aop:config>
+ -->
 </beans>

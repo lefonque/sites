@@ -5,13 +5,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.common.utils.OSEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
 import org.epis.ws.manager.core.service.InfraService;
+import org.epis.ws.manager.core.service.LogService;
 import org.epis.ws.manager.entity.AjaxResponseVO;
 import org.epis.ws.manager.entity.JQGridVO;
+import org.epis.ws.manager.entity.LogVO;
 import org.epis.ws.manager.web.utils.LoginPropertyKeyEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,9 @@ public class DummyController {
 	@Autowired
 	private InfraService infraService;
 	
+	@Autowired
+	private LogService logService;
+	
 	@RequestMapping(value="/test")
 	public String sample(){
 		return "sample/sample";
@@ -48,21 +54,28 @@ public class DummyController {
 			,Model model){
 		String result = null;
 		Map<String,Object> userInfo = infraService.getLoginUser(loginUsername);
-		logger.debug("User Info from DB : [{}] / [{}]"
-				,new Object[]{
-					userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName())
-					,userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName())
-				});
-		
-		if(loginUsername.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName()))
-				&& loginPassword.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName()))){
-			request.getSession().setAttribute("LOGIN", loginUsername);
-			result = "redirect:/config/main";
-		}
-		else{
+		if(userInfo==null){
 			result = "forward:/index.jsp";
 			request.getSession().removeAttribute("LOGIN");
 			model.addAttribute("message", "Invalid Login Password");
+		}
+		else{
+			logger.debug("User Info from DB : [{}] / [{}]"
+					,new Object[]{
+						userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName())
+						,userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName())
+					});
+			
+			if(loginUsername.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_USER.getColName()))
+					&& loginPassword.equals(userInfo.get(LoginPropertyKeyEnum.LOGIN_PASS.getColName()))){
+				request.getSession().setAttribute("LOGIN", loginUsername);
+				result = "redirect:/config/main";
+			}
+			else{
+				result = "forward:/index.jsp";
+				request.getSession().removeAttribute("LOGIN");
+				model.addAttribute("message", "Invalid Login Password");
+			}
 		}
 		return result;
 	}
@@ -207,5 +220,36 @@ public class DummyController {
 				true, String.format("%1$d 건이 성공적으로 처리되었습니다.", count), count);
 		return result;
 	}
+	
+	
+	
+	@RequestMapping(value="/logView")
+	public String showLogView(){
+		return "log/logView";
+	}
+	
+	@RequestMapping(value="/logList")
+	public @ResponseBody JQGridVO getLogList(JQGridVO paging, HttpServletRequest request){
+		boolean search = StringUtils.isNotEmpty(request.getParameter("_search")) ?
+				Boolean.valueOf(request.getParameter("_search")) : false;
+		paging.set_search(search);
+		int count = logService.getLogCount(paging);
+		int totalPages = 1;
+		if(count > 0){
+			totalPages = (int)(Math.ceil((double)count/(double)paging.getRows()));
+		}
+		paging.setRecords(count);
+		paging.setTotal(totalPages);
+		
+		if(paging.getPage() > totalPages){
+			paging.setPage(totalPages);
+		}
+		
+		List<LogVO> root = logService.getLogList(paging);
+		paging.setRoot(root);
+		
+		return paging;
+	}
+	
 	
 }

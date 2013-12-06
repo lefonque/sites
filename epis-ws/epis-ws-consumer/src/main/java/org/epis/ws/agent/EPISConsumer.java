@@ -41,7 +41,7 @@ public class EPISConsumer {
 	 */
 	private EPISConsumer() {
 		ctx = new ClassPathXmlApplicationContext(
-				"classpath:/META-INF/spring/context-consumer.xml");
+				"classpath:/META-INF/spring/context-*.xml");
 		agentProp = ctx.getBean("agentProp",Properties.class);
 	}
 
@@ -93,7 +93,7 @@ public class EPISConsumer {
 		String wsdlURLString = agentProp.getProperty("agent.provider.endpoint");
 		String svcNmString = "EPISWSGateway";
 		String portNmString = "EPISWSGatewayPort";
-		logger.info("===== Begin Schedule Job =====");
+		logger.info("===== Begin Job Execution =====");
 		try {
 			EPISWSGateway gateway
 				= createPortType(targetNamespace,wsdlURLString

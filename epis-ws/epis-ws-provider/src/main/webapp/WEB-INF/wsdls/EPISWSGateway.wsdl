@@ -24,16 +24,14 @@
       </xs:complexType>
       <xs:complexType name="findConfigurationDataResponse">
         <xs:sequence>
-          <xs:element minOccurs="0" name="return"
-            type="tns:configurationVO" />
+          <xs:element minOccurs="0" name="return" type="tns:configurationVO" />
         </xs:sequence>
       </xs:complexType>
       
       <xs:complexType name="configurationVO">
         <xs:sequence>
           <xs:element minOccurs="0" name="agentInfo" type="tns:agentVO" />
-          <xs:element maxOccurs="unbounded" minOccurs="0"
-            name="jobList" nillable="true" type="tns:jobVO" />
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="jobList" nillable="true" type="tns:jobVO" />
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="agentVO">
@@ -56,7 +54,7 @@
         <xs:sequence>
           <xs:element minOccurs="0" name="agentExecTime" type="xs:string" />
           <xs:element minOccurs="0" name="agentId" type="xs:string" />
-          <xs:element minOccurs="0" name="batchSelectCount" type="xs:string" />
+          <xs:element name="batchSelectCount" type="xs:int"/>
           <xs:element minOccurs="0" name="createdDate" type="xs:dateTime" />
           <xs:element minOccurs="0" name="jdbcDriverClassName" type="xs:string" />
           <xs:element minOccurs="0" name="jdbcPassword" type="xs:string" />
@@ -75,19 +73,10 @@
       
       <xs:complexType name="debugMethod">
         <xs:sequence>
-          <xs:element minOccurs="0" name="param" type="tns:bizVO" />
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="tns:mapWrapper"/>
         </xs:sequence>
       </xs:complexType>
       
-      <xs:complexType name="bizVO">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="agentId" type="xs:string" />
-          <xs:element maxOccurs="unbounded" minOccurs="0"
-            name="dataList" nillable="true" type="tns:mapWrapper" />
-          <xs:element minOccurs="0" name="jobId" type="xs:string" />
-        </xs:sequence>
-      </xs:complexType>
-
       <xs:complexType name="mapWrapper">
         <xs:sequence>
           <xs:element name="core">
@@ -119,11 +108,20 @@
         </xs:sequence>
       </xs:complexType>
 
+      <xs:complexType name="bizVO">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="dataList" nillable="true" type="tns:mapWrapper" />
+          <xs:element minOccurs="0" name="agentId" type="xs:string" />
+          <xs:element minOccurs="0" name="jobId" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+
       <xs:complexType name="processPrimitiveDataResponse">
         <xs:sequence>
           <xs:element minOccurs="0" name="return" type="xs:string" />
         </xs:sequence>
       </xs:complexType>
+      
       <xs:element name="Exception" type="tns:Exception" />
       <xs:complexType name="Exception">
         <xs:sequence>
@@ -166,8 +164,7 @@
     <wsdl:operation name="findConfigurationData">
       <wsdl:input name="findConfigurationData" message="tns:findConfigurationData">
       </wsdl:input>
-      <wsdl:output name="findConfigurationDataResponse"
-        message="tns:findConfigurationDataResponse">
+      <wsdl:output name="findConfigurationDataResponse" message="tns:findConfigurationDataResponse">
       </wsdl:output>
       <wsdl:fault name="Exception" message="tns:Exception">
       </wsdl:fault>
@@ -212,9 +209,7 @@
     </wsdl:operation>
     
     <wsdl:operation name="debugMethod">
-      <soap:operation
-        soapAction="http://ws.epis.org/provider/EPISWSGateway/debugMethod"
-        style="document" />
+      <soap:operation soapAction="http://ws.epis.org/provider/EPISWSGateway/debugMethod" style="document" />
       <wsdl:input name="debugMethod">
         <soap:body use="literal" />
       </wsdl:input>
@@ -227,9 +222,7 @@
     </wsdl:operation>
     
     <wsdl:operation name="processPrimitiveData">
-      <soap:operation
-        soapAction="http://ws.epis.org/provider/EPISWSGateway/processPrimitiveData"
-        style="document" />
+      <soap:operation soapAction="http://ws.epis.org/provider/EPISWSGateway/processPrimitiveData" style="document" />
       <wsdl:input name="processPrimitiveData">
         <soap:body use="literal" />
       </wsdl:input>

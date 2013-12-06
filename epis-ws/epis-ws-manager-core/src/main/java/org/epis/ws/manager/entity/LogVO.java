@@ -2,13 +2,19 @@ package org.epis.ws.manager.entity;
 
 import java.sql.Timestamp;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class LogVO {
 
 	private String logId;
 	private String agentId;
 	private String jobId;
+	private String jobName;
 	private int rowCount;
 	private String resultFlag;
+	private String resultFlagText;
+	
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Timestamp createDate;
 	
 	public String getLogId() {
@@ -25,6 +31,18 @@ public class LogVO {
 	}
 	public String getJobId() {
 		return jobId;
+	}
+	public String getJobName() {
+		return jobName;
+	}
+	public String getResultFlagText() {
+		return resultFlagText;
+	}
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+	public void setResultFlagText(String resultFlagText) {
+		this.resultFlagText = resultFlagText;
 	}
 	public String getResultFlag() {
 		return resultFlag;
