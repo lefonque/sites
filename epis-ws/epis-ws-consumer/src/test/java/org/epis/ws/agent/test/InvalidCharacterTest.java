@@ -1,4 +1,4 @@
-package org.epis.ws.consumer.test;
+package org.epis.ws.agent.test;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

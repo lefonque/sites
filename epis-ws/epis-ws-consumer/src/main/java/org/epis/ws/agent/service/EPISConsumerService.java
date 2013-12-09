@@ -115,6 +115,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 			}
 			
 			//	Update Something
+			logger.debug("eflag : [{}]",eflag);
 			count = agentService.executePostSQL(dataList, eflag);
 			if(count==-1){
 				logger.info("=== No SQL For the Post Processing ===");

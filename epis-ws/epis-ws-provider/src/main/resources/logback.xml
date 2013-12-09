@@ -7,7 +7,7 @@
     </layout>
   </appender>
    
-  <logger name="org.epis.ws.provider" level="TRACE" additivity="false">
+  <logger name="org.epis.ws.provider" level="INFO" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
    <!-- 
@@ -15,7 +15,7 @@
     <appender-ref ref="STDOUT"/>
   </logger>
    -->
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

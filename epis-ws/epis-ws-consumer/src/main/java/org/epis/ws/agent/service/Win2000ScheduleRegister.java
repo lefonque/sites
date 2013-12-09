@@ -17,7 +17,7 @@ public class Win2000ScheduleRegister extends AbstractScheduleRegister {
 
 	@Override
 	public Map<ConstEnum, List<String>> registerSchedule(String[] jobNames) throws Exception {
-		Runtime rt = Runtime.getRuntime();
+		
 		Map<ConstEnum,List<String>> result = new HashMap<ConstEnum,List<String>>();
 		result.put(ConstEnum.SUCCESS, new ArrayList<String>());
 		result.put(ConstEnum.FAIL, new ArrayList<String>());
@@ -29,7 +29,7 @@ public class Win2000ScheduleRegister extends AbstractScheduleRegister {
 		Map<ConstEnum,List<String>> processed = null;
 		for(String jobName : jobNames){
 			//retrieve AT row existed
-			processCmd(rt, String.format(findTemplate, "biz.bat", jobName));
+			runtimeExecutor.executeCMD(String.format(findTemplate, "biz.bat", jobName));
 			List<String> lines = processed.get(ConstEnum.SUCCESS);
 			if(CollectionUtils.isEmpty(lines)){
 				continue;
@@ -43,11 +43,11 @@ public class Win2000ScheduleRegister extends AbstractScheduleRegister {
 					continue;
 				}
 				//remove AT row
-				processCmd(rt, String.format(removeTemplate, tokens[0]));
+				runtimeExecutor.executeCMD(String.format(removeTemplate, tokens[0]));
 			}
 			
 			//register
-			processed = processCmd(rt, String.format(
+			processed = runtimeExecutor.executeCMD(String.format(
 					registerTemplate
 					,jobProp.getProperty(jobName+".execTime")
 					,System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey())

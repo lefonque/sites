@@ -2,14 +2,12 @@
 <wsdl:definitions name="EPISWSGatewayService" targetNamespace="http://ws.epis.org/provider/EPISWSGateway" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://ws.epis.org/provider/EPISWSGateway" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   <wsdl:types>
 <xs:schema xmlns:tns="http://ws.epis.org/provider/EPISWSGateway" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://ws.epis.org/provider/EPISWSGateway">
-  
   <xs:element name="debugMethod" type="tns:debugMethod"/>
   <xs:element name="debugMethodResponse" type="tns:debugMethodResponse"/>
   <xs:element name="findConfigurationData" type="tns:findConfigurationData"/>
   <xs:element name="findConfigurationDataResponse" type="tns:findConfigurationDataResponse"/>
   <xs:element name="processPrimitiveData" type="tns:processPrimitiveData"/>
   <xs:element name="processPrimitiveDataResponse" type="tns:processPrimitiveDataResponse"/>
-  
   <xs:complexType name="findConfigurationData">
     <xs:sequence>
       <xs:element minOccurs="0" name="agentId" type="xs:string"/>
@@ -20,7 +18,6 @@
       <xs:element minOccurs="0" name="return" type="tns:configurationVO"/>
     </xs:sequence>
   </xs:complexType>
-  
   <xs:complexType name="configurationVO">
     <xs:sequence>
       <xs:element minOccurs="0" name="agentInfo" type="tns:agentVO"/>

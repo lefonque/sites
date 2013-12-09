@@ -42,14 +42,12 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	public boolean isExistSchedule(String scheduleName)
 			throws IOException, InterruptedException, ExecutionException {
 		
-		Runtime rt = Runtime.getRuntime();
-		
 		StringBuilder cmd = new StringBuilder();
 		cmd.append("cmd /c \"")
 			.append("SCHTASKS /Query | find ")
 			.append("\"").append(scheduleName).append("\"")
 			.append("\"");
-		Map<ConstEnum,List<String>> result = processCmd(rt, cmd.toString());
+		Map<ConstEnum,List<String>> result = runtimeExecutor.executeCMD(cmd.toString());
 		
 		boolean isExist = false;
 		if(CollectionUtils.isNotEmpty(result.get(ConstEnum.SUCCESS))){
@@ -70,8 +68,6 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	public Map<ConstEnum,List<String>> removeSchedule(String scheduleName)
 			throws IOException, InterruptedException, ExecutionException {
 
-		Runtime rt = Runtime.getRuntime();
-		
 		StringBuilder cmd = new StringBuilder();
 		cmd.append("cmd /c \"")
 			.append("schtasks /Delete /TN \"")
@@ -79,7 +75,7 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 			.append("\" /F")
 			.append("\"");
 		
-		Map<ConstEnum,List<String>> result = processCmd(rt, cmd.toString());
+		Map<ConstEnum,List<String>> result = runtimeExecutor.executeCMD(cmd.toString());
 		return result;
 	}
 	
@@ -95,7 +91,6 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	public Map<ConstEnum,List<String>> registerSchedule(String[] changedJobName)
 			throws IOException, InterruptedException, ExecutionException{
 		
-		Runtime rt = Runtime.getRuntime();
 		Map<ConstEnum,List<String>> result = new HashMap<ConstEnum,List<String>>();
 		result.put(ConstEnum.SUCCESS, new ArrayList<String>());
 		result.put(ConstEnum.FAIL, new ArrayList<String>());
@@ -114,7 +109,7 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 			if(isExistSchedule(scheduleName)){
 				removeSchedule(scheduleName);
 			}
-			Map<ConstEnum,List<String>> processed = processCmd(rt, builder.toString());
+			Map<ConstEnum,List<String>> processed = runtimeExecutor.executeCMD(builder.toString());
 			builder.setLength(0);
 			List<String> msgList = processed.get(ConstEnum.SUCCESS);
 			if(CollectionUtils.isNotEmpty(msgList)){

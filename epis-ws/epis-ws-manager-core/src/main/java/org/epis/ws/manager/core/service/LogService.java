@@ -1,6 +1,7 @@
 package org.epis.ws.manager.core.service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,6 +39,7 @@ public class LogService {
 	
 	public int addLog(BizVO bizVO, String resultFlag){
 		LogVO param = new LogVO();
+		param.setLogId(UUID.randomUUID().toString());
 		param.setAgentId(bizVO.getAgentId());
 		param.setJobId(bizVO.getJobId());
 		param.setResultFlag(resultFlag);

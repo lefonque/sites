@@ -14,8 +14,11 @@ import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.epis.ws.agent.security.EPISConsumerUTCallbackHandler;
 import org.epis.ws.agent.service.EPISConsumerService;
@@ -101,7 +104,10 @@ public class EPISConsumer {
 			
 			//ws-securitypolicy로 설정된 provider측에 맞추어 호출하기 위해
 			//security설정을 한다.
-			initSecurityParameters(gateway);
+
+			Client client = ClientProxy.getClient(gateway);
+			httpTimeout(client);
+			initSecurityParameters(client);
 			
 			String methodName = "execute" + command;
 			EPISConsumerService service = ctx.getBean(EPISConsumerService.class);
@@ -156,8 +162,7 @@ public class EPISConsumer {
 	 * </pre>
 	 * @param portType
 	 */
-	private void initSecurityParameters(EPISWSGateway portType) {
-		Client client = ClientProxy.getClient(portType);
+	private void initSecurityParameters(Client client) {
 		Map<String, Object> reqCtx = client.getRequestContext();
 	
 		CallbackHandler callbackHandler = ctx.getBean("EPISUTCallbackHandler",
@@ -165,6 +170,17 @@ public class EPISConsumer {
 		reqCtx.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
 		reqCtx.put(SecurityConstants.USERNAME,
 				agentProp.getProperty("consumer.userId"));
+	}
+	
+	private void httpTimeout(Client client){
+		HTTPConduit httpConduit = HTTPConduit.class.cast(client.getConduit());
+		HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+		httpClientPolicy.setAllowChunking(true);
+		httpClientPolicy.setConnectionTimeout(
+				NumberUtils.toLong(agentProp.getProperty("agent.provider.timeout.connect")));
+		httpClientPolicy.setReceiveTimeout(
+				NumberUtils.toLong(agentProp.getProperty("agent.provider.timeout.receive")));
+		httpConduit.setClient(httpClientPolicy);
 	}
 
 

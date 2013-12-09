@@ -1,8 +1,9 @@
-package org.epis.ws.consumer.test;
+package org.epis.ws.agent.test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,8 +13,6 @@ import org.epis.ws.agent.service.WindowsScheduleRegister;
 import org.epis.ws.agent.util.PropertyEnum;
 import org.epis.ws.agent.util.SqlUtil;
 import org.epis.ws.common.entity.MapWrapper;
-import org.epis.ws.common.entity.RecordMap;
-import org.epis.ws.common.entity.RecordMapEntry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -45,20 +44,20 @@ public class ConfigTest {
 	@Autowired
 	private SqlUtil sqlUtil;
 	
-	@Test
+	
+//	@Test
 	public void testSelect(){
 		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
 		
 		String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-//		List<MapWrapper> list = bizDao.selectList(sql);
-		List<RecordMap> mapList = bizDao.selectListAsRecordMap(sql);
-		for(RecordMap wrapper : mapList){
-			logger.debug("entry count : {}", wrapper.entry.size());
-			for(RecordMapEntry entry : wrapper.entry){
+		List<MapWrapper> list = bizDao.selectList(sql);
+//		List<RecordMap> mapList = bizDao.selectListAsRecordMap(sql);
+		for(MapWrapper wrapper : list){
+			logger.debug("entry count : {}", wrapper.core.size());
+			for(Entry<String, Object>entry : wrapper.core.entrySet()){
 				logger.debug("{} : {}",entry.getKey(),entry.getValue());
 			}
 		}
-		
 	}
 	
 //	@Test
@@ -70,8 +69,18 @@ public class ConfigTest {
 		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
 	}
 	
-//	@Test
+	@Test
 	public void testGarage(){
+		String[] jobs = StringUtils.split(jobProp.getProperty("job.ids"),",");
+		int idx = 0;
+		for(String j : jobs){
+			logger.info("{} : [{}]",new Object[]{idx++,j});
+		}
+		
+		for(Entry<Object, Object> entry : System.getProperties().entrySet()){
+			logger.info("[{}] : [{}]",new Object[]{entry.getKey(),entry.getValue()});
+		}
+		
 		String dumm = "        1   ...                     오후 5:13     E:\temp\test.bat";
 		String[] tokens = StringUtils.split(dumm," ");
 		for(String token : tokens){

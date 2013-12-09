@@ -38,12 +38,11 @@ public class UnixScheduleRegister extends AbstractScheduleRegister {
 	public Map<ConstEnum,List<String>> registerSchedule(final String[] changedJobName)
 			throws IOException, InterruptedException, ExecutionException {
 		
-		Runtime rt = Runtime.getRuntime();
 		Writer writer = null;
 		File cronFile = null;
 		
 		//crontab -l
-		Map<ConstEnum,List<String>> result = processCmd(rt, "crontab -l");
+		Map<ConstEnum,List<String>> result = runtimeExecutor.executeCMD("crontab -l");
 		List<String> oldCronList = result.get(ConstEnum.SUCCESS);
 		if(CollectionUtils.isNotEmpty(result.get(ConstEnum.FAIL))){
 			logger.error("FAILE TO REGISTER SCHEDULE : Fail to get 'crontab -l'");
@@ -99,9 +98,9 @@ public class UnixScheduleRegister extends AbstractScheduleRegister {
 			try {
 				//crontab file명 => overwrite함
 				builder.setLength(0);
-				result = processCmd(rt, "crontab -r");
+				result = runtimeExecutor.executeCMD("crontab -r");
 				builder.append("crontab ").append(cronFile.getAbsolutePath());
-				result = processCmd(rt, builder.toString());
+				result = runtimeExecutor.executeCMD(builder.toString());
 			} finally {
 				FileUtils.deleteQuietly(cronFile);
 			}

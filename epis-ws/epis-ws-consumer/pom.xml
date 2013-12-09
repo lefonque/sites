@@ -159,5 +159,6 @@
       </plugin>
        -->
     </plugins>
+    <finalName>epis-ws-consumer</finalName>
   </build>
 </project>

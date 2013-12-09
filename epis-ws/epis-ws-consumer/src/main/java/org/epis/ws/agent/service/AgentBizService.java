@@ -2,7 +2,6 @@ package org.epis.ws.agent.service;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -10,11 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.dao.AgentBizDAO;
 import org.epis.ws.agent.util.SqlUtil;
 import org.epis.ws.common.entity.MapWrapper;
-import org.epis.ws.common.entity.RecordMap;
 import org.epis.ws.common.utils.EAIColumnEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AgentBizService {
 	
-	@Autowired
-	private AgentBizDAO dao;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
-	@Qualifier("jobProp")
-	private Properties jobProp;
+	private AgentBizDAO dao;
 	
 	@Value("#{jobProp['${job.id}.sqlPre']}")
 	private String preSQL;
@@ -53,7 +51,7 @@ public class AgentBizService {
 	 * 전처리SQL이 없을 경우 -1을 리턴한다.
 	 * @return
 	 */
-	@Transactional(rollbackFor=Throwable.class)
+	@Transactional(value="transactionManager",rollbackFor=Throwable.class)
 	public int executePreSQL(){
 		int result = -1;
 		if(StringUtils.isNotEmpty(preSQL)){
@@ -69,20 +67,28 @@ public class AgentBizService {
 	 * @param eflag		WebService 처리결과값
 	 * @return
 	 */
-	@Transactional(rollbackFor=Throwable.class)
+	@Transactional(value="transactionManager",rollbackFor=Throwable.class)
 	public int executePostSQL(List<MapWrapper> rowList, String eflag){
 		int result = -1;
 		if(StringUtils.isEmpty(postSQL)){
 			return result;
 		}
 		
-		result = 0;
 		Timestamp edate = new Timestamp(System.currentTimeMillis());
+		MapSqlParameterSource[] batchArgs = new MapSqlParameterSource[rowList.size()];
+		int loopIdx = 0;
 		for(MapWrapper wrapper : rowList){
 			wrapper.core.put(EAIColumnEnum.EFLAG.getColumnName(),eflag);
-			wrapper.core.put(EAIColumnEnum.EDATE.getColumnName(),edate);
-			result += dao.modify(postSQL, wrapper.core);
+			wrapper.core.put(EAIColumnEnum.SND_EDATE.getColumnName(),edate);
+			batchArgs[loopIdx++] = new MapSqlParameterSource(wrapper.core);
 		}
+		
+		result = 0;
+		long startMillisec = System.currentTimeMillis(); 
+		int[] resultArray = dao.batchModify(postSQL, batchArgs);
+		long endMillisec = System.currentTimeMillis();
+		logger.debug("Elapsed Time : [{}]",(endMillisec-startMillisec)/1000);
+		result = resultArray.length;
 		return result;
 	}
 	
@@ -91,7 +97,7 @@ public class AgentBizService {
 		return result;
 	}
 	
-	public List<RecordMap> executeMainSQLAsRecordMap(){
-		return dao.selectListAsRecordMap(mainSQL);
-	}
+//	public List<RecordMap> executeMainSQLAsRecordMap(){
+//		return dao.selectListAsRecordMap(mainSQL);
+//	}
 }

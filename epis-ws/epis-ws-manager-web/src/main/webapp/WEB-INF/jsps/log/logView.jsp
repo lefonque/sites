@@ -22,10 +22,22 @@
  -->
 <script type="text/javascript">
 
+
+var intervalId = null;
+$(window).unload(function(){
+	if(intervalId!=null){
+		window.clearInterval(intervalId);
+	}
+});
+
+
 var agentValidator = null, agentJobValidator = null;
 $(document).ready(function() {
 	initGrid();
 });
+
+
+
 
 
 /**
@@ -64,6 +76,7 @@ function initGrid() {
 			,repeatitems: false
 			,_search: "search"
 		}
+		,loadComplete: handleLoadComplete_GridLog
 	});
 	jQuery("#gridLog").jqGrid('navGrid', '#pagerLogGrid', {
 		edit : false
@@ -94,7 +107,17 @@ function datetimeFormatter(cellValue,option,rowObject){
 	return result;
 }
 
-
+/**
+ * Log Data를 Polling한다.
+ */
+function handleLoadComplete_GridLog(){
+	if(intervalId!=null){
+		window.clearInterval(intervalId);
+	}
+	intervalId = setInterval(function(){
+		$("#gridLog").trigger("reloadGrid");
+	}, 30000);
+}
 
 </script>
 <title>Configuration List</title>

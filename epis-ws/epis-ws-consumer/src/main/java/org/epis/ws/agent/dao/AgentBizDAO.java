@@ -11,8 +11,6 @@ import javax.sql.DataSource;
 
 import org.epis.ws.agent.vo.ColumnInfoVO;
 import org.epis.ws.common.entity.MapWrapper;
-import org.epis.ws.common.entity.RecordMap;
-import org.epis.ws.common.entity.RecordMapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +49,11 @@ public class AgentBizDAO {
 		return result;
 	}
 	
-	public List<RecordMap> selectListAsRecordMap(String sql){
-		List<RecordMap> result
-			= jdbcTemplate.getJdbcOperations().query(sql, new RecordMapRowMapper());
-		return result;
-	}
+//	public List<RecordMap> selectListAsRecordMap(String sql){
+//		List<RecordMap> result
+//			= jdbcTemplate.getJdbcOperations().query(sql, new RecordMapRowMapper());
+//		return result;
+//	}
 	
 	public int modify(String sql){
 		int result = jdbcTemplate.getJdbcOperations().update(sql);
@@ -87,14 +85,12 @@ public class AgentBizDAO {
 		return result;
 	}
 	
-	public int modify(String sql, RecordMap recordMap){
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		for(RecordMapEntry entry : recordMap.entry){
-			paramSource.addValue(entry.getKey(), entry.getValue());
-		}
-		int result = jdbcTemplate.update(sql, paramSource);
+	public int[] batchModify(String sql, SqlParameterSource[] batchArgs){
+		int[] result = jdbcTemplate.batchUpdate(sql, batchArgs);
 		return result;
 	}
+	
+	
 	
 	public int modify(String sql, List<ColumnInfoVO> params){
 		
@@ -108,47 +104,6 @@ public class AgentBizDAO {
 	}
 	
 	
-	
-	class RecordMapRowMapper implements RowMapper<RecordMap>{
-
-		public RecordMap mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnCount = rsmd.getColumnCount();
-			RecordMap result = new RecordMap();
-			for (int i = 1; i <= columnCount; i++) {
-				String key = getColumnKey(JdbcUtils.lookupColumnName(rsmd, i));
-				Object obj = getColumnValue(rs, i);
-				RecordMapEntry entry = new RecordMapEntry(key,obj);
-				result.entry.add(entry);
-			}
-			
-			return result;
-		}
-		
-		protected String getColumnKey(String columnName) {
-			return columnName;
-		}
-		
-		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
-			Object result = JdbcUtils.getResultSetValue(rs, index);
-			boolean oddByte = false;
-			if(result instanceof String){
-				String str = String.class.cast(result);
-				str = str.trim();
-				byte[] temp = str.getBytes();
-				for(int i = 0; i < temp.length; i++){
-					if(temp[i]==0){
-						oddByte = true;
-						temp[i] = 32;
-					}
-				}
-				if(oddByte){
-					result = new String(temp);
-				}
-			}
-			return result;
-		}
-	}
 	
 	class ColumnHashMapRowMapper implements RowMapper<MapWrapper> {
 		public MapWrapper mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -197,6 +152,8 @@ public class AgentBizDAO {
 			}
 			return result;
 		}
-	
 	}
+	
+
+	
 }
