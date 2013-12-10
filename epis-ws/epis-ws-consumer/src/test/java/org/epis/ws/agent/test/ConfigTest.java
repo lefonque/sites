@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.dao.AgentBizDAO;
+import org.epis.ws.agent.service.EPISConsumerService;
 import org.epis.ws.agent.service.UnixScheduleRegister;
 import org.epis.ws.agent.service.WindowsScheduleRegister;
 import org.epis.ws.agent.util.PropertyEnum;
@@ -44,6 +45,9 @@ public class ConfigTest {
 	@Autowired
 	private SqlUtil sqlUtil;
 	
+	@Autowired
+	private EPISConsumerService consumerService;
+	
 	
 //	@Test
 	public void testSelect(){
@@ -67,6 +71,12 @@ public class ConfigTest {
 		
 		sql = "UPDATE just_table SET field1=?, field2=CONCAT('P-',?), field3='James', field4=? WHERE field5=TRIM(?)";
 		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
+	}
+	
+	@Test
+	public void testService(){
+		String[] jobIds = consumerService.getJobIds();
+		logger.debug("jobIds:[{}][{}]",new Object[]{jobIds[0],jobIds[1]});
 	}
 	
 	@Test

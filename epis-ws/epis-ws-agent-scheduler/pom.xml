@@ -6,6 +6,12 @@
     <version>0.0.1</version>
   </parent>
   <artifactId>epis-ws-agent-scheduler</artifactId>
+  <description>
+    epis-ws-consumer를 스케쥴링하여 실행하는 모듈임.
+    epis-ws-consumer의 실행은 Runtime클래스를 이용하여 command를 실행하는 방식임.
+     따라서 epis-ws-consumer와 본 모듈은 java부분에서는 의존관계는 없음.
+  </description>
+  
   <dependencies>
     <dependency>
       <groupId>org.springframework</groupId>

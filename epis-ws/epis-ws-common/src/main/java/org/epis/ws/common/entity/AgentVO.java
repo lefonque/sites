@@ -5,22 +5,64 @@ import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 
+/**
+ * Agent정보를 담는 Value Object
+ * @author developer
+ *
+ */
 public class AgentVO {
 
+	/**
+	 * Agent 고유ID
+	 */
 	private String agentId;
+	/**
+	 * 해당 Agent가 심겨진 기관의 조직코드
+	 */
 	private String orgCode;
+	/**
+	 * 해당 Agent가 동작되는 환경의 OS
+	 * Windows, Unix(Linux포함)
+	 */
 	private String operatingSystem;
+	/**
+	 * 해당 Agent가 동작되는 환경의 Charset
+	 */
 	private String charset;
+	/**
+	 * 해당 Agent에 할당된 webservice 유저ID
+	 */
 	private String websvcUser;
+	/**
+	 * 해당 Agent에 할당된 webservice 패스워드
+	 */
 	private String websvcPass;
+	/**
+	 * 담당자명
+	 */
 	private String officerName;
+	/**
+	 * 담당자 연락처
+	 */
 	private String officerContact;
 	
+	/**
+	 * SMS 사용시 전화번호
+	 */
 	private String smsCellNo;
+	/**
+	 * SMS 사용여부
+	 */
 	private String smsUseYn;
 	
+	/**
+	 * 데이터 생성일자
+	 */
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createdDate;
+	/**
+	 * 데이터 수정일자
+	 */
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date modifiedDate;
 	

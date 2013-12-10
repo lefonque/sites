@@ -15,7 +15,7 @@
     
     <File>logs/logFile.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>logs/${job.id}/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>logs/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy>
     
     <layout class="ch.qos.logback.classic.PatternLayout">
@@ -23,17 +23,11 @@
     </layout>
   </appender>
    
-  <logger name="org.epis.ws.agent.scheduler" level="DEBUG" additivity="false">
+  <logger name="org.epis.ws.agent" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>
   </logger>
   
-  <!-- 
-  <logger name="org.apache.cxf" level="INFO" additivity="false">
-    <appender-ref ref="STDOUT" />
-  </logger>
-    -->
- 
   <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>

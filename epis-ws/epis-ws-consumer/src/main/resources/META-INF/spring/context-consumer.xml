@@ -21,6 +21,9 @@
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
   </context:component-scan>
+  <context:component-scan base-package="org.epis.ws.common">
+     <context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+  </context:component-scan>
 
   <util:properties id="jobProp"
     location="file:#{systemProperties['consumer.root.dir']}/properties/job.properties" />

@@ -16,6 +16,6 @@ public class ExecutorTest {
 	
 	@Test
 	public void testExec(){
-		executor.execute("JOB-1");
+		executor.execute("JOB-2");
 	}
 }

@@ -10,6 +10,11 @@ import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
 import org.epis.ws.common.entity.MapWrapper;
 
+/**
+ * 웹서비스 인터페이스
+ * @author developer
+ *
+ */
 @WebService(name="EPISWSGateway"
 			,targetNamespace="http://ws.epis.org/provider/EPISWSGateway")
 public interface EPISWSGateway {

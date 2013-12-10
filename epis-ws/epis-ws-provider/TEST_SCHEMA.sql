@@ -20,7 +20,7 @@ create table COM_EPIS_EAI_AGENT (
 );
 
 create table COM_EPIS_EAI_JOB (
-	job_id VARCHAR2(4000) not null primary key
+	job_id VARCHAR2(4000) not null
 	,agent_id VARCHAR2(4000)
 	,job_name VARCHAR2(4000)
 	,job_type VARCHAR2(4000)
@@ -36,10 +36,12 @@ create table COM_EPIS_EAI_JOB (
 	,batch_select_count INTEGER
 	,created_date TIMESTAMP
 	,modified_date TIMESTAMP
+	,primary key(job_id,agent_id)
 );
 
+
 CREATE TABLE COM_EPIS_EAI_LOG(
-	log_id VARCHAR2(4000) primary key
+	log_id VARCHAR2(4000) not null primary key
 	,agent_id VARCHAR2(4000)
 	,job_id VARCHAR2(4000)
 	,row_count INTEGER

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.epis.ws.agent.vo.ColumnInfoVO;
 import org.epis.ws.common.entity.MapWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 @Repository
 public class AgentBizDAO {
 
-	private final Logger logger = LoggerFactory.getLogger(AgentBizDAO.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	
@@ -42,6 +41,11 @@ public class AgentBizDAO {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
+	/**
+	 * Main SQL을 실행할 때 사용되는 메서드
+	 * @param sql	Main SQL
+	 * @return
+	 */
 	public List<MapWrapper> selectList(String sql){
 //		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
 		List<MapWrapper> result
@@ -49,30 +53,21 @@ public class AgentBizDAO {
 		return result;
 	}
 	
-//	public List<RecordMap> selectListAsRecordMap(String sql){
-//		List<RecordMap> result
-//			= jdbcTemplate.getJdbcOperations().query(sql, new RecordMapRowMapper());
-//		return result;
-//	}
-	
+	/**
+	 * 인자가 없는 Insert/Update/Delete SQL를 처리함.
+	 * @param sql
+	 * @return
+	 */
 	public int modify(String sql){
 		int result = jdbcTemplate.getJdbcOperations().update(sql);
 		return result;
 	}
 	
 	/**
-	 * For Insert, Update, Delete
-	 * @param sql
-	 * @param params
-	 * @return
-	 */
-	public int modify(String sql, Object... params){
-		int result = jdbcTemplate.getJdbcOperations().update(sql, params);
-		return result;
-	}
-	
-	/**
-	 * For Insert, Update, Delete with record Map
+	 * <pre>
+	 * 건단위로 처리할 경우 사용됨.
+	 * 현재 사용안함.
+	 * </pre>
 	 * @param sql
 	 * @param record
 	 * @return
@@ -85,21 +80,18 @@ public class AgentBizDAO {
 		return result;
 	}
 	
+	/**
+	 * <pre>
+	 * <p>한 묶음으로 Update를 처리함.</p>
+	 * 
+	 * PreSQL, PostSQL처리시 사용됨
+	 * </pre>
+	 * @param sql	
+	 * @param batchArgs
+	 * @return
+	 */
 	public int[] batchModify(String sql, SqlParameterSource[] batchArgs){
 		int[] result = jdbcTemplate.batchUpdate(sql, batchArgs);
-		return result;
-	}
-	
-	
-	
-	public int modify(String sql, List<ColumnInfoVO> params){
-		
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		for(ColumnInfoVO colInfo : params){
-			paramSource.addValue(colInfo.getFieldName(), colInfo.getValue(), colInfo.getType());
-		}
-		
-		int result = jdbcTemplate.update(sql, paramSource);
 		return result;
 	}
 	

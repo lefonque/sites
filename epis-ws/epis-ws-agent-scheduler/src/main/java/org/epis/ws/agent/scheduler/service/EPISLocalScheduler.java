@@ -15,7 +15,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Scheduler {
+public class EPISLocalScheduler {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -26,6 +26,18 @@ public class Scheduler {
 	@Qualifier("jobProp")
 	private Properties jobProp;
 	
+	/**
+	 * <pre>
+	 * <p>Schedule Job을 등록한다.</p>
+	 * 
+	 * job.properties 파일을 읽어 기재된 job들 각각에
+	 * 해당하는 Trigger를 작성하여 ScheduleFactoryBean에 등록한다.
+	 * 
+	 * ScheduleFactory에 등록되면 job.properties의 
+	 * [job id].execTime의 시각에 맞추어 매일마다 실행이 된다.
+	 * </pre>
+	 * @throws Exception
+	 */
 	public void register() throws Exception{
 		String[] jobIds = StringUtils.split(jobProp.getProperty("job.ids"),",");
 		Trigger[] triggers = new Trigger[jobIds.length];
@@ -38,7 +50,7 @@ public class Scheduler {
 			jobDetailFactoryBean.setArguments(new Object[]{jobId});
 			jobDetailFactoryBean.setName("EPISJob_" + jobId);
 			jobDetailFactoryBean.afterPropertiesSet();
-			logger.debug("Create JobDetail");
+			logger.debug("=== Create JobDetail : [{}] ===",jobId);
 			
 			String cronExp = convertTimeToCronExp(jobProp.getProperty(jobId + ".execTime"));
 			CronTriggerFactoryBean triggerFactoryBean
@@ -47,7 +59,7 @@ public class Scheduler {
 			triggerFactoryBean.setJobDetail(jobDetailFactoryBean.getObject());
 			triggerFactoryBean.setCronExpression(cronExp);
 			triggerFactoryBean.afterPropertiesSet();
-			logger.debug("Create Trigger");
+			logger.debug("=== Create Trigger : [{}] ===",jobId);
 			
 			triggers[idx++] = triggerFactoryBean.getObject();
 		}
@@ -60,6 +72,13 @@ public class Scheduler {
 		scheduleFactoryBean.start();
 	}
 	
+	/**
+	 * <p>
+	 * 시각(e.g. 11:00)을 Quartz 프레임워크의 cron표현식으로 변환한다.
+	 * </p>
+	 * @param time
+	 * @return
+	 */
 	private String convertTimeToCronExp(String time){
 		String[] timeElem = StringUtils.split(time,":");
 		if(timeElem.length!=2){

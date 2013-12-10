@@ -7,10 +7,10 @@
 AGENT_ROOT_DIR=$(dirname $0)
 
 # Job Name
-JOB_NAME=$1
+JOB_ID=$1
 
 # Uncomment when PRODUCT stage
-#java -Dconsumer.root.dir=$AGENT_ROOT_DIR -Djob.name=$JOB_NAME -jar $AGENT_ROOT_DIR/epis-ws-consumer.jar Config >> $AGENT_ROOT_DIR/`date +%Y%m%d-%H%M%S`.config.log
+#java -Dconsumer.root.dir=$AGENT_ROOT_DIR -Djob.id=$JOB_ID -jar $AGENT_ROOT_DIR/epis-ws-consumer.jar Config >> $AGENT_ROOT_DIR/`date +%Y%m%d-%H%M%S`.config.log
 
 # For Testing(Comment when PRODUCT stage)
-java -Dconsumer.root.dir=$AGENT_ROOT_DIR -Djob.name=$JOB_NAME -jar $AGENT_ROOT_DIR/target/epis-ws-consumer.jar Debug >> $AGENT_ROOT_DIR/`date +%Y%m%d-%H%M%S`.config.debug.log
+java -Dconsumer.root.dir=$AGENT_ROOT_DIR -Djob.id=$JOB_ID -jar $AGENT_ROOT_DIR/target/epis-ws-consumer.jar Debug >> $AGENT_ROOT_DIR/`date +%Y%m%d-%H%M%S`.config.debug.log

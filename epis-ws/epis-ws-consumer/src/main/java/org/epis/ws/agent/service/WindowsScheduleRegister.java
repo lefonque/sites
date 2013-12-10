@@ -13,6 +13,15 @@ import org.epis.ws.agent.util.PropertyEnum;
 import org.epis.ws.common.utils.ConstEnum;
 import org.springframework.stereotype.Service;
 
+/**
+ * <pre>
+ * <p>Windows 2000 이후의 NT계열 OS 에서 Schedule Job을 등록한다.</p>
+ * 
+ * Schtasks.exe를 이용하여 Schedule Job을 등록한다.
+ * </pre>
+ * @author developer
+ *
+ */
 @Service("WindowsScheduleRegister")
 public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	
@@ -39,7 +48,7 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public boolean isExistSchedule(String scheduleName)
+	private boolean isExistSchedule(String scheduleName)
 			throws IOException, InterruptedException, ExecutionException {
 		
 		StringBuilder cmd = new StringBuilder();
@@ -65,7 +74,7 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public Map<ConstEnum,List<String>> removeSchedule(String scheduleName)
+	private Map<ConstEnum,List<String>> removeSchedule(String scheduleName)
 			throws IOException, InterruptedException, ExecutionException {
 
 		StringBuilder cmd = new StringBuilder();
@@ -80,7 +89,14 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 	}
 	
 	/**
-	 * Schedule을 등록한다.
+	 * <pre>
+	 * <p>schtasks.exe를 이용하여 Schedule을 등록한다.</p>
+	 * 
+	 * 다음과 같은 절처를 거친다.
+	 * 	1. 해당 job id의 Job이 등록되어 있는지 조회한다.
+	 * 	2. 등록되어 있다면 삭제한다.
+	 * 	3. 해당 job id의 Job을 등록한다.
+	 * </pre>
 	 * @param config
 	 * @return
 	 * @throws IOException

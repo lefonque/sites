@@ -23,6 +23,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * <pre>
+ * <p>Runtime 클래스를 이용하여 Command를 실행하는 클래스</p>
+ * 
+ * Command를 실행한 결과는 CMDMessageCollector 클래스를 사용하여 출력문자열을 수집한다.
+ * 
+ * </pre>
+ * 
+ * @see org.epis.ws.common.utils.RuntimeExecutor.CMDMessageCollector
+ * @author developer
+ *
+ */
 @Component
 public class RuntimeExecutor {
 	
@@ -67,7 +79,7 @@ public class RuntimeExecutor {
 		
 		Map<ConstEnum,List<String>> result = new HashMap<ConstEnum,List<String>>();
 		try {
-			process = Runtime.getRuntime().exec(cmd.toString());
+			process = Runtime.getRuntime().exec(cmd);
 	
 			reader = new BufferedReader(new InputStreamReader(process.getInputStream(), charsetName));
 			failReader = new BufferedReader(new InputStreamReader(process.getErrorStream(),charsetName));
@@ -130,9 +142,12 @@ public class RuntimeExecutor {
 	
 	/**
 	 * <pre>
-	 * 별도의 Thread상에서 문자열 수집을 처리하는 Callable 클래스.
+	 * 별도의 Thread상에서 문자열 수집을 처리하는 Callable 인터페이스 구현체
+	 * RuntimeExecutor내 ExecutorService 인스턴스를 이용하여 실행됨
+	 * 
 	 * Thread와 동일한 용도이나, 데이터 리턴이 가능함.
 	 * </pre>
+	 * @see org.epis.ws.common.utils.RuntimeExecutor
 	 * @author developer
 	 *
 	 */

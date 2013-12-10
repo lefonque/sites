@@ -8,7 +8,6 @@ import java.util.Properties;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.util.PropertyEnum;
-import org.epis.ws.agent.util.SqlUtil;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.service.EPISWSGateway;
@@ -17,10 +16,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
+/**
+ * <pre>
+ * <p>Agent처리의 실질적인 부분을 수행하는 서비스 클래스</p>
+ * 
+ * 
+ * </pre>
+ * @author developer
+ *
+ */
 @Service
 public class EPISConsumerService implements ApplicationContextAware {
 
@@ -28,20 +37,34 @@ public class EPISConsumerService implements ApplicationContextAware {
 	
 	private ApplicationContext ctx;
 	
-	@Autowired
-	@Qualifier("jobProp")
-	private Properties jobProp;
+	private String[] jobIds;
+	
+	@Value("#{jobProp['job.ids']}")
+	public void setJobIds(String jobIdsString){
+		jobIds = StringUtils.splitPreserveAllTokens(jobIdsString, ",");
+	}
+	
+	public String[] getJobIds(){
+		return jobIds;
+	}
 	
 	@Autowired
 	@Qualifier("agentProp")
 	private Properties agentProp;
 	
 	@Autowired
-	private SqlUtil sqlUtil;
-	
-	@Autowired
 	private AgentBizService agentService;
 	
+	/**
+	 * <pre>
+	 * <p>테스트용 메서드</p>
+	 * 
+	 * 웹서비스 데이터 송수신을 테스팅하기 위한 메서드.
+	 * main sql을 실행한 결과를 웹서비스로 전송한다.
+	 * </pre>
+	 * @param gateway	웹서비스 인터페이스
+	 * @throws Exception
+	 */
 	public void executeDebug(EPISWSGateway gateway) throws Exception{
 //		String str = gateway.processPrimitiveData("", "");
 //		logger.debug("RESULT : {}", str);
@@ -59,12 +82,12 @@ public class EPISConsumerService implements ApplicationContextAware {
 	}
 	
 	public void executeConfig(EPISWSGateway gateway) throws Exception {
+		
 		final AbstractScheduleRegister register = ctx.getBean(
 				agentProp.getProperty("consumer.operatingSystem") + "ScheduleRegister"
 				,AbstractScheduleRegister.class);
-		String[] jobNames = StringUtils.splitPreserveAllTokens(jobProp.getProperty("job.ids"), ",");
 		
-		register.registerSchedule(jobNames);
+		register.registerSchedule(jobIds);
 	}
 	
 	public boolean executeBiz(EPISWSGateway gateway) {

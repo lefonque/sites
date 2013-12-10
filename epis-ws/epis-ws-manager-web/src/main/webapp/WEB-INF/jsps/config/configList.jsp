@@ -8,10 +8,12 @@
 <link rel="stylesheet" type="text/css" href='<c:url value="/resources/css/ui-lightness/jquery-ui-1.10.3.custom.css"/>'>
 <link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/ui.jqgrid.css"/>' />
 <link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/sample/screen.css"/>' />
+<link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/epis-menu.css"/>' />
 
 
 <script type="text/javascript" src='<c:url value="/resources/js/jquery-1.10.2.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery-ui-1.10.3.custom.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/jquery.ui.menubar.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/i18n/grid.locale-en.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery.jqGrid.src.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery.validate.js"/>'></script>
@@ -24,6 +26,7 @@
 
 var agentValidator = null, agentJobValidator = null;
 $(document).ready(function() {
+	initMenu();
 	initFormDialog();
 	initValidation();
 	initGrid();
@@ -36,6 +39,11 @@ $(document).ready(function() {
 	$('#dialogAgentJob').find('input:text, input:password').attr('size','38');
 	$('#dialogAgent').find('input:text, input:password').attr('size','30');
 });
+
+
+function initMenu(){
+	$('#menu').menubar();
+}
 
 /**
  * 입력 Form Dialog(Configuration, Job) 및 Alert Dialog를 설정함
@@ -774,6 +782,15 @@ function handleSelectChange_JdbcDriver(event){
 <title>Configuration List</title>
 </head>
 <body>
+	<!-- ======================================================================================== -->
+	<!-- 메뉴 표시부 : Configuration 설정 / 로그화면 -->
+	<!-- ======================================================================================== -->
+	<ul id="menu">
+		<li><a href='<c:url value="/config/main"/>'>Configuration 설정</a></li>
+		<li><a href='<c:url value="/config/logView"/>'>Log 목록</a></li>
+	</ul>
+	
+	
 	<!-- ======================================================================================== -->
 	<!-- Agent List 표시부 : Grid -->
 	<!-- ======================================================================================== -->

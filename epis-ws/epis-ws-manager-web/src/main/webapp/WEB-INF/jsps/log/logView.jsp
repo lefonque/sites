@@ -8,10 +8,11 @@
 <link rel="stylesheet" type="text/css" href='<c:url value="/resources/css/ui-lightness/jquery-ui-1.10.3.custom.css"/>'>
 <link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/ui.jqgrid.css"/>' />
 <link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/sample/screen.css"/>' />
-
+<link rel="stylesheet" type="text/css" media="screen" href='<c:url value="/resources/css/epis-menu.css"/>' />
 
 <script type="text/javascript" src='<c:url value="/resources/js/jquery-1.10.2.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery-ui-1.10.3.custom.js"/>'></script>
+<script type="text/javascript" src='<c:url value="/resources/js/jquery.ui.menubar.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/i18n/grid.locale-en.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery.jqGrid.src.js"/>'></script>
 <script type="text/javascript" src='<c:url value="/resources/js/jquery.validate.js"/>'></script>
@@ -33,11 +34,14 @@ $(window).unload(function(){
 
 var agentValidator = null, agentJobValidator = null;
 $(document).ready(function() {
+	initMenu();
 	initGrid();
 });
 
 
-
+function initMenu(){
+	$('#menu').menubar();
+}
 
 
 /**
@@ -52,12 +56,13 @@ function initGrid() {
 		url : '<c:url value="/config/logList"/>'
 		,mtype : 'POST'
 		,datatype : "json"
+		,height: 230
 		,colNames : [ 'Log ID', 'Agent ID','Job ID', '작업명', 'Row수', 'Result Flag', '처리결과', '처리일자']
 		,colModel : [ 
-			{ name : 'logId', index : 'log_id', width : 120 }
-			,{ name : 'agentId', index : 'agent_id', width : 120 }
+			{ name : 'logId', index : 'log_id', width : 116 }
+			,{ name : 'agentId', index : 'agent_id', width : 100 }
 			,{ name : 'jobId', index : 'job_id', width : 66 }
-			,{ name : 'jobName', index : 'job_name', width : 100}
+			,{ name : 'jobName', index : 'job_name', width : 140}
 			,{ name : 'rowCount', index : 'row_count', width : 100 }
 			,{ name : 'resultFlag', index : 'result_flag', width : 70 }
 			,{ name : 'resultFlagText', index : 'result_flag_text', width : 70 }
@@ -76,6 +81,7 @@ function initGrid() {
 			,repeatitems: false
 			,_search: "search"
 		}
+		,afterInsertRow : handleAfterInsertRow_GridLog
 		,loadComplete: handleLoadComplete_GridLog
 	});
 	jQuery("#gridLog").jqGrid('navGrid', '#pagerLogGrid', {
@@ -119,10 +125,20 @@ function handleLoadComplete_GridLog(){
 	}, 30000);
 }
 
+
+function handleAfterInsertRow_GridLog(rowid, rdata){
+	if(rdata!=null && rdata.resultFlag=='F') {
+		$("#"+rowid,"#gridLog").css({'background': 'red'});
+	}
+}
 </script>
 <title>Configuration List</title>
 </head>
 <body>
+	<ul id="menu">
+		<li><a href='<c:url value="/config/main"/>'>Configuration 설정</a></li>
+		<li><a href='<c:url value="/config/logView"/>'>Log 목록</a></li>
+	</ul>
 	<!-- ======================================================================================== -->
 	<!-- Log List 표시부 : Grid -->
 	<!-- ======================================================================================== -->
