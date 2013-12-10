@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
  * ThreadLocal에는 DB접속정보 및 job id를 담은 Map을 get/set하고 있으며,
  * DynamicDataSource를 사용하게 될 경우, Job쪽 테이블에서 jdbc접속정보를 추출하여
  * 별도의 테이블로 작성하고, 본 클래스의 Map은 jdbc접속정보 테이블의 VO로 변경하는 것이 좋음
- * 
+ * (JDBConnectionVO을 이용하여 Table 세팅진행 권장)
  * 
  * </pre>
  * @author developer
