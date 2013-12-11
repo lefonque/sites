@@ -73,7 +73,7 @@ public class Win2000ScheduleRegister extends AbstractScheduleRegister {
 			//register
 			processed = runtimeExecutor.executeCMD(String.format(
 					registerTemplate
-					,jobProp.getProperty(jobName+".execTime")
+					,jobProp.getProperty(jobName+PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey())
 					,System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey())
 					,jobName
 				)

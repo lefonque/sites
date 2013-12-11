@@ -2,13 +2,14 @@ package org.epis.ws.agent.service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.dao.AgentBizDAO;
 import org.epis.ws.agent.util.SqlUtil;
-import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.utils.EAIColumnEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -88,7 +92,7 @@ public class AgentBizService {
 	 * @return
 	 */
 	@Transactional(value="transactionManager",rollbackFor=Throwable.class)
-	public int executePostSQL(List<MapWrapper> rowList, String eflag){
+	public int executePostSQL(List<Map<String,Object>> rowList, String eflag){
 		int result = -1;
 		if(StringUtils.isEmpty(postSQL)){
 			return result;
@@ -97,10 +101,10 @@ public class AgentBizService {
 		Timestamp edate = new Timestamp(System.currentTimeMillis());
 		MapSqlParameterSource[] batchArgs = new MapSqlParameterSource[rowList.size()];
 		int loopIdx = 0;
-		for(MapWrapper wrapper : rowList){
-			wrapper.core.put(EAIColumnEnum.EFLAG.getColumnName(),eflag);
-			wrapper.core.put(EAIColumnEnum.SND_EDATE.getColumnName(),edate);
-			batchArgs[loopIdx++] = new MapSqlParameterSource(wrapper.core);
+		for(Map<String,Object> wrapper : rowList){
+			wrapper.put(EAIColumnEnum.SND_EFLAG.getColumnName(),eflag);
+			wrapper.put(EAIColumnEnum.SND_EDATE.getColumnName(),edate);
+			batchArgs[loopIdx++] = new MapSqlParameterSource(wrapper);
 		}
 		
 		result = 0;
@@ -119,12 +123,31 @@ public class AgentBizService {
 	 * </pre>
 	 * @return
 	 */
-	public List<MapWrapper> executeMainSQL(){
-		List<MapWrapper> result = dao.selectList(mainSQL);
+	public List<Map<String,Object>> executeMainSQL(){
+		List<Map<String,Object>> result = dao.selectList(mainSQL);
 		return result;
 	}
 	
-//	public List<RecordMap> executeMainSQLAsRecordMap(){
-//		return dao.selectListAsRecordMap(mainSQL);
-//	}
+	public String convertListToJSON(List<Map<String,Object>> list) throws JsonProcessingException{
+		String result = StringUtils.EMPTY;
+		if(CollectionUtils.isNotEmpty(list)){
+			ObjectMapper mapper = new ObjectMapper();
+			result = mapper.writeValueAsString(list);
+		}
+		
+		return result;
+	}
+	
+	public String executeMainSQLAsJSON() throws JsonProcessingException{
+		String result = StringUtils.EMPTY;
+		List<Map<String,Object>> list = dao.selectList(mainSQL);
+		int count = 0;
+		if(CollectionUtils.isNotEmpty(list)){
+			count = list.size();
+			ObjectMapper mapper = new ObjectMapper();
+			result = mapper.writeValueAsString(list);
+		}
+		logger.info("=== Record Count by Main SQL Process : [{}] ===",count);
+		return result;
+	}
 }

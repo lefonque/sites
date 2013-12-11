@@ -97,7 +97,7 @@ public class UnixScheduleRegister extends AbstractScheduleRegister {
 		//write result of (crontab -l) + cmds to file
 		String cronFormat = "%1$s %2$s * * *";
 		for(String jobName : jobIds){
-			String[] time = StringUtils.splitPreserveAllTokens(jobProp.getProperty(jobName + ".execTime"),":");
+			String[] time = StringUtils.splitPreserveAllTokens(jobProp.getProperty(jobName + PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey()),":");
 			crontabList.add(String.format(cronFormat, time[1], time[0]));
 		}
 		

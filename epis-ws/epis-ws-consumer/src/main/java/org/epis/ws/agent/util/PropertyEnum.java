@@ -2,10 +2,9 @@ package org.epis.ws.agent.util;
 
 public enum PropertyEnum {
 
-	JOB_SQL_PRE(".sqlPre")
-	,JOB_SQL_MAIN(".sqlMain")
-	,JOB_SQL_POST(".sqlPost")
-	,JOB_BATCH_SIZE(".batch.selectcount")
+	JOB_SUFFIX_BATCH_SIZE(".batchSelectCount")
+	,JOB_SUFFIX_JOB_NAME(".jobName")
+	,JOB_SUFFIX_EXEC_TIME(".execTime")
 	
 	,AGENT_ID("consumer.agentId")
 	,SYS_ROOT_DIR("consumer.root.dir")

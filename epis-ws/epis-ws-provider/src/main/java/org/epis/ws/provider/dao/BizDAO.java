@@ -1,12 +1,9 @@
 package org.epis.ws.provider.dao;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -17,12 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.LinkedCaseInsensitiveMap;
 
 @Repository
 public class BizDAO {
@@ -37,7 +31,40 @@ public class BizDAO {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
-	public int[] insert(String sql, List<MapWrapper> paramList){
+public int[] insert(String sql, List<Map<String,Object>> paramList) throws Exception {
+		
+		int idx = 0;
+		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
+		MapSqlParameterSource[] paramSources = new MapSqlParameterSource[paramList.size()];
+		Object value = null;
+		for(Map<String,Object> wrapper : paramList){
+			wrapper.put(EAIColumnEnum.RECV_EDATE.getColumnName(), nowTime);
+			if(wrapper.size()!=13 && wrapper.size()!=23){
+				logger.debug("Map Element Size[{}] : [{}]",new Object[]{wrapper.size(),wrapper});
+			}
+			for(String key : wrapper.keySet()){
+				
+				value = wrapper.get(key);
+				if(value instanceof XMLGregorianCalendar){
+					GregorianCalendar cal
+						= XMLGregorianCalendar.class.cast(value)
+							.toGregorianCalendar();
+					value = cal.getTime();
+					wrapper.put(key,value);
+				}
+			}
+			paramSources[idx] = new MapSqlParameterSource(wrapper);
+			
+			idx++;
+		}
+		
+		
+		
+		int[] result = jdbcTemplate.batchUpdate(sql, paramSources);
+		return result;
+	}
+	
+	public int[] insert2(String sql, List<MapWrapper> paramList) throws Exception {
 		
 		int idx = 0;
 		final Timestamp nowTime = new Timestamp(System.currentTimeMillis());
@@ -45,11 +72,12 @@ public class BizDAO {
 		Object value = null;
 		for(MapWrapper wrapper : paramList){
 			wrapper.core.put(EAIColumnEnum.RECV_EDATE.getColumnName(), nowTime);
+			if(wrapper.core.size()!=13 && wrapper.core.size()!=23){
+				logger.debug("Map Element Size[{}] : [{}]",new Object[]{wrapper.core.size(),wrapper.core});
+			}
 			for(String key : wrapper.core.keySet()){
+				
 				value = wrapper.core.get(key);
-				if(value!=null){
-					logger.trace("[{}]'s type : [{}]",new Object[]{key,value.getClass()});
-				}
 				if(value instanceof XMLGregorianCalendar){
 					GregorianCalendar cal
 						= XMLGregorianCalendar.class.cast(value)
@@ -59,50 +87,13 @@ public class BizDAO {
 				}
 			}
 			paramSources[idx] = new MapSqlParameterSource(wrapper.core);
+			
 			idx++;
 		}
 		
 		
-		if(logger.isTraceEnabled()){
-			logger.trace("SQL : [{}]",sql);
-			for(MapSqlParameterSource paramSource : paramSources){
-				logger.trace("PARAMETER : [{}]",paramSource.getValues());
-			}
-		}
-		return jdbcTemplate.batchUpdate(sql, paramSources);
-	}
-	
-	
-	public List<MapWrapper> select(String sql){
-		return jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper());
-	}
-	
-	class ColumnHashMapRowMapper implements RowMapper<MapWrapper> {
-		public MapWrapper mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnCount = rsmd.getColumnCount();
-			HashMap<String, Object> mapOfColValues = createColumnMap(columnCount);
-			for (int i = 1; i <= columnCount; i++) {
-				String key = getColumnKey(JdbcUtils.lookupColumnName(rsmd, i));
-				Object obj = getColumnValue(rs, i);
-				mapOfColValues.put(key, obj);
-			}
-			MapWrapper result = new MapWrapper(mapOfColValues);
-			return result;
-		}
 		
-		protected HashMap<String, Object> createColumnMap(int columnCount) {
-			return new LinkedCaseInsensitiveMap<Object>(columnCount);
-		}
-		
-		protected String getColumnKey(String columnName) {
-			return columnName;
-		}
-		
-		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
-			return JdbcUtils.getResultSetValue(rs, index);
-		}
-	
+		int[] result = jdbcTemplate.batchUpdate(sql, paramSources);
+		return result;
 	}
-	
 }

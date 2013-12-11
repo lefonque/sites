@@ -1,4 +1,4 @@
-package org.epis.ws.common.utils;
+package org.epis.ws.manager.util;
 
 import org.epis.ws.common.entity.JDBConnectionVO;
 import org.springframework.util.Assert;

@@ -3,7 +3,11 @@ package org.epis.ws.agent.scheduler.service;
 import java.text.ParseException;
 import java.util.Properties;
 
+import javax.annotation.PreDestroy;
+
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.agent.scheduler.utils.PropertyEnum;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,16 @@ public class EPISLocalScheduler {
 	@Qualifier("jobProp")
 	private Properties jobProp;
 	
+	private SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+	
+	@PreDestroy
+	public void destroy(){
+		try {
+			schedulerFactoryBean.destroy();
+		} catch (SchedulerException e) {
+			logger.error("Exception Occurred on Destroying",e);
+		}
+	}
 	/**
 	 * <pre>
 	 * <p>Schedule Job을 등록한다.</p>
@@ -46,13 +60,13 @@ public class EPISLocalScheduler {
 			MethodInvokingJobDetailFactoryBean jobDetailFactoryBean
 				= new MethodInvokingJobDetailFactoryBean();
 			jobDetailFactoryBean.setTargetObject(executor);
-			jobDetailFactoryBean.setTargetMethod("executeCmd");
+			jobDetailFactoryBean.setTargetMethod("execute");
 			jobDetailFactoryBean.setArguments(new Object[]{jobId});
 			jobDetailFactoryBean.setName("EPISJob_" + jobId);
 			jobDetailFactoryBean.afterPropertiesSet();
 			logger.debug("=== Create JobDetail : [{}] ===",jobId);
 			
-			String cronExp = convertTimeToCronExp(jobProp.getProperty(jobId + ".execTime"));
+			String cronExp = convertTimeToCronExp(jobProp.getProperty(jobId + PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey()));
 			CronTriggerFactoryBean triggerFactoryBean
 				= new CronTriggerFactoryBean();
 			triggerFactoryBean.setName("EPISTrigger_" + jobId);
@@ -65,11 +79,15 @@ public class EPISLocalScheduler {
 		}
 		
 		
-		SchedulerFactoryBean scheduleFactoryBean = new SchedulerFactoryBean();
-		scheduleFactoryBean.setTriggers(triggers);
-		scheduleFactoryBean.afterPropertiesSet();
+		schedulerFactoryBean.setTriggers(triggers);
+		schedulerFactoryBean.afterPropertiesSet();
 		
-		scheduleFactoryBean.start();
+		schedulerFactoryBean.start();
+	}
+	
+	//RMI를 사용하게 될 경우, server도 이 메서드에서 shutdown하도록 함.
+	public void stopScheduler(){
+		schedulerFactoryBean.stop();
 	}
 	
 	/**

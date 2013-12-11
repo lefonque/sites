@@ -5,11 +5,12 @@ import java.util.Map;
 
 import javax.jws.WebService;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils.Null;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
-import org.epis.ws.common.entity.MapWrapper;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.common.utils.ConstEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
@@ -43,6 +44,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	@Override
 	public String processPrimitiveData(BizVO bizParam)
 			throws Exception {
+		logger.info("===== RECEIVED WebService Request [{}:{}] =====",new Object[]{bizParam.getAgentId(),bizParam.getJobId()});
 		String result = ConstEnum.SUCCESS.name();
 		String resultFlag = "F";
 		String agentId = bizParam.getAgentId(), jobId = bizParam.getJobId();
@@ -51,22 +53,23 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 				throw new IllegalArgumentException("PARAMETER IS NULL!!");
 			}
 			
-			if(CollectionUtils.isEmpty(bizParam.getDataList())){
+			if(StringUtils.isEmpty(bizParam.getJsonData())){
 				logger.warn("===== No Data Found to execute in SERVER =====");
-				resultFlag = "S";
-				return result;
 			}
 			else{
 				bizService.addData(bizParam);
+				logger.info("===== Executed on Server side Successfully =====");
 			}
 			resultFlag = "S";
-			//TODO Customize Logging
-			logger.debug("===== Executed on Server side Successfully =====");
+		} catch(Exception e) {
+			logger.error("##### JSON String : [{}] #####",bizParam.getJsonData());
+			logger.error("##### Exception Occurred on Executing processPrimitiveData(BizVO) #####",e);
+			throw e;
 		} finally {
 			logService.writeLog(bizParam, resultFlag);
 		}
 		
-		
+		logger.info("===== REPLY WebService Response =====");
 		return result;
 	}
 	
@@ -77,11 +80,20 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	}
 
 	@Override
-	public String debugMethod(List<MapWrapper> recordList) throws Exception {
+	public String debugMethod(String jsonString) throws Exception {
+		String result = "";
+		if(StringUtils.isEmpty(jsonString)){
+			result = "Empty";
+			return result;
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String,Object>> recordList = mapper.readValue(
+				jsonString, new TypeReference<List<Map<String,Object>>>(){});
 		logger.debug("param's dataList : {}",recordList.size());
 		
-		for(MapWrapper wrapper : recordList){
-			Map<String,Object> map = wrapper.core;
+		for(Map<String,Object> wrapper : recordList){
+			Map<String,Object> map = wrapper;
 			Object value = null;Class<?> type = null;
 			for(String key : map.keySet()){
 				value = map.get(key);

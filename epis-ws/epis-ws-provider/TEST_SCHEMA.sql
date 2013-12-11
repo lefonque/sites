@@ -66,6 +66,10 @@ SELECT COUNT(log_id) FROM (
 		WHERE log.job_id=job.job_id
 )
 WHERE result_flag_text='성공'
+
+
+
+shutdown;
 /*
 SELECT SYSDATE FROM DUAL
 SELECT SYSTIMESTAMP FROM DUAL

@@ -40,8 +40,8 @@ public class EPISConsumerUTCallbackHandler implements CallbackHandler {
 		
 		for(Callback callback : callbacks){
 			WSPasswordCallback wspc = WSPasswordCallback.class.cast(callback);
-			if(agentProp.getProperty("consumer.userId").equals(wspc.getIdentifier())){
-				wspc.setPassword(agentProp.getProperty("consumer.pass"));
+			if(agentProp.getProperty("consumer.websvcUser").equals(wspc.getIdentifier())){
+				wspc.setPassword(agentProp.getProperty("consumer.websvcPass"));
 			}
 			logger.debug("Callback Handler processed! ({})",wspc.getIdentifier());
 		}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.epis.ws.common.utils.RuntimeExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,10 @@ public class AgentExecutor {
 	
 	@Value("#{systemProperties['consumer.root.dir']}")
 	private String rootDir;
+	
+	@Autowired
+	@Qualifier("agentProp")
+	private Properties agentProp;
 	
 	@Autowired
 	private RuntimeExecutor executor;
@@ -86,14 +92,28 @@ public class AgentExecutor {
 	 */
 	private String getCmd(String jobId){
 		
-		StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder("java");
 		
 		String sysPropOption = " -D";
-		builder.append("java").append(sysPropOption)
-			.append("consumer.root.dir").append("=").append(rootDir);
 		
+		//System Property
+		builder.append(sysPropOption)
+			.append("consumer.root.dir").append("=").append(rootDir);
 		builder.append(sysPropOption).append("job.id").append("=").append(jobId);
 		
+		//Memory Option
+		String permSize = agentProp.getProperty("agent.java.option.permsize");
+		if(StringUtils.isNotEmpty(permSize)){
+			builder.append(" -XX:PermSize=").append(permSize).append("m")
+				.append(" -XX:MaxPermSize=").append(permSize).append("m");
+		}
+		String heapSize = agentProp.getProperty("agent.java.option.heapsize");
+		if(StringUtils.isNotEmpty(heapSize)){
+			builder.append(" -Xms").append(heapSize).append("m")
+				.append(" -Xms").append(heapSize).append("m");	
+		}
+		
+		//jar file
 		builder.append(" -jar ").append(rootDir).append(File.separator)
 			.append("epis-ws-consumer.jar").append(" Biz");
 		

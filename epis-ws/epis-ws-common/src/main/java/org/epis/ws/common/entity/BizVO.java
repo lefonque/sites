@@ -1,6 +1,5 @@
 package org.epis.ws.common.entity;
 
-import java.util.List;
 
 /**
  * <pre>
@@ -23,7 +22,7 @@ public class BizVO {
 	 * Map을 wrapping하는 MapWrapper클래스를 사용하여 List에 담음.
 	 * </pre>
 	 */
-	private List<MapWrapper> dataList;
+	private String jsonData;
 
 	/**
 	 * Agent ID
@@ -35,27 +34,27 @@ public class BizVO {
 	 */
 	private String jobId;
 
-	public List<MapWrapper> getDataList() {
-		return dataList;
-	}
-
 	public String getAgentId() {
 		return agentId;
-	}
-
-	public String getJobId() {
-		return jobId;
-	}
-
-	public void setDataList(List<MapWrapper> dataList) {
-		this.dataList = dataList;
 	}
 
 	public void setAgentId(String agentId) {
 		this.agentId = agentId;
 	}
 
+	public String getJobId() {
+		return jobId;
+	}
+
 	public void setJobId(String jobId) {
 		this.jobId = jobId;
+	}
+
+	public String getJsonData() {
+		return jsonData;
+	}
+
+	public void setJsonData(String jsonData) {
+		this.jsonData = jsonData;
 	}
 }

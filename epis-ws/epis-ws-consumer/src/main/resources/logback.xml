@@ -23,7 +23,7 @@
     </layout>
   </appender>
    
-  <logger name="org.epis.ws.agent" level="DEBUG" additivity="false">
+  <logger name="org.epis.ws.agent" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>
   </logger>

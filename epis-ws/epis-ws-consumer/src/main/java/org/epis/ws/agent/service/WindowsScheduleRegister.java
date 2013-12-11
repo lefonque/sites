@@ -113,14 +113,14 @@ public class WindowsScheduleRegister extends AbstractScheduleRegister {
 		
 		StringBuilder builder = new StringBuilder();
 		for(String jobName : changedJobName){
-			String scheduleName = jobProp.getProperty(jobName + ".name");
+			String scheduleName = jobProp.getProperty(jobName + PropertyEnum.JOB_SUFFIX_JOB_NAME.getKey());
 			
 			builder.append("cmd /c SCHTASKS /Create /TN ").append(scheduleName)
 			.append(" /TR \"")
 			.append(System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey()))
 			.append(File.separator).append("biz.bat ").append(jobName).append("\"")
 			.append(" /SC DAILY /ST ")
-			.append(jobProp.getProperty(jobName + ".execTime"));
+			.append(jobProp.getProperty(jobName + PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey()));
 			
 			if(isExistSchedule(scheduleName)){
 				removeSchedule(scheduleName);

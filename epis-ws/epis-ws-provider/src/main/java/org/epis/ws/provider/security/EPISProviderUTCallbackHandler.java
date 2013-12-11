@@ -43,6 +43,7 @@ public class EPISProviderUTCallbackHandler implements CallbackHandler {
 					password = clientService.getWebServicePass(username);
 					if(password!=null){
 						wspc.setPassword(password);
+						logger.info("===== Authentication Success =====");
 					}
 					break;
 				}

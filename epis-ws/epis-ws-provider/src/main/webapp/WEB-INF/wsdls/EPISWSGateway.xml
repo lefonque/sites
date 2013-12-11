@@ -34,6 +34,7 @@
       <xs:element minOccurs="0" name="officerName" type="xs:string"/>
       <xs:element minOccurs="0" name="operatingSystem" type="xs:string"/>
       <xs:element minOccurs="0" name="orgCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="scheduleType" type="xs:string"/>
       <xs:element minOccurs="0" name="smsCellNo" type="xs:string"/>
       <xs:element minOccurs="0" name="smsUseYn" type="xs:string"/>
       <xs:element minOccurs="0" name="websvcPass" type="xs:string"/>
@@ -42,10 +43,10 @@
   </xs:complexType>
   <xs:complexType name="jobVO">
     <xs:sequence>
-      <xs:element minOccurs="0" name="agentExecTime" type="xs:string"/>
       <xs:element minOccurs="0" name="agentId" type="xs:string"/>
       <xs:element name="batchSelectCount" type="xs:int"/>
       <xs:element minOccurs="0" name="createdDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="execTime" type="xs:string"/>
       <xs:element minOccurs="0" name="jdbcDriverClassName" type="xs:string"/>
       <xs:element minOccurs="0" name="jdbcPassword" type="xs:string"/>
       <xs:element minOccurs="0" name="jdbcUrl" type="xs:string"/>
@@ -62,25 +63,7 @@
   </xs:complexType>
   <xs:complexType name="debugMethod">
     <xs:sequence>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="tns:mapWrapper"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="mapWrapper">
-    <xs:sequence>
-      <xs:element name="core">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" name="key" type="xs:string"/>
-                  <xs:element minOccurs="0" name="value" type="xs:anyType"/>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element minOccurs="0" name="param" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="debugMethodResponse">
@@ -95,9 +78,9 @@
   </xs:complexType>
   <xs:complexType name="bizVO">
     <xs:sequence>
-      <xs:element maxOccurs="unbounded" minOccurs="0" name="dataList" nillable="true" type="tns:mapWrapper"/>
       <xs:element minOccurs="0" name="agentId" type="xs:string"/>
       <xs:element minOccurs="0" name="jobId" type="xs:string"/>
+      <xs:element minOccurs="0" name="jsonData" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="processPrimitiveDataResponse">

@@ -7,14 +7,18 @@
     </layout>
   </appender>
    
-  <logger name="org.epis.ws.provider" level="INFO" additivity="false">
+  <logger name="org.epis.ws.provider" level="TRACE" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-   <!-- 
+  <!-- 
   <logger name="org.springframework.jdbc" level="DEBUG" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
    -->
+  <logger name="org.apache.cxf" level="INFO" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
+  
   <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>

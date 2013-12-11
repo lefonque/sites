@@ -430,7 +430,7 @@ function initGrid() {
 			,{ name : 'jobName', index : 'job_name', width : 100 }
 			,{ name : 'agentId', index : 'agent_id', width : 50 }
 			,{ name : 'jobType', index : 'job_type', width : 50 }
-			,{ name : 'agentExecTime', index : 'agent_exec_time', width : 80 }
+			,{ name : 'execTime', index : 'agent_exec_time', width : 80 }
 			,{ name : 'sqlMain', index : 'sql_main', width : 150 }
 			,{ name : 'sqlPre', index : 'sql_pre', width : 150 }
 			,{ name : 'sqlPost', index : 'sql_post', width : 150 }
@@ -897,8 +897,8 @@ function handleSelectChange_JdbcDriver(event){
 					class="required" />
 			</p>
 			<p>
-				<label for="agentExecTime">실행시각</label>
-				<input type="text" name="agentExecTime" id="agentExecTime"
+				<label for="execTime">실행시각</label>
+				<input type="text" name="execTime" id="execTime"
 					class="required time" />
 			</p>
 			<p>

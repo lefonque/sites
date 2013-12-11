@@ -45,9 +45,9 @@
   </cxf:bus>
   
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-    destroy-method="close" p:driverClassName="#{jobProp['${job.id}.jdbcDriverClass']}"
+    destroy-method="close" p:driverClassName="#{jobProp['${job.id}.jdbcDriverClassName']}"
     p:url="#{jobProp['${job.id}.jdbcUrl']}" p:username="#{jobProp['${job.id}.jdbcUsername']}"
-    p:password="#{jobProp['${job.id}.jdbcPass']}" />
+    p:password="#{jobProp['${job.id}.jdbcPassword']}" />
 
 
   <!-- ====================================================== -->

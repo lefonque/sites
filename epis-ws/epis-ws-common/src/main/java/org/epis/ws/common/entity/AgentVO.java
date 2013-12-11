@@ -56,6 +56,11 @@ public class AgentVO {
 	private String smsUseYn;
 	
 	/**
+	 * Schedule Type : Local, OS
+	 */
+	private String scheduleType;
+	
+	/**
 	 * 데이터 생성일자
 	 */
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -125,6 +130,12 @@ public class AgentVO {
 	}
 	public void setSmsUseYn(String smsUseYn) {
 		this.smsUseYn = smsUseYn;
+	}
+	public String getScheduleType() {
+		return scheduleType;
+	}
+	public void setScheduleType(String scheduleType) {
+		this.scheduleType = scheduleType;
 	}
 	public Date getCreatedDate() {
 		return createdDate;

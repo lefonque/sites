@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
-import org.epis.ws.agent.dao.AgentBizDAO;
+import org.epis.ws.agent.service.AgentBizService;
 import org.epis.ws.agent.service.EPISConsumerService;
 import org.epis.ws.agent.service.UnixScheduleRegister;
 import org.epis.ws.agent.service.WindowsScheduleRegister;
@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="classpath*:/META-INF/spring/*.xml")
 public class ConfigTest {
@@ -36,7 +38,7 @@ public class ConfigTest {
 	private UnixScheduleRegister unixSchedule;
 	
 	@Autowired
-	private AgentBizDAO bizDao;
+	private AgentBizService bizDao;
 	
 	@Autowired
 	@Qualifier("jobProp")
@@ -49,37 +51,27 @@ public class ConfigTest {
 	private EPISConsumerService consumerService;
 	
 	
-//	@Test
+	@Test
 	public void testSelect(){
-		String jobId = System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey());
-		
-		String sql = jobProp.getProperty(jobId + PropertyEnum.JOB_SQL_MAIN.getKey());
-		List<MapWrapper> list = bizDao.selectList(sql);
-//		List<RecordMap> mapList = bizDao.selectListAsRecordMap(sql);
-		for(MapWrapper wrapper : list){
-			logger.debug("entry count : {}", wrapper.core.size());
-			for(Entry<String, Object>entry : wrapper.core.entrySet()){
-				logger.debug("{} : {}",entry.getKey(),entry.getValue());
-			}
+		try {
+			String json = bizDao.executeMainSQLAsJSON();
+			logger.info("json : ({}bytes)[{}]",new Object[]{json.getBytes().length, json});
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
 //	@Test
-	public void testSqlUtil(){
-		String sql = "INSERT INTO just_table (field1,field2,field3,field4,field5) VALUES('A? or B?', ?, 'get out', ?, CONCAT('P-',?))";
-		logger.debug(sqlUtil.convertInsertSQL(sql));
-		
-		sql = "UPDATE just_table SET field1=?, field2=CONCAT('P-',?), field3='James', field4=? WHERE field5=TRIM(?)";
-		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
-	}
+//	public void testSqlUtil(){
+//		String sql = "INSERT INTO just_table (field1,field2,field3,field4,field5) VALUES('A? or B?', ?, 'get out', ?, CONCAT('P-',?))";
+//		logger.debug(sqlUtil.convertInsertSQL(sql));
+//		
+//		sql = "UPDATE just_table SET field1=?, field2=CONCAT('P-',?), field3='James', field4=? WHERE field5=TRIM(?)";
+//		logger.debug(sqlUtil.convertNamedParameterUpdateSQL(sql));
+//	}
 	
-	@Test
-	public void testService(){
-		String[] jobIds = consumerService.getJobIds();
-		logger.debug("jobIds:[{}][{}]",new Object[]{jobIds[0],jobIds[1]});
-	}
-	
-	@Test
+//	@Test
 	public void testGarage(){
 		String[] jobs = StringUtils.split(jobProp.getProperty("job.ids"),",");
 		int idx = 0;
@@ -100,7 +92,7 @@ public class ConfigTest {
 		String jobName = "job1";
 		String template = "cmd /c \"at %1$s /every:M,T,W,Th,F,S,Su cmd /c \"%2$s\\biz.bat %3$s\"\"";
 		String result = String.format(template
-				,jobProp.getProperty(jobName+".execTime")
+				,jobProp.getProperty(jobName+PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey())
 				,System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey())
 				,jobName);
 		logger.debug("formatted : [{}]", result);

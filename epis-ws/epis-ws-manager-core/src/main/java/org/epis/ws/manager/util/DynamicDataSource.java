@@ -1,4 +1,4 @@
-package org.epis.ws.common.utils;
+package org.epis.ws.manager.util;
 
 import java.beans.Introspector;
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * 
  * 현재 본 클래스는 사용안함.
  * </pre>
- * @see org.epis.ws.common.utils.DBKeyContextHolder
+ * @see org.epis.ws.manager.util.DBKeyContextHolder
  * @author developer
  *
  */

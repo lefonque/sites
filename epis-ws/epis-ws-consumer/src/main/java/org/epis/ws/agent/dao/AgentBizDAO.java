@@ -1,9 +1,5 @@
 package org.epis.ws.agent.dao;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,16 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.LinkedCaseInsensitiveMap;
 
 /**
- * agent.properties에 설정된 SQL문을 실행하는 DAO
+ * job.properties에 설정된 SQL문을 실행하는 DAO
  * 
  * @author developer
  *
@@ -46,10 +39,16 @@ public class AgentBizDAO {
 	 * @param sql	Main SQL
 	 * @return
 	 */
-	public List<MapWrapper> selectList(String sql){
+	public List<MapWrapper> selectListAsMap(String sql){
 //		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
 		List<MapWrapper> result
-			= jdbcTemplate.getJdbcOperations().query(sql, new ColumnHashMapRowMapper());
+			= jdbcTemplate.getJdbcOperations().query(sql, new MapWrapperRowMapper());
+		return result;
+	}
+	
+	public List<Map<String,Object>> selectList(String sql){
+		List<Map<String,Object>> result
+			= jdbcTemplate.getJdbcOperations().queryForList(sql);
 		return result;
 	}
 	
@@ -94,58 +93,4 @@ public class AgentBizDAO {
 		int[] result = jdbcTemplate.batchUpdate(sql, batchArgs);
 		return result;
 	}
-	
-	
-	
-	class ColumnHashMapRowMapper implements RowMapper<MapWrapper> {
-		public MapWrapper mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnCount = rsmd.getColumnCount();
-			HashMap<String, Object> mapOfColValues = createColumnMap(columnCount);
-			for (int i = 1; i <= columnCount; i++) {
-				String key = getColumnKey(JdbcUtils.lookupColumnName(rsmd, i));
-				Object obj = getColumnValue(rs, i);
-				mapOfColValues.put(key, obj);
-			}
-			MapWrapper result = new MapWrapper(mapOfColValues);
-			return result;
-		}
-		
-		protected HashMap<String, Object> createColumnMap(int columnCount) {
-			return new LinkedCaseInsensitiveMap<Object>(columnCount);
-		}
-		
-		protected String getColumnKey(String columnName) {
-			return columnName;
-		}
-		
-		protected Object getColumnValue(ResultSet rs, int index) throws SQLException {
-			Object result = JdbcUtils.getResultSetValue(rs, index);
-			//CXF에서 XML Escape를 하기 때문에 처리상에 문제 발생함.
-			//CDATA를 이용하려면 MOXy를 이용하는 방법밖에 없음.=> Object 타입 필드는 MOXy로도 해결 안됨
-//			if(result instanceof String){
-//				result = "<![CDATA[" + result + "]]>";
-//			}
-			
-			boolean oddByte = false;
-			if(result instanceof String){
-				String str = String.class.cast(result);
-				byte[] temp = str.getBytes();
-				for(int i = 0; i < temp.length; i++){
-					if(temp[i]==0){
-						oddByte = true;
-						temp[i] = 32;
-					}
-				}
-				if(oddByte){
-					str = new String(temp);
-				}
-				result = str;
-			}
-			return result;
-		}
-	}
-	
-
-	
 }

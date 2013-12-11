@@ -41,13 +41,13 @@ public class AuthenticationFailedOutInterceptor extends AbstractSoapInterceptor 
 		Exception exception = message.getContent(Exception.class);
 		Fault fault = Fault.class.cast(exception);
 		if(fault.getCause() instanceof WSSecurityException){
-			logger.debug("==== Exception Message : {}",fault.getCode());
+			logger.error("##### Fault Code : [{}] #####",fault.getCode());
 			
 			
 			Exchange exchange = PhaseInterceptorChain.getCurrentMessage().getExchange();
 			Message oldMsg = exchange.getInMessage();
 			String remoteAddr = ServletRequest.class.cast(oldMsg.get(AbstractHTTPDestination.HTTP_REQUEST)).getRemoteAddr();
-			logger.debug("remote address : {}",remoteAddr);
+			logger.error("### Remote Address : [{}] ###",remoteAddr);
 			
 			
 			SAAJInInterceptor.INSTANCE.handleMessage(SoapMessage.class.cast(oldMsg));

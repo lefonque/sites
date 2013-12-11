@@ -1,14 +1,11 @@
 package org.epis.ws.common.service;
 
-import java.util.List;
-
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
-import org.epis.ws.common.entity.MapWrapper;
 
 /**
  * 웹서비스 인터페이스
@@ -29,6 +26,6 @@ public interface EPISWSGateway {
 	
 	@WebMethod(operationName="debugMethod"
 			,action="http://ws.epis.org/provider/EPISWSGateway/debugMethod")
-	public String debugMethod(@WebParam(name="param") List<MapWrapper> param) throws Exception;
+	public String debugMethod(@WebParam(name="param") String param) throws Exception;
 	
 }

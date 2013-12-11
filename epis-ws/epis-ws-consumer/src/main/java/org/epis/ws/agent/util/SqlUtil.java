@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 현재 convertPagableSelectSQL(String) 메서드만 사용가능함.
+ * @author developer
+ *
+ */
 @Component
 public class SqlUtil {
 	
@@ -18,17 +23,26 @@ public class SqlUtil {
 	@Value("#{systemProperties['job.id']}")
 	private String jobId;
 	
+	/**
+	 * <pre>
+	 * <p>select SQL을 paging 가능한 형태로 변환한다.</p>
+	 * 
+	 * 
+	 * </pre>
+	 * @param sql
+	 * @return
+	 */
 	public String convertPagableSelectSQL(String sql){
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT * FROM (SELECT ROWNUM rnum, temp.* FROM (")
 			.append(sql)
 			.append(") temp) WHERE rnum BETWEEN 1 AND ")
-			.append(jobProp.getProperty(jobId + PropertyEnum.JOB_BATCH_SIZE.getKey()));
+			.append(jobProp.getProperty(jobId + PropertyEnum.JOB_SUFFIX_BATCH_SIZE.getKey()));
 		return builder.toString();
 	}
 	
-	public String convertNamedParameterUpdateSQL(String sql){
+	protected String convertNamedParameterUpdateSQL(String sql){
 		String keyword = "set";
 		int pairStartIndex = StringUtils.indexOfIgnoreCase(sql, keyword) + keyword.length();
 		String pairPart = sql.substring(pairStartIndex).trim();
@@ -40,7 +54,7 @@ public class SqlUtil {
 		return builder.toString();
 	}
 	
-	private String replaceForUpdate(String sqlPairPart){
+	protected String replaceForUpdate(String sqlPairPart){
 		
 		char ch = 0;
 		String fieldName = null;
@@ -138,7 +152,7 @@ public class SqlUtil {
 	 * @param sql
 	 * @return
 	 */
-	public String convertInsertSQL(String sql){
+	protected String convertInsertSQL(String sql){
 		
 		int startIdx = sql.indexOf("(") + 1;
 		int endIdx = StringUtils.indexOfIgnoreCase(sql, "values");

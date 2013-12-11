@@ -1,6 +1,6 @@
 package org.epis.ws.common.entity;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -16,13 +16,13 @@ import java.util.HashMap;
  */
 public class MapWrapper {
 	
-	public final HashMap<String,Object> core;
+	public final LinkedHashMap<String,Object> core;
 	
 	public MapWrapper(){
-		core = new HashMap<String,Object>();
+		core = new LinkedHashMap<String,Object>();
 	}
 	
-	public MapWrapper(HashMap<String,Object> core){
+	public MapWrapper(LinkedHashMap<String,Object> core){
 		this.core = core;
 	}
 }

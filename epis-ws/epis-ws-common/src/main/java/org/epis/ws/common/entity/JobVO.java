@@ -36,7 +36,7 @@ public class JobVO {
 	/**
 	 * 스케줄러에 의해 Agent가 본 작업을 실행할 시각
 	 */
-	private String agentExecTime;
+	private String execTime;
 
 	/**
 	 * <pre>
@@ -119,11 +119,11 @@ public class JobVO {
 	public void setJobType(String jobType) {
 		this.jobType = jobType;
 	}
-	public String getAgentExecTime() {
-		return agentExecTime;
+	public String getExecTime() {
+		return execTime;
 	}
-	public void setAgentExecTime(String execTime) {
-		this.agentExecTime = execTime;
+	public void setExecTime(String execTime) {
+		this.execTime = execTime;
 	}
 	public String getJdbcUrl() {
 		return jdbcUrl;
