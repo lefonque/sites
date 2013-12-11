@@ -214,7 +214,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 				logger.warn("##### It must be in the infinite looping!!! #####");
 				break;
 			}
-			logger.debug("=== Loop : [{}] =======================================",loopCount);
+			logger.info("=== Loop : [{}] =======================================",loopCount);
 			
 			//	Select
 			dataList = agentService.executeMainSQL();
