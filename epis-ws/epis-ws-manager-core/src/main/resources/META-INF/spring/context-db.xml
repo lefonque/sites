@@ -15,11 +15,11 @@
   <!-- ====================================================== -->
   <!-- DataSource 정의 										   -->
   <!-- ====================================================== -->
-  <bean id="dataSource" class="${db.hsqldb.datasource.class}" destroy-method="close"
+  <bean id="devDataSource" class="${db.hsqldb.datasource.class}" destroy-method="close"
   	p:driverClassName="${db.hsqldb.driver.class}" p:url="${db.hsqldb.url}"
   	p:username="${db.hsqldb.username}" p:password="${db.hsqldb.password}"/>
     
-  <bean id="infraDataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
+  <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
    p:driverType="thin" p:user="${db.oracle.username}" p:password="${db.oracle.password}"
    p:URL="${db.oracle.url}"/>
   
@@ -27,7 +27,7 @@
   <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
   	p:URL="#{jdbc['db.oracle.url']}" p:user="#{jdbc['db.oracle.username']}"
   	p:password="#{jdbc['db.oracle.password']}"/>
-  -->	
+  -->
 	
   <!-- ====================================================== -->
   <!-- Mybatis-Spring Integration 							-->

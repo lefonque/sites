@@ -101,7 +101,7 @@ function initFormDialog() {
 			var agentId = $('#jobAgentId').val();
 			resetForm('AgentJob', agentJobValidator);
 			$('#jobAgentId').val(agentId);
-			//$('#useExpression').prop('checked',false).trigger('change');
+			$('#jobType').val('A');
 		}
 	});
 	
@@ -255,6 +255,7 @@ function handleApplyBtnClick_DialogAgentJob(){
 				alert('responseText : ' + jqXHR.responseText);
 			}
 		});
+		/*
 		$.post(url
 			,$('#formAgentJob').serialize()
 			,function(data){	//완료시 처리
@@ -269,6 +270,7 @@ function handleApplyBtnClick_DialogAgentJob(){
 		).fail(function(){
 			openAlertDialog("처리에 실패하였습니다.");
 		});
+		*/
 	}
 	else{
 		agentJobValidator.focusInvalid();
@@ -952,7 +954,7 @@ function handleSelectChange_JdbcDriver(event){
 			</fieldset>
 			<input type="hidden" id="jobAgentId" name="agentId"/>
 			<input type="hidden" id="jobId" name="jobId"/>
-			<input type="hidden" id="jobType" name="jobType" value="AGENT"/>
+			<input type="hidden" id="jobType" name="jobType" value="A"/>
 			<input type="hidden" id="job_applyType" name="job_applyType"/>
 		</form>
 	</div>

@@ -15,7 +15,7 @@ SELECT * FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-1,'YYYYMMDD')
 
 
 --RESET JOB-1
-UPDATE ifs_if_mgarak SET SURVEY_DATE=TO_CHAR(SYSDATE-1,'YYYYMMDD');
+UPDATE ifs_if_mgarak SET SURVEY_DATE=TO_CHAR(SYSDATE,'YYYYMMDD');
 delete from IFR_IF_MGARAK;
 
 select count(*) from IFR_IF_MGARAK;
@@ -70,7 +70,7 @@ WHERE (
 	from IFR_IF_MUTONG
 );
 UPDATE IFS_IF_MUTONG_TEMP SET SEND_FLAG='N' where send_flag='F';
-select count(*) from IFS_IF_MUTONG_TEMP where send_flag='N';
+select count(*) from IFS_IF_MUTONG_TEMP where send_flag='Y';
 delete from IFR_IF_MUTONG;
 
 select count(*) from IFR_IF_MUTONG

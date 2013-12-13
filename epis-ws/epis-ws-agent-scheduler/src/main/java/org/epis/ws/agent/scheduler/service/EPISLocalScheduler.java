@@ -53,6 +53,9 @@ public class EPISLocalScheduler {
 	 * @throws Exception
 	 */
 	public void register() throws Exception{
+		
+		logger.info("===== Schedule Job Registration START =====");
+		
 		String[] jobIds = StringUtils.split(jobProp.getProperty("job.ids"),",");
 		Trigger[] triggers = new Trigger[jobIds.length];
 		int idx = 0;
@@ -64,7 +67,7 @@ public class EPISLocalScheduler {
 			jobDetailFactoryBean.setArguments(new Object[]{jobId});
 			jobDetailFactoryBean.setName("EPISJob_" + jobId);
 			jobDetailFactoryBean.afterPropertiesSet();
-			logger.debug("=== Create JobDetail : [{}] ===",jobId);
+			logger.info("=== Create JobDetail : [{}] ===",jobId);
 			
 			String cronExp = convertTimeToCronExp(jobProp.getProperty(jobId + PropertyEnum.JOB_SUFFIX_EXEC_TIME.getKey()));
 			CronTriggerFactoryBean triggerFactoryBean
@@ -73,16 +76,17 @@ public class EPISLocalScheduler {
 			triggerFactoryBean.setJobDetail(jobDetailFactoryBean.getObject());
 			triggerFactoryBean.setCronExpression(cronExp);
 			triggerFactoryBean.afterPropertiesSet();
-			logger.debug("=== Create Trigger : [{}] ===",jobId);
+			logger.info("=== Create Trigger : [{}] ===",jobId);
 			
 			triggers[idx++] = triggerFactoryBean.getObject();
 		}
 		
-		
 		schedulerFactoryBean.setTriggers(triggers);
 		schedulerFactoryBean.afterPropertiesSet();
+		logger.info("=== Registered Triggers ===");
 		
 		schedulerFactoryBean.start();
+		logger.info("===== Schedule Job Registration END =====");
 	}
 	
 	//RMI를 사용하게 될 경우, server도 이 메서드에서 shutdown하도록 함.

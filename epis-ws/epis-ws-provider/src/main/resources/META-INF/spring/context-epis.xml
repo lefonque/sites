@@ -17,6 +17,7 @@
   <import resource="classpath:/META-INF/spring/context-db.xml"/>
   
   <util:properties id="jdbcBiz" location="classpath:/META-INF/properties/jdbcBiz.properties"/>
+  <util:properties id="smsProp" location="classpath:/META-INF/properties/sms.properties"/>
   
   <context:component-scan base-package="org.epis.ws.provider">
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
@@ -25,10 +26,20 @@
   
   
   <bean id="bizDataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
-   p:driverType="thin" p:URL="#{jdbcBiz['db.biz.oracle.url']}"
-   p:user="#{jdbcBiz['db.biz.oracle.username']}" p:password="#{jdbcBiz['db.biz.oracle.password']}"
+   p:driverType="thin" p:URL="#{jdbcBiz['db.biz.url']}"
+   p:user="#{jdbcBiz['db.biz.username']}" p:password="#{jdbcBiz['db.biz.password']}"
    />
-   
+  
+  <!-- 
+  <bean id="smsDataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
+    p:driverType="thin" p:URL="#{smsProp['db.sms.url']}"
+    p:user="#{smsProp['db.sms.username']}" p:password="#{smsProp['db.sms.password']}"
+    />
+   -->
+  <bean id="smsDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+    p:driverClassName="org.hsqldb.jdbcDriver" p:url="jdbc:hsqldb:hsql://localhost/testdb"
+    p:username="sa" p:password="sa"/>
+    
   <!-- ====================================================== -->
   <!-- Transaction -->
   <!-- ====================================================== -->
@@ -36,5 +47,5 @@
   
   <bean id="bizTransactionManager"
     class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-    p:dataSource-ref="dataSource" />
+    p:dataSource-ref="bizDataSource" />
 </beans>

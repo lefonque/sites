@@ -9,7 +9,9 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.agent.scheduler.utils.PropertyEnum;
 import org.epis.ws.common.utils.ConstEnum;
+import org.epis.ws.common.utils.OSEnum;
 import org.epis.ws.common.utils.RuntimeExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ public class AgentExecutor {
 	
 	@Autowired
 	private RuntimeExecutor executor;
+	
 	
 	/**
 	 * <pre>
@@ -92,13 +95,18 @@ public class AgentExecutor {
 	 */
 	private String getCmd(String jobId){
 		
+		String agentRootDir = rootDir;
+		OSEnum osType = OSEnum.valueOf(agentProp.getProperty(PropertyEnum.AGENT_OS.getKey()));
+		if(osType!=OSEnum.Unix){
+			agentRootDir = "\"" + rootDir + "\"";
+		}
+		
 		StringBuilder builder = new StringBuilder("java");
 		
 		String sysPropOption = " -D";
-		
 		//System Property
 		builder.append(sysPropOption)
-			.append("consumer.root.dir").append("=").append(rootDir);
+			.append("consumer.root.dir").append("=").append(agentRootDir);
 		builder.append(sysPropOption).append("job.id").append("=").append(jobId);
 		
 		//Memory Option
@@ -114,7 +122,7 @@ public class AgentExecutor {
 		}
 		
 		//jar file
-		builder.append(" -jar ").append(rootDir).append(File.separator)
+		builder.append(" -jar ").append(agentRootDir).append(File.separator)
 			.append("epis-ws-consumer.jar").append(" Biz");
 		
 		logger.debug("Command : [{}]",builder.toString());

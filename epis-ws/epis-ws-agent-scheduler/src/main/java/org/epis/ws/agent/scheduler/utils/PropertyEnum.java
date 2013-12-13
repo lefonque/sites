@@ -3,6 +3,7 @@ package org.epis.ws.agent.scheduler.utils;
 public enum PropertyEnum {
 
 	JOB_SUFFIX_EXEC_TIME(".execTime")
+	,AGENT_OS("consumer.operatingSystem")
 	;
 	
 	private String key;

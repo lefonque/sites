@@ -23,6 +23,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+/**
+ * 
+ * @author developer
+ *
+ */
 @Repository
 public class ConfigurationDAO {
 

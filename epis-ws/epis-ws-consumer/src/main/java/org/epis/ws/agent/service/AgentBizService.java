@@ -102,8 +102,8 @@ public class AgentBizService {
 		MapSqlParameterSource[] batchArgs = new MapSqlParameterSource[rowList.size()];
 		int loopIdx = 0;
 		for(Map<String,Object> wrapper : rowList){
-			wrapper.put(EAIColumnEnum.SND_EFLAG.getColumnName(),eflag);
-			wrapper.put(EAIColumnEnum.SND_EDATE.getColumnName(),edate);
+			wrapper.put(EAIColumnEnum.EFLAG.name(),eflag);
+			wrapper.put(EAIColumnEnum.EDATE.name(),edate);
 			batchArgs[loopIdx++] = new MapSqlParameterSource(wrapper);
 		}
 		

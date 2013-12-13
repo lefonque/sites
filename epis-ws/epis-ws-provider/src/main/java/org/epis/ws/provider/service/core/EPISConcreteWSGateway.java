@@ -9,13 +9,16 @@ import org.apache.commons.lang3.ObjectUtils.Null;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.epis.ws.common.entity.AgentVO;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.common.entity.ConfigurationVO;
+import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.common.service.EPISWSGateway;
 import org.epis.ws.common.utils.ConstEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
 import org.epis.ws.manager.core.service.LogService;
 import org.epis.ws.provider.service.BizService;
+import org.epis.ws.provider.service.SMSQueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
-	private ConfigurationService service;
+	private ConfigurationService configService;
 	
 	@Autowired
 	private BizService bizService;
@@ -39,7 +42,8 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	@Autowired
 	private LogService logService;
 	
-	
+	@Autowired
+	private SMSQueueService service;
 	
 	@Override
 	public String processPrimitiveData(BizVO bizParam)
@@ -48,6 +52,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 		String result = ConstEnum.SUCCESS.name();
 		String resultFlag = "F";
 		String agentId = bizParam.getAgentId(), jobId = bizParam.getJobId();
+		JobVO jobInfo = null;
 		try{
 			if(bizParam==null || agentId==null || jobId==null){
 				throw new IllegalArgumentException("PARAMETER IS NULL!!");
@@ -57,13 +62,23 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 				logger.warn("===== No Data Found to execute in SERVER =====");
 			}
 			else{
-				bizService.addData(bizParam);
+
+				jobInfo = configService.getJobInfo(agentId,jobId);
+				String sql = jobInfo.getServerSql();
+
+				bizService.addData(bizParam, sql);
 				logger.info("===== Executed on Server side Successfully =====");
 			}
 			resultFlag = "S";
 		} catch(Exception e) {
 			logger.error("##### JSON String : [{}] #####",bizParam.getJsonData());
 			logger.error("##### Exception Occurred on Executing processPrimitiveData(BizVO) #####",e);
+			
+			AgentVO agentInfo = configService.getAgentInfo(agentId);
+			if((agentInfo!=null) && ("Y".equals(agentInfo.getSmsUseYn()))){
+				service.addSMSQueueRecord(agentInfo, jobInfo);
+				logger.info("=== Add to SMS Queue ===");
+			}
 			throw e;
 		} finally {
 			logService.writeLog(bizParam, resultFlag);
@@ -75,7 +90,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 	
 	@Override
 	public ConfigurationVO findConfigurationData(String agentId) throws Exception {
-		ConfigurationVO result = service.getConfigurationInfo(agentId);
+		ConfigurationVO result = configService.getConfigurationInfo(agentId);
 		return result;
 	}
 

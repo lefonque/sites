@@ -29,7 +29,7 @@ public class InfraDAO {
 	private Properties sqlRepo;
 
 	@Autowired
-	@Qualifier("infraDataSource")
+	@Qualifier("dataSource")
 	private void setDataSource(DataSource dataSource){
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}

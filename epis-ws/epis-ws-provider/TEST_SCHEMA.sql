@@ -5,33 +5,33 @@ drop table COM_EPIS_EAI_AGENT;
 drop table COM_EPIS_EAI_JOB;
 drop table COM_EPIS_EAI_LOG;
 create table COM_EPIS_EAI_AGENT (
-	agent_id VARCHAR2(4000) not null primary key
-	,org_code VARCHAR2(4000)
-	,operating_system VARCHAR2(4000)
-	,charset VARCHAR2(4000)
-	,websvc_user VARCHAR2(4000)
-	,websvc_pass VARCHAR2(4000)
-	,officer_name VARCHAR2(4000)
-	,officer_contact VARCHAR2(4000)
-	,sms_use_yn CHAR
-	,sms_cell_no VARCHAR2(4000)
+	agent_id VARCHAR2(100) not null primary key
+	,org_code VARCHAR2(100)
+	,operating_system VARCHAR2(20)
+	,charset VARCHAR2(20)
+	,websvc_user VARCHAR2(50)
+	,websvc_pass VARCHAR2(50)
+	,officer_name VARCHAR2(50)
+	,officer_contact VARCHAR2(20)
+	,sms_use_yn CHAR(1)
+	,sms_cell_no VARCHAR2(20)
 	,created_date TIMESTAMP
 	,modified_date TIMESTAMP
 );
 
 create table COM_EPIS_EAI_JOB (
-	job_id VARCHAR2(4000) not null
-	,agent_id VARCHAR2(4000)
-	,job_name VARCHAR2(4000)
-	,job_type VARCHAR2(4000)
-	,agent_exec_time VARCHAR2(4000)
+	job_id VARCHAR2(100) not null
+	,agent_id VARCHAR2(100) not null
+	,job_name VARCHAR2(100)
+	,job_type CHAR(1)
+	,exec_time VARCHAR2(10)
 	,sql_main VARCHAR2(4000)
 	,sql_pre VARCHAR2(4000)
 	,sql_post VARCHAR2(4000)
-	,jdbc_driver_class_name VARCHAR2(4000)
-	,jdbc_url VARCHAR2(4000)
-	,jdbc_username VARCHAR2(4000)
-	,jdbc_password VARCHAR2(4000)
+	,jdbc_driver_class_name VARCHAR2(100)
+	,jdbc_url VARCHAR2(100)
+	,jdbc_username VARCHAR2(50)
+	,jdbc_password VARCHAR2(50)
 	,server_sql VARCHAR2(4000)
 	,batch_select_count INTEGER
 	,created_date TIMESTAMP
@@ -41,17 +41,42 @@ create table COM_EPIS_EAI_JOB (
 
 
 CREATE TABLE COM_EPIS_EAI_LOG(
-	log_id VARCHAR2(4000) not null primary key
-	,agent_id VARCHAR2(4000)
-	,job_id VARCHAR2(4000)
+	log_id VARCHAR2(100) not null primary key
+	,agent_id VARCHAR2(100)
+	,job_id VARCHAR2(100)
 	,row_count INTEGER
 	,result_flag CHAR(1)
 	,create_date TIMESTAMP
 );
 
-create sequence seq_agent start with 1 increment by 1 maxvalue 1000000;
-create sequence seq_job start with 1 increment by 1 maxvalue 1000000;
-create sequence seq_log start with 1 increment by 1 maxvalue 1000000;
+create sequence seq_agent start with 1 increment by 1 maxvalue 100000000;
+create sequence seq_job start with 1 increment by 1 maxvalue 100000000;
+create sequence seq_log start with 1 increment by 1 maxvalue 100000000;
+
+
+
+--SMS
+DROP TABLE EM_SMT_TRAN;
+DROP SEQUENCE sq_em_smt_tran_01;
+CREATE TABLE em_smt_tran (
+	mt_pr NUMBER(30) NOT NULL PRIMARY KEY
+	,date_client_req TIMESTAMP
+	,content VARCHAR2(4000)
+	,callback VARCHAR(20)
+	,service_type CHAR(1)
+	,broadcast_yn CHAR(1)
+	,msg_status CHAR(1)
+	,recipient_num VARCHAR(20)
+	,recipient_net VARCHAR(200)
+	,recipient_npsend VARCHAR(200)
+	,country_code VARCHAR(10)
+	,charset VARCHAR(10)
+	,msg_type VARCHAR(10)
+	,crypto_yn CHAR(1)
+	,connectionid VARCHAR(50)
+);
+
+CREATE SEQUENCE sq_em_smt_tran_01 start with 1 increment by 1 maxvalue 100000000;
 
 ALTER USER SA SET PASSWORD 'sa'
 

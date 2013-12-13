@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.BizVO;
-import org.epis.ws.common.entity.JobVO;
 import org.epis.ws.manager.core.dao.ConfigurationDAO;
 import org.epis.ws.provider.dao.BizDAO;
 import org.slf4j.Logger;
@@ -29,12 +28,8 @@ public class BizService {
 	private BizDAO dao;
 	
 	@Transactional(value="bizTransactionManager", rollbackFor=Throwable.class)
-	public int addData(BizVO bizVO) throws Exception {
+	public int addData(BizVO bizVO, String sql) throws Exception {
 		
-		String agentId = bizVO.getAgentId(), jobId = bizVO.getJobId();
-		JobVO jobInfo = configDao.selectJobInfo(agentId,jobId);
-		String sql = jobInfo.getServerSql();
-
 //		List<MapWrapper> wrapperList = bizVO.getDataList();
 		int result = 0;
 		List<Map<String,Object>> list = null;
