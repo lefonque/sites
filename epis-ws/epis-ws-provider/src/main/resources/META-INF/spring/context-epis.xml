@@ -30,15 +30,15 @@
    p:user="#{jdbcBiz['db.biz.username']}" p:password="#{jdbcBiz['db.biz.password']}"
    />
   
-  <!-- 
   <bean id="smsDataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
     p:driverType="thin" p:URL="#{smsProp['db.sms.url']}"
     p:user="#{smsProp['db.sms.username']}" p:password="#{smsProp['db.sms.password']}"
     />
-   -->
+  <!-- 
   <bean id="smsDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
     p:driverClassName="org.hsqldb.jdbcDriver" p:url="jdbc:hsqldb:hsql://localhost/testdb"
     p:username="sa" p:password="sa"/>
+   -->
     
   <!-- ====================================================== -->
   <!-- Transaction -->
