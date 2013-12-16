@@ -7,7 +7,6 @@ IF %AGENT_ROOT_DIR:~-1%==\ set AGENT_ROOT_DIR=%AGENT_ROOT_DIR:~0,-1%
 
 :: JAVA EXECUTION
 java -Dconsumer.root.dir="%AGENT_ROOT_DIR%" -jar "%AGENT_ROOT_DIR%"/epis-ws-agent-scheduler.jar
-::java -Dconsumer.root.dir="%AGENT_ROOT_DIR%" -jar "%AGENT_ROOT_DIR%"/target/epis-ws-agent-scheduler.jar
 
 
 ::Install as Windows Service
