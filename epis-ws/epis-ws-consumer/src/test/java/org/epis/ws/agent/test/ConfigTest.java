@@ -1,7 +1,7 @@
 package org.epis.ws.agent.test;
 
+import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -10,10 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.service.AgentBizService;
 import org.epis.ws.agent.service.EPISConsumerService;
 import org.epis.ws.agent.service.UnixScheduleRegister;
+import org.epis.ws.agent.service.WebServiceClientService;
 import org.epis.ws.agent.service.WindowsScheduleRegister;
 import org.epis.ws.agent.util.PropertyEnum;
 import org.epis.ws.agent.util.SqlUtil;
-import org.epis.ws.common.entity.MapWrapper;
+import org.epis.ws.common.service.EPISWSGateway;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -41,6 +42,9 @@ public class ConfigTest {
 	private AgentBizService bizDao;
 	
 	@Autowired
+	private WebServiceClientService clientService;
+	
+	@Autowired
 	@Qualifier("jobProp")
 	private Properties jobProp;
 	
@@ -50,8 +54,26 @@ public class ConfigTest {
 	@Autowired
 	private EPISConsumerService consumerService;
 	
-	
 	@Test
+	public void testExecute(){
+		
+		String svcNmString = "EPISWSGateway";
+		String portNmString = "EPISWSGatewayPort";
+		try {
+			EPISWSGateway gateway
+				= clientService.createClient(
+				svcNmString,portNmString,EPISWSGateway.class);
+			consumerService.executeBiz(gateway);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+//	@Test
 	public void testSelect(){
 		try {
 			String json = bizDao.executeMainSQLAsJSON();

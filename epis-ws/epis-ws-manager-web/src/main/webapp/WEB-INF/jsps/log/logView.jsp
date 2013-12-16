@@ -57,17 +57,18 @@ function initGrid() {
 		,mtype : 'POST'
 		,datatype : "json"
 		,height: 230
-		,colNames : [ 'Log ID', 'Agent ID','Job ID', '작업명', 'Row수', 'Result Flag', '처리결과', '처리일자']
+		,colNames : [ 'Log ID', 'Agent ID','Job ID', '작업명', 'Row갯수', 'Result Flag', '처리결과', '처리일자']
 		,colModel : [ 
-			{ name : 'logId', index : 'log_id', width : 116 }
-			,{ name : 'agentId', index : 'agent_id', width : 100 }
+			{ name : 'logId', index : 'log_id', width : 135 }
+			,{ name : 'agentId', index : 'agent_id', width : 80 }
 			,{ name : 'jobId', index : 'job_id', width : 66 }
 			,{ name : 'jobName', index : 'job_name', width : 140}
-			,{ name : 'rowCount', index : 'row_count', width : 100 }
+			,{ name : 'rowCount', index : 'row_count'
+				,formatter : 'number', formatoptions : {thousandsSeparator : ',', decimalPlaces : '0'}, width : 70}
 			,{ name : 'resultFlag', index : 'result_flag', width : 70 }
 			,{ name : 'resultFlagText', index : 'result_flag_text', width : 70 }
 			,{ name : 'createDate', index : 'create_date'
-				,formatter : datetimeFormatter, width : 100 }
+				,formatter : datetimeFormatter, width : 130 }
 		]
 		,rowNum : 10
 		,rowList : [ 10, 20, 30 ]
@@ -108,7 +109,7 @@ function initGrid() {
 function datetimeFormatter(cellValue,option,rowObject){
 	 var result = '';
 	 if(cellValue!=null){
-		 result = new Date(cellValue).format('yyyy-mm-dd HH:MM');
+		 result = new Date(cellValue).format('yyyy-mm-dd HH:MM:ss.l');
 	 }
 	return result;
 }

@@ -109,7 +109,13 @@ public class AgentBizService {
 		
 		result = 0;
 		long startMillisec = System.currentTimeMillis(); 
-		int[] resultArray = dao.batchModify(postSQL, batchArgs);
+		int[] resultArray = null;
+		try {
+			resultArray = dao.batchModify(postSQL, batchArgs);
+		} catch (Exception e) {
+			logger.error("error",e);
+			throw new RuntimeException(e);
+		}
 		long endMillisec = System.currentTimeMillis();
 		logger.debug("Elapsed Time : [{}]",(endMillisec-startMillisec)/1000);
 		result = resultArray.length;
