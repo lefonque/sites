@@ -24,6 +24,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * <pre>
+ * <p>로그 정보를 처리하는 Service</p>
+ * 
+ * LogDAO를 이용하여 로그정보를 처리함
+ * 로그기록은 Thread를 이용하여 처리함.
+ * </pre>
+ * @author developer
+ *
+ */
 @Service
 public class LogService {
 

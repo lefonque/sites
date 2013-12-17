@@ -1,4 +1,4 @@
-package org.epis.ws.common.entity;
+package org.epis.ws.manager.entity;
 
 public class JDBConnectionVO {
 

@@ -13,12 +13,9 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
   <!-- ====================================================== -->
-  <!-- DataSource 정의 										   -->
+  <!-- DataSource Definition						    	   -->
   <!-- ====================================================== -->
-  <bean id="devDataSource" class="${db.hsqldb.datasource.class}" destroy-method="close"
-  	p:driverClassName="${db.hsqldb.driver.class}" p:url="${db.hsqldb.url}"
-  	p:username="${db.hsqldb.username}" p:password="${db.hsqldb.password}"/>
-    
+  
   <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource" destroy-method="close"
    p:driverType="thin" p:user="${db.oracle.username}" p:password="${db.oracle.password}"
    p:URL="${db.oracle.url}"/>

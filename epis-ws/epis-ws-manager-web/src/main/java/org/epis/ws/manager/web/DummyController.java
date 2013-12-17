@@ -12,9 +12,9 @@ import org.epis.ws.common.utils.OSEnum;
 import org.epis.ws.manager.core.service.ConfigurationService;
 import org.epis.ws.manager.core.service.InfraService;
 import org.epis.ws.manager.core.service.LogService;
-import org.epis.ws.manager.entity.AjaxResponseVO;
 import org.epis.ws.manager.entity.JQGridVO;
 import org.epis.ws.manager.entity.LogVO;
+import org.epis.ws.manager.web.entity.AjaxResponseVO;
 import org.epis.ws.manager.web.utils.LoginPropertyKeyEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * 웹화면에서의 요청을 처리하는 Controller
+ * @author developer
+ *
+ */
 @Controller
 public class DummyController {
 	

@@ -1,17 +1,29 @@
 package org.epis.ws.manager.entity;
 
 import java.util.List;
-/*_search=true
-nd=1386307226951
-rows=10
-page=1
-sidx=create_date
-sord=desc
-searchField=job_id
-searchString=JOB-2
-searchOper=eq
-filters=
+
+/**
+ * <pre>
+ * <p>페이징의 목적으로 만들어진 VO클래스</p>
  * 
+ * 페이징을 하기 위한 정보를 담고 있으나, 사실상
+ * JQGrid의 페이징처리를 위하여 변수명이 맞추어져 있음.
+ * 
+ * JQGrid의 페이징처리에 관련된 변수명은 다음과 같음
+ * 
+ * _search=true
+ * nd=1386307226951
+ * rows=10
+ * page=1
+ * sidx=create_date
+ * sord=desc
+ * searchField=job_id
+ * searchString=JOB-2
+ * searchOper=eq
+ * filters=
+ * </pre>
+ * @author developer
+ *
  */
 public class JQGridVO {
 	private int page;//페이지

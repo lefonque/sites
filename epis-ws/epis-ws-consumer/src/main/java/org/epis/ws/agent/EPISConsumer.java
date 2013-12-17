@@ -13,6 +13,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
+ * <pre>
+ * <p>Agent가 실행되는 Entry Point</p>
+ * 
+ * WebService를 위한 Service 인스턴스를 생성하여,
+ * 필요한 처리를 수행함.
+ * </pre>
  * @author developer
  *
  */

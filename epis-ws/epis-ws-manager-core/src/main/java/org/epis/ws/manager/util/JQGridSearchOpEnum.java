@@ -1,5 +1,13 @@
 package org.epis.ws.manager.util;
 
+/**
+ * <pre>
+ * <p>JQGrid의 조건검색시에 사용될 연산자를 리터럴상수로 나열한 Enum</p>
+ * SQL의 Where구문 작성시에 사용됨.
+ * </pre>
+ * @author developer
+ *
+ */
 public enum JQGridSearchOpEnum {
 
 	EQUAL("eq","=%1$s")

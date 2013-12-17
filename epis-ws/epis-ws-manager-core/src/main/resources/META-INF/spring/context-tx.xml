@@ -15,10 +15,11 @@
   
   <bean id="defaultTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
    p:dataSource-ref="dataSource"/>
-    
-    <bean id="dynamicTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+  
+  <!-- create DataSource per Job's JDBC Setting,
+  <bean id="dynamicTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
    p:dataSource-ref="bizDataSource"/>
-    
+   -->
   <!-- 
   <tx:advice id="txAdvice" transaction-manager="transactionManager">
     <tx:attributes>

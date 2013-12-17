@@ -18,6 +18,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+/**
+ * <pre>
+ * <p>Provider가 로깅데이터를 DB에 반영하거나 조회할 때 사용되는 DAO</p>
+ * </pre> 
+ * @author developer
+ *
+ */
 @Repository
 public class LogDAO {
 	
@@ -39,6 +46,11 @@ public class LogDAO {
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	}
 	
+	/**
+	 * 로깅데이터를 insert한다.
+	 * @param log
+	 * @return
+	 */
 	public int insertLog(LogVO log){
 		String sql = sqlRepo.getProperty("insert.log");
 		
@@ -47,6 +59,15 @@ public class LogDAO {
 		return result;
 	}
 
+	/**
+	 * <pre>
+	 * <p>로깅데이터를 조회한다.</p>
+	 * 
+	 * 검색어를 사용한 조건검색이 가능하며, 검색시 단 하나의 검색조건만 사용가능함.
+	 * </pre>
+	 * @param paging
+	 * @return
+	 */
 	public List<LogVO> selectLogList(JQGridVO paging){
 		String sql = sqlRepo.getProperty("select.log.list");
 		
@@ -59,7 +80,7 @@ public class LogDAO {
 		
 		StringBuilder where = new StringBuilder();
 		if(paging.is_search()){
-			where.append(getWhereClause(paging," WHERE "));
+			where.append(getWhereClause(paging));
 			paramSource.addValue(paging.getSearchField(),paging.getSearchString());
 		}
 		sql = String.format(sql, paging.getSidx(), paging.getSord(), where.toString());
@@ -68,12 +89,24 @@ public class LogDAO {
 		return result;
 	}
 	
+	/**
+	 * <pre>
+	 * <p>검색조건이 반영된 총 Log 갯수를 구하는 메서드</p>
+	 * 
+	 * Log 목록표시 Grid 부분의 Paging을 위하여 총 record수를 구하기 위해 사용됨.
+	 * 조건 검색이 가능하므로, 검색 조건을 반영하여 총 Log갯수를 구함.
+	 * 
+	 * 
+	 * </pre>
+	 * @param paging
+	 * @return
+	 */
 	public int selectLogCount(JQGridVO paging){
 		int result = 0;
 		StringBuilder sql = new StringBuilder(sqlRepo.getProperty("select.log.count"));
 		
 		if(paging.is_search()){
-			sql.append(getWhereClause(paging," WHERE "));
+			sql.append(getWhereClause(paging));
 			MapSqlParameterSource paramSource
 				= new MapSqlParameterSource(paging.getSearchField(), paging.getSearchString());
 			
@@ -86,12 +119,27 @@ public class LogDAO {
 		return result;
 	}
 	
-	private StringBuilder getWhereClause(JQGridVO paging, String prefix){
+	/**
+	 * <pre>
+	 * <p> SQL의 WHERE절 내의 부분을 작성하는 메서드<p>
+	 * 
+	 * 검색조건을 적용하여 검색할 경우, 검색 조건을 적용하여 SQL의
+	 * WHERE절 부분을 작성하는데, JQGridSearchOpEnum을 이용하여
+	 * 비교조건별 적절한 SQL연산자를 적용한다.
+	 * 
+	 * WHERE절을 작성하여 SQL에 삽입하는 만큼, 본 메서드가 적용되는
+	 * SQL은 문장 구성시 이에 대해 유의하여야 한다.
+	 * </pre>
+	 * @param paging
+	 * @param prefix
+	 * @return
+	 */
+	private StringBuilder getWhereClause(JQGridVO paging){
 		String param = ":" + paging.getSearchField();
 		JQGridSearchOpEnum opEnum = JQGridSearchOpEnum.get(paging.getSearchOper());
 		
 		StringBuilder where = new StringBuilder();
-		where.append(prefix).append(paging.getSearchField())
+		where.append(" WHERE ").append(paging.getSearchField())
 			.append(String.format(opEnum.getValue(), param));
 		return where;
 	}

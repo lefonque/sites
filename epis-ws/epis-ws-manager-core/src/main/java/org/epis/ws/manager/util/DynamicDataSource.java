@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.epis.ws.common.entity.JDBConnectionVO;
+import org.epis.ws.manager.entity.JDBConnectionVO;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +18,10 @@ import org.springframework.stereotype.Component;
  * <pre>
  * <p>Job ID에 따라 Connection를 생성하는 DataSource</p>
  * 
- * Job ID에 따라 Connection을 생성하나, 키값을 Job ID로 하는 것은 비효율 적임
+ * Job ID에 따라 Connection을 생성하나, 키값을 Job ID로 하는 것은 비효율 적임.
  * (Job ID가 무한히 늘어남에 따라 DataSource도 무한히 늘어날 것이므로)
+ * 
+ * Job설정의 양을 감안하여 본 DataSource를 사용하게 될 경우,
  * DB접속정보를 JOB에서 분리하여 별도의 entity로 관리하고, DB접속정보의 키를
  * Job ID와 관계를 맺어 Map의 키를 DB접속정보의 키로 사용하는 방향으로 접근할 것.
  * (JDBConnectionVO 클래스 이용)

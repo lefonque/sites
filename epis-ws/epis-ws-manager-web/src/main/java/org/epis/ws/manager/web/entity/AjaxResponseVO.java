@@ -1,7 +1,16 @@
-package org.epis.ws.manager.entity;
+package org.epis.ws.manager.web.entity;
 
 
 
+/**
+ * <pre>
+ * <p>Ajax요청에 대한 응답내용을 wrapping하는 VO클래스</p>
+ * 
+ * 성공-실패 여부, 결과 메세지, 적용 레코드 수를 담고 있다.
+ * </pre>
+ * @author developer
+ *
+ */
 public class AjaxResponseVO {
 
 	private boolean success;
