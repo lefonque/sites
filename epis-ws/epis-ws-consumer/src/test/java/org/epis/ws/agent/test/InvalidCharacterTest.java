@@ -5,8 +5,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.epis.ws.agent.dao.MapWrapperRowMapper;
-import org.epis.ws.common.entity.MapWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -34,11 +32,11 @@ public class InvalidCharacterTest {
 	@Test
 	public void testCharset(){
 		String sql = "SELECT * FROM COM_SEED WHERE IDX=431";
-		List<MapWrapper> list = jdbcTemplate.getJdbcOperations().query(sql, new MapWrapperRowMapper());
+		List<Map<String,Object>> list = jdbcTemplate.getJdbcOperations().queryForList(sql);
 		
 		String val = null;
 		String literal = "맛이 좋아 소비자가 선호합니다.";
-		Map<String,Object> map = list.get(0).core;
+		Map<String,Object> map = list.get(0);
 		Object obj = null;
 		obj = map.get("ITEM_SPEC");
 		val = String.class.cast(obj);

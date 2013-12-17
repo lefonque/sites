@@ -20,6 +20,7 @@
   <!-- IMPORTANT : For Using System Properties -->
   <context:property-placeholder system-properties-mode="ENVIRONMENT" />
   
+  <!-- 실행시에 epis-ws-consumer.jar와 같이 위치해야 하며, epis-ws-consumer가 참조하는 프로퍼티를 바라본다. -->
   <util:properties id="jobProp"
     location="file:${consumer.root.dir}/properties/job.properties" />
   <util:properties id="agentProp"

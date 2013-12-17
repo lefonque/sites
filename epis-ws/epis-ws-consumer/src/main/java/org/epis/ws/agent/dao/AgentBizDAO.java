@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.epis.ws.common.entity.MapWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +31,6 @@ public class AgentBizDAO {
 	@Qualifier("dataSource")
 	public void setDataSource(DataSource dataSource){
 		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-	}
-	
-	/**
-	 * Main SQL을 실행할 때 사용되는 메서드
-	 * @param sql	Main SQL
-	 * @return
-	 */
-	public List<MapWrapper> selectListAsMap(String sql){
-//		List<Map<String,Object>> result = jdbcTemplate.getJdbcOperations().queryForList(sql);
-		List<MapWrapper> result
-			= jdbcTemplate.getJdbcOperations().query(sql, new MapWrapperRowMapper());
-		return result;
 	}
 	
 	public List<Map<String,Object>> selectList(String sql){

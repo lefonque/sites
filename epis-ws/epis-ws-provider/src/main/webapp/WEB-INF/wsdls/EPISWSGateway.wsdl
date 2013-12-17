@@ -218,7 +218,7 @@
   <wsdl:service name="EPISWSGateway">
     <wsdl:port name="EPISWSGatewayPort" binding="tns:EPISWSGatewaySoapBinding">
       <soap:address
-        location="http://localhost:8080/epis-ws/webservices/EPISWSGateway" />
+        location="http://market.okdab.com/epis-ws/webservices/EPISWSGateway" />
     </wsdl:port>
   </wsdl:service>
 
