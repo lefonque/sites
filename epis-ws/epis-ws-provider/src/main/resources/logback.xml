@@ -14,9 +14,9 @@
       <level>INFO</level>
     </filter>
     
-    <File>${consumer.root.dir}/logs/${job.id}/logFile.log</File>
+    <File>/home/webservice/logs/epis-ws-provider.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>${consumer.root.dir}/logs/${job.id}/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>/home/webservice/logs/epis-ws-provider.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy>
     
     <layout class="ch.qos.logback.classic.PatternLayout">
@@ -25,19 +25,18 @@
   </appender>
    
   <logger name="org.epis.ws.provider" level="INFO" additivity="false">
-    <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILE"/>
   </logger>
   <!-- 
   <logger name="org.springframework.jdbc" level="DEBUG" additivity="false">
     <appender-ref ref="STDOUT"/>
   </logger>
-   -->
+  
   <logger name="org.apache.cxf" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>
   </logger>
-  
+   -->
   <root level="WARN">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE"/>

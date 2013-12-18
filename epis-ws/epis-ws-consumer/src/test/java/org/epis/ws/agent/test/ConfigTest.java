@@ -63,7 +63,7 @@ public class ConfigTest {
 			EPISWSGateway gateway
 				= clientService.createClient(
 				svcNmString,portNmString,EPISWSGateway.class);
-			consumerService.executeBiz(gateway);
+//			consumerService.executeBiz(gateway);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -47,7 +47,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		logger.trace("Context Path : [{}]",request.getContextPath());
 		boolean result = true;
 		//예외처리
-		if(!StringUtils.endsWith(request.getRequestURI(), "/config/login")){
+		if(!StringUtils.contains(request.getRequestURI(), "/config/login")){
 			if(session.getAttribute("LOGIN")==null){
 				request.setAttribute("msg","Session Expired");
 				response.sendRedirect(request.getContextPath() + "/index.jsp");
