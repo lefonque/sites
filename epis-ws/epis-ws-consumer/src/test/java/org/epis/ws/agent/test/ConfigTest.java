@@ -2,11 +2,13 @@ package org.epis.ws.agent.test;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.epis.ws.agent.dao.AgentBizDAO;
 import org.epis.ws.agent.service.AgentBizService;
 import org.epis.ws.agent.service.EPISConsumerService;
 import org.epis.ws.agent.service.UnixScheduleRegister;
@@ -24,8 +26,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="classpath*:/META-INF/spring/*.xml")
 public class ConfigTest {
@@ -39,7 +39,10 @@ public class ConfigTest {
 	private UnixScheduleRegister unixSchedule;
 	
 	@Autowired
-	private AgentBizService bizDao;
+	private AgentBizService bizService;
+	
+	@Autowired
+	private AgentBizDAO bizDAO;
 	
 	@Autowired
 	private WebServiceClientService clientService;
@@ -54,7 +57,7 @@ public class ConfigTest {
 	@Autowired
 	private EPISConsumerService consumerService;
 	
-	@Test
+//	@Test
 	public void testExecute(){
 		
 		String svcNmString = "EPISWSGateway";
@@ -63,7 +66,7 @@ public class ConfigTest {
 			EPISWSGateway gateway
 				= clientService.createClient(
 				svcNmString,portNmString,EPISWSGateway.class);
-//			consumerService.executeBiz(gateway);
+			consumerService.executeBiz(gateway);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,15 +76,20 @@ public class ConfigTest {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testSelect(){
-		try {
-			String json = bizDao.executeMainSQLAsJSON();
-			logger.info("json : ({}bytes)[{}]",new Object[]{json.getBytes().length, json});
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			String json = bizService.executeMainSQLAsJSON();
+//			logger.info("json : ({}bytes)[{}]",new Object[]{json.getBytes().length, json});
+//		} catch (JsonProcessingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		String sql = "select * from ifs_if_mutong where rownum between 1 and 10";
+		List<Map<String, Object>> list = bizDAO.selectList(sql);
+		int count = bizService.executePostSQL(list, "Y");
+		
+		logger.info("COUNT : [{}]",count);
 	}
 	
 //	@Test

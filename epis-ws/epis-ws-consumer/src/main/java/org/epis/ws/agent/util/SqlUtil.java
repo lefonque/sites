@@ -27,18 +27,25 @@ public class SqlUtil {
 	 * <pre>
 	 * <p>select SQL을 paging 가능한 형태로 변환한다.</p>
 	 * 
-	 * 
+	 * 만일 [Job ID].batchSelectCount의 값이 세팅되어 있지 않을 경우,
+	 * 인자로 제공된 SQL을 가공없이 그대로 리턴한다. 
 	 * </pre>
 	 * @param sql
 	 * @return
 	 */
 	public String convertPagableSelectSQL(String sql){
-		
+		String batchLimitSize = jobProp.getProperty(jobId + PropertyEnum.JOB_SUFFIX_BATCH_SIZE.getKey());
 		StringBuilder builder = new StringBuilder();
-		builder.append("SELECT * FROM (SELECT ROWNUM rnum, temp.* FROM (")
-			.append(sql)
-			.append(") temp) WHERE rnum BETWEEN 1 AND ")
-			.append(jobProp.getProperty(jobId + PropertyEnum.JOB_SUFFIX_BATCH_SIZE.getKey()));
+		if(StringUtils.isEmpty(batchLimitSize)){
+			builder.append(sql);
+		}
+		else{
+			builder.append("SELECT * FROM (SELECT ROWNUM rnum, temp.* FROM (")
+				.append(sql)
+				.append(") temp) WHERE rnum BETWEEN 1 AND ")
+				.append(batchLimitSize);
+		}
+		
 		return builder.toString();
 	}
 	

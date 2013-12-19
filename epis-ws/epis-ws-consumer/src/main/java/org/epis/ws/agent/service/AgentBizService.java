@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.agent.dao.AgentBizDAO;
 import org.epis.ws.agent.util.SqlUtil;
@@ -107,7 +108,6 @@ public class AgentBizService {
 			batchArgs[loopIdx++] = new MapSqlParameterSource(wrapper);
 		}
 		
-		result = 0;
 		long startMillisec = System.currentTimeMillis(); 
 		int[] resultArray = null;
 		try {
@@ -118,7 +118,14 @@ public class AgentBizService {
 		}
 		long endMillisec = System.currentTimeMillis();
 		logger.debug("Elapsed Time : [{}]",(endMillisec-startMillisec)/1000);
-		result = resultArray.length;
+		
+		result = 0;
+		if(ArrayUtils.isNotEmpty(resultArray)) {
+			if( !((resultArray.length==1) && (resultArray[0] == 0)) ) {
+				result = resultArray.length;
+			}
+		}
+		
 		return result;
 	}
 	
