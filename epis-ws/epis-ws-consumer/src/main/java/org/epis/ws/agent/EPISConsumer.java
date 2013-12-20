@@ -89,7 +89,19 @@ public class EPISConsumer {
 		String svcNmString = "EPISWSGateway";
 		String portNmString = "EPISWSGatewayPort";
 		logger.info("===== Begin Job Execution =====");
+		
+		//locking을 하게 될 경우, 관리자가 locking 여부를 확인하는 절차가 필요함.
+		//관리자가 존재하지 않는 환경일 경우, 문제의 소지가 있어 comment out함.
+//		boolean isLocked = service.isLocked();
+//		if(isLocked){
+//			logger.warn("===== Job ID [{}] is Locked!!!!! ====="
+//					,System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey()));
+//			return;
+//		}
+		
 		try {
+//			service.locking();
+//			logger.info("===== Lock on =====");
 			EPISWSGateway gateway
 				= clientService.createClient(
 					svcNmString,portNmString,EPISWSGateway.class);
@@ -106,6 +118,9 @@ public class EPISConsumer {
 			logger.error("##### MalformedURLException Occurred on start() #####", e);
 		} catch (Exception e){
 			logger.error("##### Exception Occurred on start() #####", e);
+		} finally {
+//			service.unlocking();
+//			logger.info("===== Lock off =====");
 		}
 		logger.info("===== Finish Schedule Job =====");
 	}

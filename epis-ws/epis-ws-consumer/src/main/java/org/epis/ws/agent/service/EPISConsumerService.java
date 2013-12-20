@@ -1,9 +1,14 @@
 package org.epis.ws.agent.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -396,4 +401,43 @@ public class EPISConsumerService implements ApplicationContextAware {
 		logger.info("===== Configuration Synchronize END =====");
 	}
 */
+	
+	public boolean isLocked(){
+		File lockFile = getLockFile();
+		return (lockFile.exists() && lockFile.isFile());
+	}
+	
+
+	public void locking() throws IOException{
+		File lockFile = getLockFile();
+		Writer writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(lockFile));
+			IOUtils.write(new BigDecimal(System.nanoTime()).toString(), writer);
+			IOUtils.write(IOUtils.LINE_SEPARATOR, writer);
+			IOUtils.write(System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey()), writer);
+			writer.flush();
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
+	
+	public void unlocking() {
+		File lockFile = getLockFile();
+		if (lockFile.exists() && lockFile.isFile()) {
+			lockFile.delete();
+		}
+	}
+	
+	private File getLockFile(){
+		StringBuilder lockFilePath = new StringBuilder();
+		lockFilePath.append(System.getProperty(PropertyEnum.SYS_ROOT_DIR.getKey()))
+			.append(IOUtils.DIR_SEPARATOR)
+			.append(System.getProperty(PropertyEnum.SYS_JOB_NAME.getKey()))
+			.append(".lock");
+		
+		File file = new File(lockFilePath.toString());
+		return file;
+	}
+	
 }

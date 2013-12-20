@@ -49,7 +49,7 @@ WHERE (
 );
 select count(*) from IFS_IF_MUTONG where send_flag='N';
 delete from IFR_IF_MUTONG;
-select count(*) from IFR_IF_MUTONG2
+select count(*) from IFR_IF_MUTONG
 
 
 select SURVEY_DATE
