@@ -13,9 +13,9 @@
       <level>INFO</level>
     </filter>
     
-    <File>logs/logFile.log</File>
+    <File>${consumer.root.dir}/logs/logFile.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>logs/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>${consumer.root.dir}/logs/logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy>
     
     <layout class="ch.qos.logback.classic.PatternLayout">

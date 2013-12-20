@@ -99,7 +99,7 @@ public class EPISConsumer {
 			Object result = method.invoke(service, gateway);
 			String msg = "Successfully";
 			if(Boolean.class.cast(result)){
-				msg = " with Error";
+				msg = "with Error";
 			}
 			logger.info("===== Executed Schedule Job {} =====",msg);
 		} catch (MalformedURLException e) {

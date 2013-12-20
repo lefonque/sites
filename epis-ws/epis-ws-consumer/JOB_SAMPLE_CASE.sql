@@ -12,7 +12,12 @@ INSERT INTO IFR_IF_MUTONG (
 
 
 SELECT count(*) FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-1,'YYYYMMDD')
-SELECT * FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-1,'YYYYMMDD')
+
+
+SELECT SURVEY_DATE, STAN_CODE,          TRADE_UNIT, SPEC, GRADE, INTERVAL, SMALL,  LARGE,  AVERAGE, DUQTY,   WEIGHT,  SET_VALUE FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-1,'YYYYMMDD')
+minus
+select SURVEY_DATE, STAN_CODE,          TRADE_UNIT, SPEC, GRADE, INTERVAL, SMALL,  LARGE,  AVERAGE, DUQTY,   WEIGHT,  SET_VALUE from ifr_if_mgarak WHERE SURVEY_DATE >='20131219'
+
 --RESET JOB-1
 UPDATE ifs_if_mgarak SET SURVEY_DATE=TO_CHAR(SYSDATE-1,'YYYYMMDD');
 delete from IFR_IF_MGARAK;
@@ -44,7 +49,25 @@ WHERE (
 );
 select count(*) from IFS_IF_MUTONG where send_flag='N';
 delete from IFR_IF_MUTONG;
-select count(*) from IFR_IF_MUTONG;
+select count(*) from IFR_IF_MUTONG2
+
+
+select SURVEY_DATE
+	,ITEM_CODE
+	,KIND_CODE
+	,SURVEY_GRADE
+	,AREA_CODE
+	,MARKET_CODE
+	,SURVEY_TYPE from ifr_if_mutong2
+minus
+select SURVEY_DATE
+	,ITEM_CODE
+	,KIND_CODE
+	,SURVEY_GRADE
+	,AREA_CODE
+	,MARKET_CODE
+	,SURVEY_TYPE from ifs_if_mutong
+
 
 
 -- debug
@@ -69,11 +92,30 @@ WHERE (
 	from IFR_IF_MUTONG
 );
 UPDATE IFS_IF_MUTONG_TEMP SET SEND_FLAG='N' where send_flag='F';
-select count(*) from IFS_IF_MUTONG_TEMP where send_flag='Y';
+select count(*) from IFS_IF_MUTONG_TEMP where send_flag='N';
 delete from IFR_IF_MUTONG;
 
-select count(*) from IFR_IF_MUTONG
+select count(*) from IFR_IF_MUTONG2
 
+
+select count(*) from (
+select
+		SURVEY_DATE
+		,ITEM_CODE
+		,KIND_CODE
+		,SURVEY_GRADE
+		,AREA_CODE
+		,MARKET_CODE
+		,SURVEY_TYPE
+	from IFR_IF_MUTONG2
+	group by SURVEY_DATE
+		,ITEM_CODE
+		,KIND_CODE
+		,SURVEY_GRADE
+		,AREA_CODE
+		,MARKET_CODE
+		,SURVEY_TYPE
+)
 
 
 select * from IFS_IF_MUTONG_TEMP where KIND_CODE is null;

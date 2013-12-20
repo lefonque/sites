@@ -188,6 +188,7 @@ public class EPISConsumerService implements ApplicationContextAware {
 			String jsonData = agentService.convertListToJSON(dataList);
 			bizParam.setJsonData(jsonData);
 			
+			occurError = false;
 			//	Execute WebService
 			eflag = "F";
 			try {

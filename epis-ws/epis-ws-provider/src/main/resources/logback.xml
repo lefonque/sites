@@ -14,9 +14,9 @@
       <level>INFO</level>
     </filter>
     
-    <File>/home/webservice/logs/epis-ws-provider.log</File>
+    <File>${catalina.base}/logs/epis-ws-provider.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>/home/webservice/logs/epis-ws-provider.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>${catalina.base}/logs/epis-ws-provider.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy>
     
     <layout class="ch.qos.logback.classic.PatternLayout">

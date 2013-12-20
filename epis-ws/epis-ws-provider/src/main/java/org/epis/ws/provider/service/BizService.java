@@ -3,6 +3,7 @@ package org.epis.ws.provider.service;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.epis.ws.common.entity.BizVO;
 import org.epis.ws.manager.core.dao.ConfigurationDAO;
@@ -36,9 +37,12 @@ public class BizService {
 		if(StringUtils.isNotEmpty(bizVO.getJsonData())){
 			ObjectMapper mapper = new ObjectMapper();
 			list = mapper.readValue(bizVO.getJsonData(), new TypeReference<List<Map<String,Object>>>() {});
-			int[] resultCount = dao.insert(sql, list);
-			if(resultCount!=null){
-				result = resultCount.length;
+			if(CollectionUtils.isNotEmpty(list)){
+				logger.info("===== Received Record Count : [{}]",list.size());
+				int[] resultCount = dao.insert(sql, list);
+				if(resultCount!=null){
+					result = resultCount.length;
+				}
 			}
 		}
 		

@@ -1,6 +1,7 @@
 package org.epis.ws.agent.service;
 
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +118,7 @@ public class AgentBizService {
 			throw new RuntimeException(e);
 		}
 		long endMillisec = System.currentTimeMillis();
-		logger.debug("Elapsed Time : [{}]",(endMillisec-startMillisec)/1000);
+		logger.debug("Elapsed Time : [{}]ms",NumberFormat.getInstance().format(endMillisec-startMillisec));
 		
 		result = 0;
 		if(ArrayUtils.isNotEmpty(resultArray)) {

@@ -57,7 +57,7 @@ public class ConfigTest {
 	@Autowired
 	private EPISConsumerService consumerService;
 	
-//	@Test
+	@Test
 	public void testExecute(){
 		
 		String svcNmString = "EPISWSGateway";
@@ -76,7 +76,7 @@ public class ConfigTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSelect(){
 //		try {
 //			String json = bizService.executeMainSQLAsJSON();
