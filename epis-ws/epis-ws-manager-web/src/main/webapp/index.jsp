@@ -26,7 +26,7 @@ $(document).ready(function(){
 	
 	$('form.cmxform').css({'width':'310px'});
 	$('#dialogLogin').dialog({
-		height: 210
+		height: 204
 		,width: 350
 		,modal: true
 		,dialogClass: 'no-close'
@@ -60,6 +60,7 @@ $(document).ready(function(){
 	$('#dialogAlert').dialog('open');
 	</c:if>
 
+	$('.ui-dialog-buttonset').before('<div style="height:46px; line-height:46px;px;float:left;width:144px;font-family:\'돋움\'"><span>이용문의 : 정보기술팀</span><div>');
 });
 
 function handler_DialogLoginSubmit(event){
@@ -69,10 +70,10 @@ function handler_DialogLoginSubmit(event){
 	}
 }
 </script>
-<title>WebService Configuration</title>
+<title>EPIS 범용 정보연계 솔루션</title>
 </head>
 <body>
-<div id="dialogLogin" title="Login">
+<div id="dialogLogin" title="EPIS 범용 정보연계 솔루션">
 	<form id="formLogin" name="formLogin" method="post" class="cmxform">
 		<fieldset>
 			<p>
