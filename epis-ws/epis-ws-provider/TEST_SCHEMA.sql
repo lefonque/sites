@@ -49,9 +49,26 @@ CREATE TABLE COM_EPIS_EAI_LOG(
 	,create_date TIMESTAMP
 );
 
-create sequence seq_agent start with 1 increment by 1 maxvalue 100000000;
-create sequence seq_job start with 1 increment by 1 maxvalue 100000000;
-create sequence seq_log start with 1 increment by 1 maxvalue 100000000;
+create sequence seq_agent
+	MINVALUE 1
+	NOMAXVALUE
+	INCREMENT BY 1
+	NOCYCLE
+	NOORDER
+	CACHE 20;
+create sequence seq_job
+	MINVALUE 1
+	NOMAXVALUE
+	INCREMENT BY 1
+	NOCYCLE
+	NOORDER
+	CACHE 20;
+
+
+
+select SEQ_AGENT.NEXTVAL from dual
+select SEQ_JOB.NEXTVAL from dual
+select LAST_NUMBER from user_sequences where sequence_name = 'SEQ_JOB'
 
 
 

@@ -144,8 +144,11 @@ function handleOpen_DialogAgent(event, ui){
 	var applyType = $(this).find('input[name$="applyType"]').val();
 	if(applyType=="U"){
 		//$('#dialogAgentHead').text($('#orgCode option:selected').text());
-		$('#dialogAgentHead').text();
+		$('#dialogAgentHead').text($('#agentId').val() + " 수정입력");
 	}
+	
+	//SMS 사용여부에 따라 입력활성화 처리
+	$('#smsUseYn').trigger('change');
 }
 
 
@@ -399,6 +402,7 @@ function initGrid() {
 				handleRowSelect_GridAgent(null,status);
 			}
 		}
+		,loadError: handleLoadError_GridAgent
 		,gridComplete: handleComplete_GridAgent
 	});
 	jQuery("#gridAgent").jqGrid('navGrid', '#pagerAgentGrid', {
@@ -461,6 +465,7 @@ function initGrid() {
 			,repeatitems: false
 		}
 		,onSelectRow: handleRowSelect_GridAgentJob
+		,onSelectAll: handleAllSelect_GridAgentJob
 		,gridComplete: handleComplete_GridAgentJob
 	});
 	jQuery("#gridAgentJob").jqGrid('navGrid', '#pagerAgentJobGrid', 
@@ -560,6 +565,10 @@ function handleRowSelect_GridAgent(rowId,status){
 	
 }
 
+function handleLoadError_GridAgent(xhr,status,error){
+	alert(error);
+}
+
 /**
  * gridAgent가 표시가 완료되었을 때 처리되는 Callback Method
  */
@@ -579,21 +588,47 @@ function handleComplete_GridAgent(){
 
 
 function handleRowSelect_GridAgentJob(rowId,status){
-	//체킹해제시에만 체킹된 row 존재여부 확인
-	if(!status){
-		var rowIdArray = $('#gridAgentJob').jqGrid('getGridParam','selarrrow');
-		if(rowIdArray!=null && rowIdArray.length > 0){
-			rowId = rowIdArray[rowIdArray.length-1];
-		}
-		else{
-			rowId = null;
+	var inactivateModifyButton = true;
+	
+	//체킹된 row 존재여부 확인
+	var rowIdArray = $('#gridAgentJob').jqGrid('getGridParam','selarrrow');
+	if(rowIdArray!=null && rowIdArray.length > 0){
+		rowId = rowIdArray[rowIdArray.length-1];
+		if(rowIdArray.length==1){
+			//하나만 선택되었을 때만 수정버튼 활성화
+			inactivateModifyButton = false;
 		}
 	}
-	var inactivateButton = true;
+	else{
+		rowId = null;
+	}
+	var inactivateRemoveButton = true;
 	if(rowId!=null){
-		inactivateButton = false;
+		inactivateRemoveButton = false;
 	}
-	$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",inactivateButton);
+	//$('#btnModifyAgentJob, #btnRemoveAgentJob').button("option","disabled",inactivateButton);
+	
+	$('#btnRemoveAgentJob').button("option","disabled",inactivateRemoveButton);
+	$('#btnModifyAgentJob').button("option","disabled",inactivateModifyButton);
+}
+
+function handleAllSelect_GridAgentJob(rowIdArray,status){
+	var firstRowId = null;
+	var inactivateModifyButton = true;
+	//체킹시에만 체킹된 row 존재여부 확인
+	if(rowIdArray!=null && rowIdArray.length > 0){
+		firstRowId = rowIdArray[rowIdArray.length-1];
+		if(rowIdArray.length==1){
+			//하나만 선택되었을 때만 수정버튼 활성화
+			inactivateModifyButton = false;
+		}
+	}
+	var inactivateRemoveButton = true;
+	if(status && (firstRowId!=null)){
+		inactivateRemoveButton = false;
+	}
+	$('#btnRemoveAgentJob').button("option","disabled",inactivateRemoveButton);
+	$('#btnModifyAgentJob').button("option","disabled",inactivateModifyButton);
 }
 
 /**
@@ -800,9 +835,9 @@ function handleSelectChange_JdbcDriver(event){
 		<h1>Agent 설정</h1>
 		<table id="gridAgent"></table>
 		<div id="pagerAgentGrid"></div>
-		<button id="btnAddAgent">Add</button>
-		<button id="btnModifyAgent">Modify</button>
-		<button id="btnRemoveAgent">Remove</button>
+		<button id="btnAddAgent">추가</button>
+		<button id="btnModifyAgent">수정</button>
+		<button id="btnRemoveAgent">삭제</button>
 	</div>
 	
 	<!-- ======================================================================================== -->
@@ -812,9 +847,9 @@ function handleSelectChange_JdbcDriver(event){
 		<h1>작업 설정</h1>
 		<table id="gridAgentJob"></table>
 		<div id="pagerAgentJobGrid"></div>
-		<button id="btnAddAgentJob">Add</button>
-		<button id="btnModifyAgentJob">Modify</button>
-		<button id="btnRemoveAgentJob">Remove</button>
+		<button id="btnAddAgentJob">추가</button>
+		<button id="btnModifyAgentJob">수정</button>
+		<button id="btnRemoveAgentJob">삭제</button>
 	</div>
 	
 	<!-- ======================================================================================== -->
