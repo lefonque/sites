@@ -133,7 +133,7 @@ function handleAfterInsertRow_GridLog(rowid, rdata){
 	}
 }
 </script>
-<title>Configuration List</title>
+<title>EPIS 범용 정보연계 솔루션 : Log 조회</title>
 </head>
 <body>
 	<ul id="menu">

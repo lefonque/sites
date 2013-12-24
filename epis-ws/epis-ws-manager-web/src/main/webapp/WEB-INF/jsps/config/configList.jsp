@@ -781,7 +781,7 @@ function handleSelectChange_JdbcDriver(event){
 }
 
 </script>
-<title>Configuration List</title>
+<title>EPIS 범용 정보연계 솔루션 : Agent 설정</title>
 </head>
 <body>
 	<!-- ======================================================================================== -->
