@@ -71,7 +71,7 @@ public class EPISConcreteWSGateway implements EPISWSGateway {
 			}
 			resultFlag = "S";
 		} catch(Exception e) {
-			logger.error("##### JSON String : [{}] #####",bizParam.getJsonData());
+			//logger.error("##### JSON String : [{}] #####",bizParam.getJsonData());
 			logger.error("##### Exception Occurred on Executing processPrimitiveData(BizVO) #####",e);
 			
 			AgentVO agentInfo = configService.getAgentInfo(agentId);

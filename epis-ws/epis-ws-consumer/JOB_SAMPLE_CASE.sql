@@ -11,7 +11,6 @@ INSERT INTO IFR_IF_MUTONG (
 )
 
 
-SELECT count(*) FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-3,'YYYYMMDD') --3934
 
 
 SELECT SURVEY_DATE, STAN_CODE, TRADE_UNIT, SPEC, GRADE, INTERVAL, SMALL,  LARGE,  AVERAGE, DUQTY,   WEIGHT,  SET_VALUE FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-1,'YYYYMMDD')
@@ -22,7 +21,9 @@ select SURVEY_DATE, STAN_CODE, TRADE_UNIT, SPEC, GRADE, INTERVAL, SMALL,  LARGE,
 UPDATE ifs_if_mgarak SET SURVEY_DATE=TO_CHAR(SYSDATE-1,'YYYYMMDD');
 delete from IFR_IF_MGARAK;
 
+SELECT count(*) FROM ifs_if_mgarak WHERE SURVEY_DATE >=TO_CHAR(SYSDATE-8,'YYYYMMDD') --3934
 select count(*) from IFR_IF_MGARAK;
+select survey_date,count(*) from ifs_if_mgarak group by survey_date;
 
 
 
@@ -47,10 +48,16 @@ WHERE (
 		,SURVEY_TYPE
 	from IFR_IF_MUTONG
 );
-select * from IFS_IF_MUTONG where send_flag='N'; --9593
-select s
+select count(*) from IFS_IF_MUTONG where send_flag='N'; --9593
+select count(*) from IFR_IF_MUTONG;
 delete from IFR_IF_MUTONG;
 select count(*) from IFR_IF_MUTONG
+
+
+select count(*) from ifs_if_mutong where send_flag='F'
+
+select survey_date, count(*) from ifs_if_mutong group by survey_date;
+update ifs_if_mutong set send_flag='N' WHERE survey_date >= '20131202';
 
 
 select SURVEY_DATE
