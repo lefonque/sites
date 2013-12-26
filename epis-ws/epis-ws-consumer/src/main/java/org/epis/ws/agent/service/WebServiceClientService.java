@@ -88,6 +88,8 @@ public class WebServiceClientService {
 		reqCtx.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
 		reqCtx.put(SecurityConstants.USERNAME,
 				agentProp.getProperty("consumer.websvcUser"));
+		
+//		reqCtx.put(Message.MTOM_ENABLED,Boolean.TRUE);
 	}
 
 	/**
@@ -126,6 +128,7 @@ public class WebServiceClientService {
 			fault.setFaultString(e.getMessage());
 			fault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE,
 					"CLIENT"));
+//			fault.setFaultCode(new QName(Soap11.SOAP_NAMESPACE,	"CLIENT"));
 			throw new SOAPFaultException(fault);
 		} catch (SOAPException e1) {
 			throw new RuntimeException(String.format(message, e.toString()));
