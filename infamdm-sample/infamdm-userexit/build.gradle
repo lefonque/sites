@@ -1,0 +1,7 @@
+
+dependencies {
+    provided files('../libs/siperian-bdd.jar','../libs/siperian-api.jar','../libs/siperian-common.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+jar.archiveName = "UserExitsImplementation.jar"

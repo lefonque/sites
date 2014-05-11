@@ -1,0 +1,32 @@
+apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+
+springVersion = '3.2.8.RELEASE'
+
+configurations {
+	all*.exclude group: 'log4j', module: 'log4j'
+}
+	
+dependencies {
+	providedCompile "javax.servlet:javax.servlet-api:3.0.1"
+	providedCompile "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
+	providedCompile "org.picketbox:jboss-security-spi:4.0.20.Final"
+	providedCompile files('../libs/jboss-client.jar')
+	
+	compile files('../libs/siperian-api.jar','../libs/siperian-common.jar')
+	
+	compile 'org.slf4j:jcl-over-slf4j:1.7.7'
+	compile 'org.slf4j:log4j-over-slf4j:1.7.7'
+	compile 'ch.qos.logback:logback-classic:1.1.2'
+	
+    compile "org.springframework:spring-webmvc:${springVersion}"
+    compile "org.springframework:spring-tx:${springVersion}"
+    compile "commons-fileupload:commons-fileupload:1.3.1"
+    
+    compile "org.apache.commons:commons-lang3:3.3.2"
+    
+    testCompile "org.springframework:spring-test:${springVersion}"
+}
+
+test.enabled=false
+testClasses.enabled=false
