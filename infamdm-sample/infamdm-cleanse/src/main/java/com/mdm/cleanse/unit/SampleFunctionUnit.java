@@ -60,7 +60,7 @@ public class SampleFunctionUnit implements FunctionUnit {
 	}
 
 	@Override
-	public void cleanse(Map<String, String> input, Map<String, String> output) {
+	public void cleanse(Map<String, Object> input, Map<String, Object> output) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(input.get(getInputNames()[0])).append(input.get(getInputNames()[1]));
 		output.put(getOutputNames()[0], builder.toString());

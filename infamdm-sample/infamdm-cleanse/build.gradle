@@ -2,3 +2,9 @@
 dependencies {
 	provided files( '../libs/siperian-cleanse.jar', '../libs/siperian-common.jar')
 }
+
+test.enabled=false
+testClasses.enabled=false
+
+jar.archiveName = "infamdm-cleanse.jar"
+

@@ -1,13 +1,15 @@
 package com.mdm.cleanse.test;
 
-import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
+import com.mdm.cleanse.base.FunctionUnit;
 import com.mdm.cleanse.base.SMCCleanseLibrary;
+import com.mdm.cleanse.base.UnifiedCleanseFunction;
 import com.siperian.mrm.cleanse.api.CleanseException;
 
 
@@ -24,17 +26,21 @@ public class CleanseLibraryTest {
 		}
 	}
 	
+	@Test
 	public void test() throws CleanseException{
 		
-		SMCCleanseLibrary library = new SMCCleanseLibrary();;
+		SMCCleanseLibrary library = new SMCCleanseLibrary();
 		library.initialize(new Properties());
-		Map context = new HashMap();
-		Map input = new HashMap();
-		Map output = new HashMap();
+		Map<String,Object> context = new HashMap<String,Object>();
+		Map<String,Object> input = new HashMap<String,Object>();
+		Map<String,Object> output = new HashMap<String,Object>();
 		
-		input.put("inString1", "123");
-		input.put("inString2", "asd");
-		library.getCleanseFunction("Concatenate Function").cleanse(context, input, output);
-		logger.debug("result : " + output.get("outString1"));
+		UnifiedCleanseFunction func = (UnifiedCleanseFunction)library.getCleanseFunction("QSA_CN_SSNCHK");
+		FunctionUnit unit = func.getFunctionUnit();
+		input.put(unit.getInputNames()[0], "750406");
+		input.put(unit.getInputNames()[1], "2178423");
+		
+		func.cleanse(context, input, output);
+		logger.debug("result : " + output.get(unit.getOutputNames()[3]));
 	}
 }

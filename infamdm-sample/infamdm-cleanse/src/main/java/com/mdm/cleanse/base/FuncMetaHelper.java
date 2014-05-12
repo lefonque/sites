@@ -5,10 +5,8 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Enumeration;
@@ -18,8 +16,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
-
-import sun.net.www.protocol.file.FileURLConnection;
 
 import com.siperian.mrm.cleanse.api.CleanseFunctionDescriptor;
 import com.siperian.mrm.cleanse.api.Parameter;
@@ -60,25 +56,27 @@ public class FuncMetaHelper {
 		final String packagePath = packageName.replace('.', '/');
 		
 		URL url = null;
-		URLConnection connection = null;
+		URI uri = null;
+		String scheme = null;
 		for(final Enumeration<URL> resources = getClass().getClassLoader().getResources(packagePath);
 				resources.hasMoreElements(); ){
 			url = resources.nextElement();
 			if(url==null){
 				continue;
 			}
-			connection = url.openConnection();
-			if(JarURLConnection.class.isInstance(connection)){
+			
+			uri = url.toURI();
+			scheme = uri.getScheme();
+			if("jar".equalsIgnoreCase(scheme)){
 				result.addAll(getFuncUnitClassesInJar(
-						JarURLConnection.class.cast(connection).getJarFile(), packagePath));
+						JarURLConnection.class.cast(url.openConnection()).getJarFile(), packagePath));
 			}
-			else if(FileURLConnection.class.isInstance(connection)){
+			else if("file".equalsIgnoreCase(scheme)){
 				
 				//앙되요
 //				Path dirPath = Paths.get(URLDecoder.decode(url.getPath(), "UTF-8"));
 //				Path dirPath = FileSystems.getDefault().getPath(url.getFile());
 				
-				final URI uri = url.toURI();
 				Path dirPath = null;
 				for(FileSystemProvider provider : FileSystemProvider.installedProviders()){
 					if(provider.getScheme().equals(uri.getScheme())){
@@ -125,19 +123,22 @@ public class FuncMetaHelper {
 	private Set<Class<? extends FunctionUnit>> getFuncUnitClassesInDir(DirectoryStream<Path> dir, final String packageName) throws IOException, ClassNotFoundException{
 		final Set<Class<? extends FunctionUnit>> result = new HashSet<Class<? extends FunctionUnit>>();
 		
-		final StringBuilder builder = new StringBuilder(packageName).append(".");
-		final int initLength = packageName.length();
+		final StringBuilder builder = new StringBuilder(packageName).append('.');
+		final int initLength = builder.length();
 		final String suffix = ".class";
 		final ClassLoader classLoader = getClass().getClassLoader();
 		for(Path path : dir){
-			if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
-				result.addAll(getFuncUnitClassesInDir(Files.newDirectoryStream(path), packageName));
+			if(Files.isDirectory(path)){
+				builder.append(path.getFileName().toString());
+				result.addAll(getFuncUnitClassesInDir(Files.newDirectoryStream(path), builder.toString()));
 			}
-			if(logger.isDebugEnabled()){
-				logger.debug("Path's FileName : " + path.getFileName());
+			else{
+				if(logger.isDebugEnabled()){
+					logger.debug("Path's FileName : " + path.getFileName());
+				}
+				builder.append(path.getFileName().toString()).delete(builder.lastIndexOf(suffix), builder.length());
+				result.add((Class<? extends FunctionUnit>)classLoader.loadClass(builder.toString()));
 			}
-			builder.append(path.getFileName()).delete(builder.lastIndexOf(suffix), builder.length());
-			result.add((Class<? extends FunctionUnit>)classLoader.loadClass(builder.toString()));
 			builder.setLength(initLength);
 		}
 		

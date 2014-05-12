@@ -15,5 +15,5 @@ public interface FunctionUnit {
 	public String getFuncName();
 	public String getFuncDesc();
 	
-	public void cleanse(Map<String,String> input, Map<String,String> output);
+	public void cleanse(Map<String,Object> input, Map<String,Object> output);
 }
