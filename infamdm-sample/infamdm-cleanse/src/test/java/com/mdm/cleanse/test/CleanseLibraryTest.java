@@ -37,8 +37,8 @@ public class CleanseLibraryTest {
 		
 		UnifiedCleanseFunction func = (UnifiedCleanseFunction)library.getCleanseFunction("QSA_CN_SSNCHK");
 		FunctionUnit unit = func.getFunctionUnit();
-		input.put(unit.getInputNames()[0], "750406");
-		input.put(unit.getInputNames()[1], "2178423");
+		input.put(unit.getInputNames()[0], "751232");
+		input.put(unit.getInputNames()[1], "1120612");
 		
 		func.cleanse(context, input, output);
 		logger.debug("result : " + output.get(unit.getOutputNames()[3]));

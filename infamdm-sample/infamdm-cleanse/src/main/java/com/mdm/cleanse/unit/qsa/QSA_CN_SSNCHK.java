@@ -147,8 +147,12 @@ public class QSA_CN_SSNCHK implements FunctionUnit {
 		boolean result = false;
 		
 		//1. regular expression 체크
-		final String ssnRegex = "^\\d{6}[1-4]\\d{6}$";
+//		final String ssnRegex = "^\\d{6}[1-4]\\d{6}$";
+		final String ssnRegex = "^\\d{2}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])[1-4]\\d{6}$";
 		result = Pattern.matches(ssnRegex, ssnNumber);
+		LoggerHelper.debugLog(logger
+				,"=== [{}] Check with Regular Expression : [{}] ==="
+				,ssnNumber, result);
 		if(result){
 			int idx = 0;
 			
