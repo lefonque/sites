@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import javax.transaction.UserTransaction;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.ejb.client.EJBClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ public class SifDAOImpl implements SifDAO{
 		logger.debug("===> jboss.node.name : {}",sifClient.getConfig().getProperty("jboss.node.name"));
 		
 		final Record record = new Record();
-		record.setSiperianObjectUid("C_ATTACHMENTS");
+		record.setSiperianObjectUid("C_ATTACHMENT");
 		
 		com.siperian.sif.message.Field column = null;
 		for(Field field : attachment.getClass().getDeclaredFields()) {

@@ -10,14 +10,20 @@ configurations {
 dependencies {
 	providedCompile "javax.servlet:javax.servlet-api:3.0.1"
 	providedCompile "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
+	providedCompile "javax.servlet:jstl:1.2"
+	providedCompile "taglibs:standard:1.1.2"
 	providedCompile "org.picketbox:jboss-security-spi:4.0.20.Final"
 	providedCompile files('../libs/jboss-client.jar')
 	
+	
+	compile "com.fasterxml.jackson.core:jackson-databind:2.3.3"
 	compile files('../libs/siperian-api.jar','../libs/siperian-common.jar')
 	
 	compile 'org.slf4j:jcl-over-slf4j:1.7.7'
 	compile 'org.slf4j:log4j-over-slf4j:1.7.7'
-	compile 'ch.qos.logback:logback-classic:1.1.2'
+	compile('ch.qos.logback:logback-classic:1.1.2') {
+		exclude group: 'org.slf4j', module:'slf4j-api'
+	}
 	
     compile "org.springframework:spring-webmvc:${springVersion}"
     compile "org.springframework:spring-tx:${springVersion}"
